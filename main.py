@@ -12,6 +12,16 @@ class TradeType(Enum):
     SHORT = 2
 
 
+class OpenTradeTime(Enum):
+    OPEN = 1
+    CLOSE = 2
+
+
+class CloseTradeTime(Enum):
+    OPEN = 1
+    CLOSE = 2
+
+
 class Trade:
     def __init__(self, trade_type: TradeType, size: int, entry_price: float):
         self.trade_type = trade_type
@@ -30,10 +40,17 @@ class Trade:
 
 
 class Backtest:
-    def __init__(self, data: np.ndarray[Any, np.dtype[Any]]):
+    def __init__(
+        self,
+        data: np.ndarray[Any, np.dtype[Any]],
+        open_trade_time: OpenTradeTime,
+        close_trade_time: CloseTradeTime,
+    ):
         self.data = data
-        self.current_index = 0
+        self.open_trade_time = open_trade_time
+        self.close_trade_time = close_trade_time
 
+        self.current_index = 0
         self.money = 1000
         self.trades: List[Trade] = []
 
@@ -42,34 +59,57 @@ class Backtest:
         print(f"Data: {self.data}")
         print(f"Initial money: {self.money}")
 
-        for i, row in enumerate(self.data):
+        for i in range(len(self.data)):
             self.current_index = i
 
-            for trade in self.trades:
-                if not trade.active:
-                    continue
+            if self.close_trade_time == CloseTradeTime.OPEN:
+                self.perform_close_trades()
 
-                # For now, we can sell at least on next day
-                if self.close_signal(trade):
-                    trade.active = False
-                    trade.exit_price = row["close"]
-                    self.money += row["close"] * trade.size
-                    print(
-                        f"Close signal at index {i}: {row['close']}, profit: {trade.calc_profit()}"
-                    )
+            if self.open_trade_time == OpenTradeTime.OPEN:
+                self.perform_open_trades()
 
-            if self.buy_signal():
-                if self.money < row["open"]:
-                    print("Not enough money to buy")
-                    continue
+            # Middle of the day
 
-                trade = Trade(TradeType.LONG, 1, row["open"])
-                self.trades.append(trade)
-                self.money -= row["open"]
-                print(f"Buy signal at index {i}: {row["open"]}")
+            if self.close_trade_time == CloseTradeTime.CLOSE:
+                self.perform_close_trades()
+
+            if self.open_trade_time == OpenTradeTime.CLOSE:
+                self.perform_open_trades()
 
         print("Backtest finished.")
         print(f"Final money: {self.money}")
+
+    def perform_open_trades(self):
+        if self.buy_signal():
+            price_time = (
+                "open" if self.open_trade_time == OpenTradeTime.OPEN else "close"
+            )
+            price = self.data[self.current_index][price_time]
+
+            if self.money < price:
+                print("Not enough money to buy")
+                return
+
+            trade = Trade(TradeType.LONG, 1, price)
+            self.trades.append(trade)
+            self.money -= price
+            print(f"Buy signal at index {self.current_index}: {price}")
+
+    def perform_close_trades(self):
+        price_time = "open" if self.close_trade_time == CloseTradeTime.OPEN else "close"
+        price = self.data[self.current_index][price_time]
+        for trade in self.trades:
+            if not trade.active:
+                continue
+
+            # For now, we can sell at least on next day
+            if self.close_signal(trade):
+                trade.active = False
+                trade.exit_price = price
+                self.money += price * trade.size
+                print(
+                    f"Close signal at index {self.current_index}: {price}, profit: {trade.calc_profit()}"
+                )
 
     def get_current_open(self) -> float:
         return self.data[self.current_index]["open"]
@@ -119,5 +159,9 @@ if __name__ == "__main__":
         ],
         dtype=BacktestingDataType,
     )
-    x = Backtest(np.array(temporary_data, dtype=BacktestingDataType))
+    x = Backtest(
+        np.array(temporary_data, dtype=BacktestingDataType),
+        open_trade_time=OpenTradeTime.OPEN,
+        close_trade_time=CloseTradeTime.CLOSE,
+    )
     x.run()
