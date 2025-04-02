@@ -30,9 +30,9 @@ class Trade:
         self.exit_price: Optional[float] = None
         self.active = True
 
-    def calc_profit(self) -> Optional[float]:
-        if self.exit_price is None:
-            return None
+    def calc_profit(self) -> float:
+        assert self.exit_price
+
         if self.trade_type == TradeType.LONG:
             return (self.exit_price - self.entry_price) * self.size
         else:
@@ -51,7 +51,7 @@ class Backtest:
         self.close_trade_time = close_trade_time
 
         self.current_index = 0
-        self.money = 1000
+        self.money: float = 1000.0
         self.trades: List[Trade] = []
 
     def run(self):
@@ -80,12 +80,10 @@ class Backtest:
         print(f"Final money: {self.money}")
 
     def perform_open_trades(self):
-        if self.buy_signal():
-            price_time = (
-                "open" if self.open_trade_time == OpenTradeTime.OPEN else "close"
-            )
-            price = self.data[self.current_index][price_time]
+        price_time = "open" if self.open_trade_time == OpenTradeTime.OPEN else "close"
+        price = self.data[self.current_index][price_time]
 
+        if self.buy_signal():
             if self.money < price:
                 print("Not enough money to buy")
                 return
@@ -94,6 +92,17 @@ class Backtest:
             self.trades.append(trade)
             self.money -= price
             print(f"Buy signal at index {self.current_index}: {price}")
+            return
+
+        if self.sell_signal():
+            if self.money < price:
+                print("Not enough money to sell")
+                return
+
+            trade = Trade(TradeType.SHORT, 1, price)
+            self.trades.append(trade)
+            self.money -= price
+            print(f"Sell signal at index {self.current_index}: {price}")
 
     def perform_close_trades(self):
         price_time = "open" if self.close_trade_time == CloseTradeTime.OPEN else "close"
@@ -102,14 +111,21 @@ class Backtest:
             if not trade.active:
                 continue
 
-            # For now, we can sell at least on next day
             if self.close_signal(trade):
-                trade.active = False
-                trade.exit_price = price
-                self.money += price * trade.size
-                print(
-                    f"Close signal at index {self.current_index}: {price}, profit: {trade.calc_profit()}"
-                )
+                if trade.trade_type == TradeType.LONG:
+                    trade.active = False
+                    trade.exit_price = price
+                    self.money += price * trade.size
+                    print(
+                        f"Close long signal at index {self.current_index}: {price}, profit: {trade.calc_profit()}"
+                    )
+                elif trade.trade_type == TradeType.SHORT:
+                    trade.active = False
+                    trade.exit_price = price
+                    self.money += trade.entry_price + trade.calc_profit()
+                    print(
+                        f"Close short signal at index {self.current_index}: {price}, profit: {trade.calc_profit()}"
+                    )
 
     def get_current_open(self) -> float:
         return self.data[self.current_index]["open"]
@@ -133,6 +149,13 @@ class Backtest:
             return False
 
         return self.get_current_open() > previous_close
+
+    def sell_signal(self) -> bool:
+        previous_close = self.get_previous_close()
+        if previous_close is None:
+            return False
+
+        return self.get_current_open() < previous_close
 
     def close_signal(self, trade: Trade) -> bool:
         return True
