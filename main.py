@@ -38,11 +38,57 @@ class Trade:
         else:
             return (self.entry_price - self.exit_price) * self.size
 
+    def calc_current_value(self, current_price: float) -> float:
+        if not self.active:
+            return 0.0
+
+        return current_price * self.size
+
+
+class Account:
+
+    def __init__(self, data_size: int, initial_money: float):
+        self.__current_money = initial_money
+        # assets and equity are calculated at the end of the day
+        self.__assets_value = np.zeros(data_size, dtype=float)
+        self.__equity = np.zeros(data_size, dtype=float)
+
+    def get_current_money(self) -> float:
+        return self.__current_money
+
+    def get_final_assets_value(self) -> float:
+        return self.__assets_value[-1]
+
+    def get_assets_value(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__assets_value
+
+    def get_final_equity(self) -> float:
+        return self.__equity[-1]
+
+    def get_equity(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__equity
+
+    def update_money(self, amount: float):
+        self.__current_money += amount
+
+    def update_assets_value(self, index: int, value: float):
+        self.__assets_value[index] = value
+
+    def calculate_equity(self, index: int):
+        self.__equity[index] = self.__current_money + self.__assets_value[index]
+
+    def has_enough_money(self, amount: float) -> bool:
+        return self.__current_money >= amount
+
+    def is_bankrupt(self) -> bool:
+        return self.__current_money <= 0
+
 
 class Statistics:
 
-    def __init__(self, trades: List[Trade]):
+    def __init__(self, trades: List[Trade], account: Account):
         self.__trades = trades
+        self.__account = account
 
     def __str__(self):
         return "\n".join(
@@ -51,6 +97,9 @@ class Statistics:
                 f"Total trades: {len(self.__trades)}",
                 f"Total long trades: {len([t for t in self.__trades if t.trade_type == TradeType.LONG])}",
                 f"Total short trades: {len([t for t in self.__trades if t.trade_type == TradeType.SHORT])}",
+                f"Final money: {self.__account.get_current_money()}",
+                f"Final assets value: {self.__account.get_final_assets_value()}",
+                f"Final total equity: {self.__account.get_final_equity()}",
             ]
         )
 
@@ -67,15 +116,15 @@ class Backtest:
         self.close_trade_time = close_trade_time
 
         self.current_index = 0
-        self.money: float = 1000.0
         self.trades: List[Trade] = []
 
-        self.__statistics = Statistics(self.trades)
+        self.__account = Account(data_size=len(data), initial_money=1000.0)
+        self.__statistics = Statistics(self.trades, self.__account)
 
     def run(self):
         print("Starting backtest...")
         print(f"Data: {self.data}")
-        print(f"Initial money: {self.money}")
+        print(f"Initial money: {self.__account.get_current_money()}")
 
         for i in range(len(self.data)):
             self.current_index = i
@@ -94,6 +143,16 @@ class Backtest:
             if self.open_trade_time == OpenTradeTime.CLOSE:
                 self.perform_open_trades()
 
+            assets_value = 0.0
+            for trade in self.trades:
+                if trade.active:
+                    assets_value += trade.calc_current_value(
+                        self.data[self.current_index]["close"]
+                    )
+
+            self.__account.update_assets_value(self.current_index, assets_value)
+            self.__account.calculate_equity(self.current_index)
+
         print("Backtest finished.")
 
         print(self.__statistics)
@@ -103,24 +162,24 @@ class Backtest:
         price = self.data[self.current_index][price_time]
 
         if self.buy_signal():
-            if self.money < price:
+            if not self.__account.has_enough_money(price):
                 print("Not enough money to buy")
                 return
 
             trade = Trade(TradeType.LONG, 1, price)
             self.trades.append(trade)
-            self.money -= price
+            self.__account.update_money(-price)
             print(f"Buy signal at index {self.current_index}: {price}")
             return
 
         if self.sell_signal():
-            if self.money < price:
+            if not self.__account.has_enough_money(price):
                 print("Not enough money to sell")
                 return
 
             trade = Trade(TradeType.SHORT, 1, price)
             self.trades.append(trade)
-            self.money -= price
+            self.__account.update_money(-price)
             print(f"Sell signal at index {self.current_index}: {price}")
 
     def perform_close_trades(self):
@@ -134,14 +193,14 @@ class Backtest:
                 if trade.trade_type == TradeType.LONG:
                     trade.active = False
                     trade.exit_price = price
-                    self.money += price * trade.size
+                    self.__account.update_money(trade.calc_current_value(price))
                     print(
                         f"Close long signal at index {self.current_index}: {price}, profit: {trade.calc_profit()}"
                     )
                 elif trade.trade_type == TradeType.SHORT:
                     trade.active = False
                     trade.exit_price = price
-                    self.money += trade.entry_price + trade.calc_profit()
+                    self.__account.update_money(trade.entry_price + trade.calc_profit())
                     print(
                         f"Close short signal at index {self.current_index}: {price}, profit: {trade.calc_profit()}"
                     )
