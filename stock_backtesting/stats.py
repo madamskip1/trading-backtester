@@ -21,6 +21,7 @@ class Statistics:
                 f"Final money: {self.__account.get_current_money()}",
                 f"Final assets value: {self.__account.get_final_assets_value()}",
                 f"Final total equity: {self.__account.get_final_equity()}",
+                f"Return: {self.__account.calc_return_value()} ({(self.__account.calc_return_value() / self.__account.get_initial_money() * 100):.2f}%)",
                 f"Max drawdown: {max_drowdown} ({max_drawdown_percentage:.2f}%)",
             ]
         )
