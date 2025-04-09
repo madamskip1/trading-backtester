@@ -39,6 +39,22 @@ class Trade:
             return (self.entry_price - self.exit_price) * self.size
 
 
+class Statistics:
+
+    def __init__(self, trades: List[Trade]):
+        self.__trades = trades
+
+    def __str__(self):
+        return "\n".join(
+            [
+                "=== Statistics ===",
+                f"Total trades: {len(self.__trades)}",
+                f"Total long trades: {len([t for t in self.__trades if t.trade_type == TradeType.LONG])}",
+                f"Total short trades: {len([t for t in self.__trades if t.trade_type == TradeType.SHORT])}",
+            ]
+        )
+
+
 class Backtest:
     def __init__(
         self,
@@ -53,6 +69,8 @@ class Backtest:
         self.current_index = 0
         self.money: float = 1000.0
         self.trades: List[Trade] = []
+
+        self.__statistics = Statistics(self.trades)
 
     def run(self):
         print("Starting backtest...")
@@ -77,7 +95,8 @@ class Backtest:
                 self.perform_open_trades()
 
         print("Backtest finished.")
-        print(f"Final money: {self.money}")
+
+        print(self.__statistics)
 
     def perform_open_trades(self):
         price_time = "open" if self.open_trade_time == OpenTradeTime.OPEN else "close"
