@@ -1,11 +1,12 @@
-from typing import Any, List
+from typing import Any, List, Type
 
 import numpy as np
 
 from .account import Account
 from .market import Market, MarketTime
 from .stats import Statistics
-from .trade import CloseTradeTime, OpenTradeTime, Trade, TradeType
+from .strategy import Strategy
+from .trade import Trade, TradeType
 
 BacktestingDataType = np.dtype(
     [("min", "f8"), ("max", "f8"), ("open", "f8"), ("close", "f8")]
@@ -16,13 +17,11 @@ class Backtest:
     def __init__(
         self,
         data: np.ndarray[Any, np.dtype[Any]],
-        open_trade_time: OpenTradeTime,
-        close_trade_time: CloseTradeTime,
+        strategy: Type[Strategy],
     ):
         self.__market = Market(data)
+        self.__strategy = strategy(self.__market)
         self.__data_len = len(data)
-        self.open_trade_time = open_trade_time
-        self.close_trade_time = close_trade_time
 
         self.trades: List[Trade] = []
 
@@ -37,20 +36,13 @@ class Backtest:
             self.__market.increment_day()
             self.__market.set_current_time(MarketTime.OPEN)
 
-            if self.close_trade_time == CloseTradeTime.OPEN:
-                self.perform_close_trades()
-
-            if self.open_trade_time == OpenTradeTime.OPEN:
-                self.perform_open_trades()
-
-            # Middle of the day
+            self.perform_close_trades()
+            self.perform_open_trades()
 
             self.__market.set_current_time(MarketTime.CLOSE)
-            if self.close_trade_time == CloseTradeTime.CLOSE:
-                self.perform_close_trades()
 
-            if self.open_trade_time == OpenTradeTime.CLOSE:
-                self.perform_open_trades()
+            self.perform_close_trades()
+            self.perform_open_trades()
 
             assets_value = 0.0
             for trade in self.trades:
@@ -69,13 +61,9 @@ class Backtest:
         print(self.__statistics)
 
     def perform_open_trades(self):
-        price = (
-            self.__market.get_today_open_price()
-            if self.open_trade_time == OpenTradeTime.OPEN
-            else self.__market.get_today_close_price()
-        )
+        price = self.__market.get_current_price()
 
-        if self.buy_signal():
+        if self.__strategy.check_buy_signal(price, self.__market.get_current_time()):
             if not self.__account.has_enough_money(price):
                 print("Not enough money to buy")
                 return
@@ -86,7 +74,7 @@ class Backtest:
             print(f"Buy signal at index {self.__market.get_current_day()}: {price}")
             return
 
-        if self.sell_signal():
+        if self.__strategy.check_sell_signal(price, self.__market.get_current_time()):
             if not self.__account.has_enough_money(price):
                 print("Not enough money to sell")
                 return
@@ -97,45 +85,26 @@ class Backtest:
             print(f"Sell signal at index {self.__market.get_current_day()}: {price}")
 
     def perform_close_trades(self):
-        price = (
-            self.__market.get_today_close_price()
-            if self.close_trade_time == CloseTradeTime.CLOSE
-            else self.__market.get_today_open_price()
-        )
+        price = self.__market.get_current_price()
 
         for trade in self.trades:
             if not trade.active:
                 continue
 
-            if self.close_signal(trade):
+            if self.__strategy.check_close_signal(
+                trade, price, self.__market.get_current_time()
+            ):
                 if trade.trade_type == TradeType.LONG:
                     trade.active = False
                     trade.exit_price = price
                     self.__account.update_money(trade.calc_current_value(price))
                     print(
-                        f"Close long signal at index {self.__market.get_current_day()}: {price}, profit: {trade.calc_profit()}"
+                        f"Close long position at index {self.__market.get_current_day()}: {price}, profit: {trade.calc_profit()}"
                     )
                 elif trade.trade_type == TradeType.SHORT:
                     trade.active = False
                     trade.exit_price = price
                     self.__account.update_money(trade.entry_price + trade.calc_profit())
                     print(
-                        f"Close short signal at index {self.__market.get_current_day()}: {price}, profit: {trade.calc_profit()}"
+                        f"Close short position at index {self.__market.get_current_day()}: {price}, profit: {trade.calc_profit()}"
                     )
-
-    def buy_signal(self) -> bool:
-        previous_close = self.__market.get_close_price_on_nth_day_ago(1)
-        if previous_close is None:
-            return False
-
-        return self.__market.get_today_open_price() > previous_close
-
-    def sell_signal(self) -> bool:
-        previous_close = self.__market.get_close_price_on_nth_day_ago(1)
-        if previous_close is None:
-            return False
-
-        return self.__market.get_today_open_price() < previous_close
-
-    def close_signal(self, trade: Trade) -> bool:
-        return True

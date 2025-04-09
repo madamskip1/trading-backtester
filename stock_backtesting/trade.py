@@ -7,15 +7,6 @@ class TradeType(Enum):
     SHORT = 2
 
 
-class OpenTradeTime(Enum):
-    OPEN = 1
-    CLOSE = 2
-
-
-class CloseTradeTime(Enum):
-    OPEN = 1
-    CLOSE = 2
-
 class Trade:
     def __init__(self, trade_type: TradeType, size: int, entry_price: float):
         self.trade_type = trade_type

@@ -26,6 +26,9 @@ class Market:
     def set_current_time(self, time: MarketTime):
         self.__current_time = time
 
+    def get_current_time(self) -> MarketTime:
+        return self.__current_time
+
     def get_current_price(self) -> float:
         if self.__current_time == MarketTime.OPEN:
             return self.__data[self.__current_day]["open"]
