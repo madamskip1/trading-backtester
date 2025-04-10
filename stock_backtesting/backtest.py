@@ -1,4 +1,4 @@
-from typing import Any, List, Type
+from typing import Any, Dict, List, Type
 
 import numpy as np
 
@@ -18,6 +18,7 @@ class Backtest:
         self,
         data: np.ndarray[Any, np.dtype[Any]],
         strategy: Type[Strategy],
+        money: float = 1000.0,
     ):
         self.__market = Market(data)
         self.__strategy = strategy(self.__market)
@@ -25,10 +26,10 @@ class Backtest:
 
         self.trades: List[Trade] = []
 
-        self.__account = Account(data_size=len(data), initial_money=1000.0)
+        self.__account = Account(data_size=len(data), initial_money=money)
         self.__statistics = Statistics(self.trades, self.__account)
 
-    def run(self):
+    def run(self) -> Dict[str, Any]:
         print("Starting backtest...")
         print(f"Initial money: {self.__account.get_current_money()}")
 
@@ -57,8 +58,9 @@ class Backtest:
             self.__account.calculate_equity(self.__market.get_current_day())
 
         print("Backtest finished.")
-
         print(self.__statistics)
+
+        return self.__statistics.get_stats()
 
     def perform_open_trades(self):
         price = self.__market.get_current_price()
