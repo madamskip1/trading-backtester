@@ -29,7 +29,7 @@ class Statistics:
     def __calc_max_drown(self) -> Tuple[float, float]:
         max_drawdown = 0.0
         max_drawdown_percentage = 0.0
-        peak = self.__account.get_equity()[0]
+        peak = self.__account.get_initial_money()
 
         for equity in self.__account.get_equity():
             if equity > peak:

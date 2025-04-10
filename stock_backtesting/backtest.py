@@ -95,16 +95,16 @@ class Backtest:
                 trade, price, self.__market.get_current_time()
             ):
                 if trade.trade_type == TradeType.LONG:
-                    trade.active = False
                     trade.exit_price = price
                     self.__account.update_money(trade.calc_current_value(price))
                     print(
                         f"Close long position at index {self.__market.get_current_day()}: {price}, profit: {trade.calc_profit()}"
                     )
-                elif trade.trade_type == TradeType.SHORT:
                     trade.active = False
+                elif trade.trade_type == TradeType.SHORT:
                     trade.exit_price = price
                     self.__account.update_money(trade.entry_price + trade.calc_profit())
                     print(
                         f"Close short position at index {self.__market.get_current_day()}: {price}, profit: {trade.calc_profit()}"
                     )
+                    trade.active = False
