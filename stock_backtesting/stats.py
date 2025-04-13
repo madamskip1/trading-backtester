@@ -1,7 +1,10 @@
 from typing import Any, Dict, List, Tuple
 
+from stock_backtesting.order import OrderAction
+
 from .account import Account
-from .trade import Trade, TradeType
+from .position import PositionType
+from .trade import Trade
 
 
 class Statistics:
@@ -14,11 +17,43 @@ class Statistics:
         max_drowdown, max_drawdown_percentage = self.__calc_max_drown()
         return {
             "total_trades": len(self.__trades),
-            "total_long_trades": len(
-                [t for t in self.__trades if t.trade_type == TradeType.LONG]
+            "total_open_trades": len(
+                [t for t in self.__trades if t.order.action == OrderAction.OPEN]
             ),
-            "total_short_trades": len(
-                [t for t in self.__trades if t.trade_type == TradeType.SHORT]
+            "total_close_trades": len(
+                [t for t in self.__trades if t.order.action == OrderAction.CLOSE]
+            ),
+            "total_open_long_trades": len(
+                [
+                    t
+                    for t in self.__trades
+                    if t.order.position_type == PositionType.LONG
+                    and t.order.action == OrderAction.OPEN
+                ]
+            ),
+            "total_close_long_trades": len(
+                [
+                    t
+                    for t in self.__trades
+                    if t.order.position_type == PositionType.LONG
+                    and t.order.action == OrderAction.CLOSE
+                ]
+            ),
+            "total_open_short_trades": len(
+                [
+                    t
+                    for t in self.__trades
+                    if t.order.position_type == PositionType.SHORT
+                    and t.order.action == OrderAction.OPEN
+                ]
+            ),
+            "total_close_short_trades": len(
+                [
+                    t
+                    for t in self.__trades
+                    if t.order.position_type == PositionType.SHORT
+                    and t.order.action == OrderAction.CLOSE
+                ]
             ),
             "final_money": self.__account.get_current_money(),
             "final_assets_value": self.__account.get_final_assets_value(),
@@ -34,8 +69,12 @@ class Statistics:
             [
                 "=== Statistics ===",
                 f"Total trades: {stats['total_trades']}",
-                f"Total long trades: {stats['total_long_trades']}",
-                f"Total short trades: {stats['total_short_trades']}",
+                f"Total open trades: {stats['total_open_trades']}",
+                f"Total close trades: {stats['total_close_trades']}",
+                f"Total open long trades: {stats['total_open_long_trades']}",
+                f"Total close long trades: {stats['total_close_long_trades']}",
+                f"Total open short trades: {stats['total_open_short_trades']}",
+                f"Total close short trades: {stats['total_close_short_trades']}",
                 f"Final money: {stats['final_money']}",
                 f"Final assets value: {stats['final_assets_value']}",
                 f"Final total equity: {stats['final_total_equity']}",

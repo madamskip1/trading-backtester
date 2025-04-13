@@ -1,0 +1,32 @@
+from enum import Enum
+
+from .position import PositionType
+
+
+class OrderType(Enum):
+    MARKET_ORDER = 1
+    LIMIT_ORDER = 2
+
+
+class OrderAction(Enum):
+    OPEN = 1
+    CLOSE = 2
+
+
+class Order:
+    def __init__(
+        self,
+        order_type: OrderType,
+        price: float,
+        size: int,
+        position_type: PositionType,
+        action: OrderAction,
+    ):
+        if order_type == OrderType.LIMIT_ORDER:
+            raise NotImplementedError("Limit orders are not implemented yet.")
+
+        self.price = price
+        self.size = size
+        self.order_type = order_type
+        self.position_type = position_type
+        self.action = action
