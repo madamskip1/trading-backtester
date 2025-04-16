@@ -40,10 +40,11 @@ class Backtest:
             self.__market.increment_day()
             self.__market.set_current_time(MarketTime.OPEN)
 
+            self.__broker.process_stop_losses()
+
             orders = self.__strategy.collect_orders(
                 self.__market.get_current_time(), self.__market.get_today_open_price()
             )
-
             self.__broker.process_close_orders(orders)
             self.__broker.process_open_orders(orders)
 
@@ -51,10 +52,11 @@ class Backtest:
 
             self.__market.set_current_time(MarketTime.CLOSE)
 
+            self.__broker.process_stop_losses()
+
             orders = self.__strategy.collect_orders(
                 self.__market.get_current_time(), self.__market.get_today_close_price()
             )
-
             self.__broker.process_close_orders(orders)
             self.__broker.process_open_orders(orders)
 

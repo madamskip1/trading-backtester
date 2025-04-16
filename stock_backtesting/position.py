@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 
 class PositionType(Enum):
@@ -12,7 +13,14 @@ class PositionMode(Enum):
 
 
 class Position:
-    def __init__(self, position_type: PositionType, price: float = 0, size: int = 0):
+    def __init__(
+        self,
+        position_type: PositionType,
+        price: float = 0,
+        size: int = 0,
+        stop_loss: Optional[float] = None,
+    ):
         self.position_type = position_type
         self.avg_bought_price = price
         self.size = size
+        self.stop_loss = stop_loss

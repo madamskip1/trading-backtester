@@ -23,6 +23,7 @@ class Order:
         action: OrderAction,
         position_type: Optional[PositionType] = None,  # only for open in distinct mode
         position_to_close: Optional[Position] = None,  # only for close in distinct mode
+        stop_loss: Optional[float] = None,
     ):
         if order_type == OrderType.LIMIT_ORDER:
             raise NotImplementedError("Limit orders are not implemented yet.")
@@ -33,3 +34,4 @@ class Order:
         self.position_type = position_type
         self.action = action
         self.position_to_close = position_to_close
+        self.stop_loss = stop_loss
