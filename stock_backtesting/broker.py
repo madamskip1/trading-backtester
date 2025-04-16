@@ -24,6 +24,9 @@ class Broker:
     def get_trades(self) -> List[Trade]:
         return self.__trades
 
+    def get_positions(self) -> List[Position]:
+        return self.__positions
+
     def get_assets_value(self) -> float:
         assets_value = 0.0
         for position in self.__positions:

@@ -2,9 +2,8 @@ from typing import Any, Dict, Type
 
 import numpy as np
 
-from stock_backtesting.broker import Broker
-
 from .account import Account
+from .broker import Broker
 from .market import Market, MarketTime
 from .position import PositionMode
 from .stats import Statistics
@@ -26,11 +25,11 @@ class Backtest:
     ):
         self.__data_len = len(data)
         self.__market = Market(data)
-        self.__strategy = strategy(self.__market)
         self.__account = Account(data_size=len(data), initial_money=money)
         self.__broker = Broker(position_mode, self.__market, self.__account)
-
         self.__statistics = Statistics(self.__broker.get_trades(), self.__account)
+
+        self.__strategy = strategy(self.__market, self.__broker.get_positions())
 
     def run(self) -> Dict[str, Any]:
         print("Starting backtest...")
