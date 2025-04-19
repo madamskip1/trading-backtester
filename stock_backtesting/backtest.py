@@ -40,6 +40,7 @@ class Backtest:
             self.__market.set_current_time(MarketTime.OPEN)
 
             self.__broker.process_stop_losses()
+            self.__broker.process_take_profits()
 
             orders = self.__strategy.collect_orders(
                 self.__market.get_current_time(), self.__market.get_today_open_price()
@@ -52,6 +53,7 @@ class Backtest:
             self.__market.set_current_time(MarketTime.CLOSE)
 
             self.__broker.process_stop_losses()
+            self.__broker.process_take_profits()
 
             orders = self.__strategy.collect_orders(
                 self.__market.get_current_time(), self.__market.get_today_close_price()

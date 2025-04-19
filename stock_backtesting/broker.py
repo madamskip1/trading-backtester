@@ -65,6 +65,35 @@ class Broker:
                     )
                     self.__process_close_order(order)
 
+    def process_take_profits(self) -> None:
+        for position in self.__positions:
+            if position.take_profit is None:
+                print("Y")
+                continue
+            if position.position_type == PositionType.LONG:
+                if position.take_profit <= self.__market.get_current_price():
+                    order = Order(
+                        order_type=OrderType.MARKET_ORDER,
+                        price=self.__market.get_current_price(),
+                        size=position.size,
+                        action=OrderAction.CLOSE,
+                        position_to_close=position,
+                    )
+                    self.__process_close_order(order)
+
+            elif position.position_type == PositionType.SHORT:
+                print("X")
+                print(position.take_profit)
+                if position.take_profit >= self.__market.get_current_price():
+                    order = Order(
+                        order_type=OrderType.MARKET_ORDER,
+                        price=self.__market.get_current_price(),
+                        size=position.size,
+                        action=OrderAction.CLOSE,
+                        position_to_close=position,
+                    )
+                    self.__process_close_order(order)
+
     def process_open_orders(self, orders: List[Order]) -> None:
         for order in orders:
             if order.action != OrderAction.OPEN:
@@ -82,6 +111,7 @@ class Broker:
                     self.__positions.append(Position(PositionType.LONG))
                 self.__accumulate(self.__positions[0], order.price, order.size)
                 self.__positions[0].stop_loss = order.stop_loss
+                self.__positions[0].take_profit = order.take_profit
                 self.__account.update_money(-money)
                 order.position_type = PositionType.LONG
             elif self.__position_mode == PositionMode.DISTINCT:
@@ -90,7 +120,11 @@ class Broker:
 
                 self.__positions.append(
                     Position(
-                        order.position_type, order.price, order.size, order.stop_loss
+                        order.position_type,
+                        order.price,
+                        order.size,
+                        order.stop_loss,
+                        order.take_profit,
                     )
                 )
                 self.__account.update_money(-money)
