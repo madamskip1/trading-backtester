@@ -26,7 +26,7 @@ class BuyOnOpenCloseOnCloseAccumulateStrategy(Strategy):
             ]
 
         elif market_time == MarketTime.CLOSE:
-            # Sell on close
+            # Close on close
             return [
                 Order(
                     OrderType.MARKET_ORDER,
@@ -80,7 +80,7 @@ class BuyOnOpenCloseOnCloseDistinctStrategy(Strategy):
             ]
 
         elif market_time == MarketTime.CLOSE:
-            # Sell on close
+            # Close on close
             return [
                 Order(
                     OrderType.MARKET_ORDER,
@@ -123,3 +123,104 @@ def test_single_day_profit_long_distinct():
     assert stats["return"] == pytest.approx(-94.33, abs=0.01)
     assert stats["max_drawdown"] == pytest.approx(152.44, abs=0.01)
     assert stats["max_drawdown_percentage"] == pytest.approx(0.30, abs=0.01)
+
+
+class SellOnOpenCloseOnCloseAccumulateStrategy(Strategy):
+
+    def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
+        if market_time == MarketTime.OPEN:
+            # Sell on open
+            return [
+                Order(
+                    OrderType.MARKET_ORDER,
+                    price,
+                    1,
+                    OrderAction.OPEN,
+                    position_type=PositionType.SHORT,
+                )
+            ]
+
+        elif market_time == MarketTime.CLOSE:
+            # Close on close
+            return [
+                Order(
+                    OrderType.MARKET_ORDER,
+                    price,
+                    1,
+                    OrderAction.CLOSE,
+                )
+            ]
+
+        return []
+
+
+def test_single_day_profit_short_accumulate():
+    data = load_csv(
+        os.path.join(
+            os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
+        )
+    )
+
+    backtest = Backtest(data, SellOnOpenCloseOnCloseAccumulateStrategy, money=50000)
+    with pytest.raises(ValueError):
+        backtest.run()
+
+
+class SellOnOpenCloseOnCloseDistinctStrategy(Strategy):
+    def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
+        if market_time == MarketTime.OPEN:
+            # Sell on open
+            return [
+                Order(
+                    OrderType.MARKET_ORDER,
+                    price,
+                    1,
+                    OrderAction.OPEN,
+                    PositionType.SHORT,
+                )
+            ]
+
+        elif market_time == MarketTime.CLOSE:
+            # Close on close
+            return [
+                Order(
+                    OrderType.MARKET_ORDER,
+                    price,
+                    1,
+                    OrderAction.CLOSE,
+                    PositionType.SHORT,
+                    position_to_close=self._positions[0],
+                )
+            ]
+
+        return []
+
+
+def test_single_day_profit_short_distinct():
+    data = load_csv(
+        os.path.join(
+            os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
+        )
+    )
+
+    backtest = Backtest(
+        data,
+        SellOnOpenCloseOnCloseDistinctStrategy,
+        money=50000,
+        position_mode=PositionMode.DISTINCT,
+    )
+    stats = backtest.run()
+
+    assert stats["total_trades"] == 10
+    assert stats["total_open_trades"] == 5
+    assert stats["total_close_trades"] == 5
+    assert stats["total_open_long_trades"] == 0
+    assert stats["total_close_long_trades"] == 0
+    assert stats["total_open_short_trades"] == 5
+    assert stats["total_close_short_trades"] == 5
+    assert stats["final_money"] == pytest.approx(50094.33, abs=0.01)
+    assert stats["final_assets_value"] == 0
+    assert stats["final_total_equity"] == pytest.approx(50094.33, abs=0.01)
+    assert stats["return"] == pytest.approx(94.33, abs=0.01)
+    assert stats["max_drawdown"] == pytest.approx(61.27, abs=0.01)
+    assert stats["max_drawdown_percentage"] == pytest.approx(0.12, abs=0.01)
