@@ -47,7 +47,6 @@ class Broker:
                 if position.stop_loss >= self.__market.get_current_price():
                     order = Order(
                         order_type=OrderType.MARKET_ORDER,
-                        price=self.__market.get_current_price(),
                         size=position.size,
                         action=OrderAction.CLOSE,
                         position_to_close=position,
@@ -58,7 +57,6 @@ class Broker:
                 if position.stop_loss <= self.__market.get_current_price():
                     order = Order(
                         order_type=OrderType.MARKET_ORDER,
-                        price=self.__market.get_current_price(),
                         size=position.size,
                         action=OrderAction.CLOSE,
                         position_to_close=position,
@@ -73,7 +71,6 @@ class Broker:
                 if position.take_profit <= self.__market.get_current_price():
                     order = Order(
                         order_type=OrderType.MARKET_ORDER,
-                        price=self.__market.get_current_price(),
                         size=position.size,
                         action=OrderAction.CLOSE,
                         position_to_close=position,
@@ -84,7 +81,6 @@ class Broker:
                 if position.take_profit >= self.__market.get_current_price():
                     order = Order(
                         order_type=OrderType.MARKET_ORDER,
-                        price=self.__market.get_current_price(),
                         size=position.size,
                         action=OrderAction.CLOSE,
                         position_to_close=position,
@@ -106,7 +102,9 @@ class Broker:
 
                 if len(self.__positions) == 0:
                     self.__positions.append(Position(PositionType.LONG))
-                self.__accumulate(self.__positions[0], order.price, order.size)
+                self.__accumulate(
+                    self.__positions[0], self.__market.get_current_price(), order.size
+                )
                 self.__positions[0].stop_loss = order.stop_loss
                 self.__positions[0].take_profit = order.take_profit
                 self.__account.update_money(-money)
@@ -118,7 +116,7 @@ class Broker:
                 self.__positions.append(
                     Position(
                         order.position_type,
-                        order.price,
+                        self.__market.get_current_price(),
                         order.size,
                         order.stop_loss,
                         order.take_profit,
@@ -126,7 +124,13 @@ class Broker:
                 )
                 self.__account.update_money(-money)
 
-            self.__trades.append(Trade(order, self.__market.get_current_day()))
+            self.__trades.append(
+                Trade(
+                    order,
+                    self.__market.get_current_price(),
+                    self.__market.get_current_day(),
+                )
+            )
 
     def process_close_orders(self, orders: List[Order]) -> None:
         for order in orders:
@@ -159,7 +163,13 @@ class Broker:
 
             order.position_type = order.position_to_close.position_type
 
-        self.__trades.append(Trade(order, self.__market.get_current_day()))
+        self.__trades.append(
+            Trade(
+                order,
+                self.__market.get_current_price(),
+                self.__market.get_current_day(),
+            )
+        )
 
     def __accumulate(self, position: Position, price: float, size: int) -> None:
         position.avg_bought_price = (

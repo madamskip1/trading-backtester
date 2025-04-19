@@ -20,7 +20,6 @@ class BuyOnOpenCloseOnCloseAccumulateStrategy(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                 )
@@ -31,7 +30,6 @@ class BuyOnOpenCloseOnCloseAccumulateStrategy(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.CLOSE,
                 )
@@ -73,7 +71,6 @@ class BuyOnOpenCloseOnCloseDistinctStrategy(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     PositionType.LONG,
@@ -85,7 +82,6 @@ class BuyOnOpenCloseOnCloseDistinctStrategy(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.CLOSE,
                     PositionType.LONG,
@@ -134,7 +130,6 @@ class SellOnOpenCloseOnCloseAccumulateStrategy(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     position_type=PositionType.SHORT,
@@ -146,7 +141,6 @@ class SellOnOpenCloseOnCloseAccumulateStrategy(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.CLOSE,
                 )
@@ -174,7 +168,6 @@ class SellOnOpenCloseOnCloseDistinctStrategy(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     PositionType.SHORT,
@@ -186,7 +179,6 @@ class SellOnOpenCloseOnCloseDistinctStrategy(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.CLOSE,
                     PositionType.SHORT,

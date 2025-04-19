@@ -18,7 +18,6 @@ class BuyOnOpenFirstDayStrategyStopLoss(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     stop_loss=price - 1.0,
@@ -142,7 +141,6 @@ class SellOnOpenFirstDayStrategyStopLoss(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     position_type=PositionType.SHORT,
@@ -287,7 +285,6 @@ class BuyOnOpenStrategyStopLoss(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     position_type=PositionType.LONG,
@@ -365,7 +362,6 @@ class SellOnOpenStrategyStopLoss(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     position_type=PositionType.SHORT,

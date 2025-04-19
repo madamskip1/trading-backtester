@@ -18,18 +18,17 @@ class Order:
     def __init__(
         self,
         order_type: OrderType,
-        price: float,
         size: int,
         action: OrderAction,
         position_type: Optional[PositionType] = None,  # only for open in distinct mode
         position_to_close: Optional[Position] = None,  # only for close in distinct mode
         stop_loss: Optional[float] = None,
         take_profit: Optional[float] = None,
+        # limit_price: Optional[float] = None,  # only for limit orders TODO
     ):
         if order_type == OrderType.LIMIT_ORDER:
             raise NotImplementedError("Limit orders are not implemented yet.")
 
-        self.price = price
         self.size = size
         self.order_type = order_type
         self.position_type = position_type
@@ -37,3 +36,4 @@ class Order:
         self.position_to_close = position_to_close
         self.stop_loss = stop_loss
         self.take_profit = take_profit
+        # self.limit_price = limit_price

@@ -16,12 +16,12 @@ def test_open_long_position(account_mock: AccountMock):
         Trade(
             order=Order(
                 order_type=OrderType.MARKET_ORDER,
-                price=100.0,
                 size=1,
                 action=OrderAction.OPEN,
                 position_type=PositionType.LONG,
             ),
             date_index=0,
+            price=100,
         )
     )
 
@@ -46,12 +46,12 @@ def test_open_short_position(account_mock: AccountMock):
         Trade(
             order=Order(
                 order_type=OrderType.MARKET_ORDER,
-                price=100.0,
                 size=1,
                 action=OrderAction.OPEN,
                 position_type=PositionType.SHORT,
             ),
             date_index=0,
+            price=100,
         )
     )
 
@@ -74,12 +74,12 @@ def test_close_long_position(account_mock: AccountMock):
         Trade(
             order=Order(
                 order_type=OrderType.MARKET_ORDER,
-                price=99.0,
                 size=1,
                 action=OrderAction.CLOSE,
                 position_type=PositionType.LONG,
             ),
             date_index=0,
+            price=100,
         )
     )
 
@@ -102,12 +102,12 @@ def test_close_short_position(account_mock: AccountMock):
         Trade(
             order=Order(
                 order_type=OrderType.MARKET_ORDER,
-                price=101.0,
                 size=1,
                 action=OrderAction.CLOSE,
                 position_type=PositionType.SHORT,
             ),
             date_index=0,
+            price=100,
         )
     )
 
@@ -130,12 +130,12 @@ def test_open_and_close_long_position(account_mock: AccountMock):
         Trade(
             order=Order(
                 order_type=OrderType.MARKET_ORDER,
-                price=100.0,
                 size=1,
                 action=OrderAction.OPEN,
                 position_type=PositionType.LONG,
             ),
             date_index=0,
+            price=100,
         )
     )
 
@@ -143,12 +143,12 @@ def test_open_and_close_long_position(account_mock: AccountMock):
         Trade(
             order=Order(
                 order_type=OrderType.MARKET_ORDER,
-                price=99.0,
                 size=1,
                 action=OrderAction.CLOSE,
                 position_type=PositionType.LONG,
             ),
             date_index=1,
+            price=100,
         )
     )
 
@@ -171,12 +171,12 @@ def test_open_and_close_short_position(account_mock: AccountMock):
         Trade(
             order=Order(
                 order_type=OrderType.MARKET_ORDER,
-                price=100.0,
                 size=1,
                 action=OrderAction.OPEN,
                 position_type=PositionType.SHORT,
             ),
             date_index=0,
+            price=100,
         )
     )
 
@@ -184,12 +184,12 @@ def test_open_and_close_short_position(account_mock: AccountMock):
         Trade(
             order=Order(
                 order_type=OrderType.MARKET_ORDER,
-                price=101.0,
                 size=1,
                 action=OrderAction.CLOSE,
                 position_type=PositionType.SHORT,
             ),
             date_index=1,
+            price=100,
         )
     )
 

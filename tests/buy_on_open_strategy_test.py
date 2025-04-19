@@ -19,7 +19,6 @@ class BuyOnOpenStrategy(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                 )

@@ -18,7 +18,6 @@ class BuyOnOpenFirstDayStrategyTakeProfit(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     take_profit=price + 1.0,
@@ -142,7 +141,6 @@ class SellOnOpenFirstDayStrategyTakeProfit(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     position_type=PositionType.SHORT,
@@ -287,7 +285,6 @@ class BuyOnOpenStrategyTakeProfit(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     position_type=PositionType.LONG,
@@ -365,7 +362,6 @@ class SellOnOpenStrategyTakeProfit(Strategy):
             return [
                 Order(
                     OrderType.MARKET_ORDER,
-                    price,
                     1,
                     OrderAction.OPEN,
                     position_type=PositionType.SHORT,
