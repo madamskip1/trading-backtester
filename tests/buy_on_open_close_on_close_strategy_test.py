@@ -2,13 +2,14 @@ import os
 from typing import List
 
 import pytest
-from utils.load_csv import load_csv
 
 from stock_backtesting.backtest import Backtest
 from stock_backtesting.market import MarketTime
 from stock_backtesting.order import Order, OrderAction, OrderType
 from stock_backtesting.position import PositionMode, PositionType
 from stock_backtesting.strategy import Strategy
+
+from .utils.load_csv import load_csv
 
 
 class BuyOnOpenCloseOnCloseAccumulateStrategy(Strategy):
