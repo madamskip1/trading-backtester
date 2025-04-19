@@ -4,10 +4,10 @@ from stock_backtesting.broker import Broker
 from stock_backtesting.order import Order, OrderAction, OrderType
 from stock_backtesting.position import PositionType
 
-from ..conftest import MockMarket
+from ..conftest import MarketMock
 
 
-def test_long_equal(mock_market: MockMarket, test_broker_accumulate: Broker):
+def test_long_equal(market_mock: MarketMock, test_broker_accumulate: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         price=100,
@@ -16,11 +16,11 @@ def test_long_equal(mock_market: MockMarket, test_broker_accumulate: Broker):
         position_type=PositionType.LONG,
         take_profit=101,
     )
-    mock_market.price = 100
+    market_mock.price = 100
     test_broker_accumulate.process_open_orders([open_order])
     opened_position = test_broker_accumulate.get_positions()[0]
 
-    mock_market.price = 101
+    market_mock.price = 101
     test_broker_accumulate.process_take_profits()
 
     assert len(test_broker_accumulate.get_positions()) == 0
@@ -43,7 +43,7 @@ def test_long_equal(mock_market: MockMarket, test_broker_accumulate: Broker):
     assert test_broker_accumulate.get_assets_value() == 0
 
 
-def test_long_greater(mock_market: MockMarket, test_broker_accumulate: Broker):
+def test_long_greater(market_mock: MarketMock, test_broker_accumulate: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         price=100,
@@ -53,11 +53,11 @@ def test_long_greater(mock_market: MockMarket, test_broker_accumulate: Broker):
         take_profit=101,
     )
 
-    mock_market.price = 100
+    market_mock.price = 100
     test_broker_accumulate.process_open_orders([open_order])
     opened_position = test_broker_accumulate.get_positions()[0]
 
-    mock_market.price = 102
+    market_mock.price = 102
     test_broker_accumulate.process_take_profits()
 
     assert len(test_broker_accumulate.get_positions()) == 0
@@ -79,7 +79,7 @@ def test_long_greater(mock_market: MockMarket, test_broker_accumulate: Broker):
     )
 
 
-def test_long_less(mock_market: MockMarket, test_broker_accumulate: Broker):
+def test_long_less(market_mock: MarketMock, test_broker_accumulate: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         price=100,
@@ -88,10 +88,10 @@ def test_long_less(mock_market: MockMarket, test_broker_accumulate: Broker):
         position_type=PositionType.LONG,
         take_profit=101,
     )
-    mock_market.price = 100
+    market_mock.price = 100
     test_broker_accumulate.process_open_orders([open_order])
 
-    mock_market.price = 100.5
+    market_mock.price = 100.5
     test_broker_accumulate.process_take_profits()
 
     assert len(test_broker_accumulate.get_positions()) == 1
@@ -100,7 +100,7 @@ def test_long_less(mock_market: MockMarket, test_broker_accumulate: Broker):
     assert test_broker_accumulate.get_trades()[0].order == open_order
 
 
-def test_short_equal(mock_market: MockMarket, test_broker_distinct: Broker):
+def test_short_equal(market_mock: MarketMock, test_broker_distinct: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         price=100,
@@ -109,11 +109,11 @@ def test_short_equal(mock_market: MockMarket, test_broker_distinct: Broker):
         position_type=PositionType.SHORT,
         take_profit=99,
     )
-    mock_market.price = 100
+    market_mock.price = 100
     test_broker_distinct.process_open_orders([open_order])
     opened_position = test_broker_distinct.get_positions()[0]
 
-    mock_market.price = 99
+    market_mock.price = 99
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 0
@@ -134,7 +134,7 @@ def test_short_equal(mock_market: MockMarket, test_broker_distinct: Broker):
     assert test_broker_distinct.get_assets_value() == 0
 
 
-def test_short_less(mock_market: MockMarket, test_broker_distinct: Broker):
+def test_short_less(market_mock: MarketMock, test_broker_distinct: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         price=100,
@@ -143,11 +143,11 @@ def test_short_less(mock_market: MockMarket, test_broker_distinct: Broker):
         position_type=PositionType.SHORT,
         take_profit=99,
     )
-    mock_market.price = 100
+    market_mock.price = 100
     test_broker_distinct.process_open_orders([open_order])
     opened_position = test_broker_distinct.get_positions()[0]
 
-    mock_market.price = 98
+    market_mock.price = 98
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 0
@@ -167,7 +167,7 @@ def test_short_less(mock_market: MockMarket, test_broker_distinct: Broker):
     )
 
 
-def test_short_greater(mock_market: MockMarket, test_broker_distinct: Broker):
+def test_short_greater(market_mock: MarketMock, test_broker_distinct: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         price=100,
@@ -176,10 +176,10 @@ def test_short_greater(mock_market: MockMarket, test_broker_distinct: Broker):
         position_type=PositionType.SHORT,
         take_profit=99,
     )
-    mock_market.price = 100
+    market_mock.price = 100
     test_broker_distinct.process_open_orders([open_order])
 
-    mock_market.price = 99.5
+    market_mock.price = 99.5
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 1
@@ -189,7 +189,7 @@ def test_short_greater(mock_market: MockMarket, test_broker_distinct: Broker):
 
 
 def test_take_profit_not_set_long(
-    mock_market: MockMarket, test_broker_accumulate: Broker
+    market_mock: MarketMock, test_broker_accumulate: Broker
 ):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
@@ -198,10 +198,10 @@ def test_take_profit_not_set_long(
         action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
-    mock_market.price = 100
+    market_mock.price = 100
     test_broker_accumulate.process_open_orders([open_order])
 
-    mock_market.price = 101
+    market_mock.price = 101
     test_broker_accumulate.process_take_profits()
 
     assert len(test_broker_accumulate.get_positions()) == 1
@@ -211,7 +211,7 @@ def test_take_profit_not_set_long(
 
 
 def test_take_profit_not_set_short(
-    mock_market: MockMarket, test_broker_distinct: Broker
+    market_mock: MarketMock, test_broker_distinct: Broker
 ):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
@@ -220,10 +220,10 @@ def test_take_profit_not_set_short(
         action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
-    mock_market.price = 100
+    market_mock.price = 100
     test_broker_distinct.process_open_orders([open_order])
 
-    mock_market.price = 99
+    market_mock.price = 99
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 1
@@ -232,7 +232,7 @@ def test_take_profit_not_set_short(
     assert test_broker_distinct.get_trades()[0].order == open_order
 
 
-def test_multiple_long_positions(mock_market: MockMarket, test_broker_distinct: Broker):
+def test_multiple_long_positions(market_mock: MarketMock, test_broker_distinct: Broker):
     open_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
         price=50,
@@ -251,11 +251,11 @@ def test_multiple_long_positions(mock_market: MockMarket, test_broker_distinct: 
         take_profit=52,
     )
 
-    mock_market.price = 50
+    market_mock.price = 50
     test_broker_distinct.process_open_orders([open_order1, open_order2])
     opened_position1 = test_broker_distinct.get_positions()[0]
 
-    mock_market.price = 51
+    market_mock.price = 51
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 1
@@ -277,7 +277,7 @@ def test_multiple_long_positions(mock_market: MockMarket, test_broker_distinct: 
 
 
 def test_multiple_short_positions(
-    mock_market: MockMarket, test_broker_distinct: Broker
+    market_mock: MarketMock, test_broker_distinct: Broker
 ):
     open_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
@@ -297,11 +297,11 @@ def test_multiple_short_positions(
         take_profit=48,
     )
 
-    mock_market.price = 50
+    market_mock.price = 50
     test_broker_distinct.process_open_orders([open_order1, open_order2])
     opened_position1 = test_broker_distinct.get_positions()[0]
 
-    mock_market.price = 49
+    market_mock.price = 49
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 1

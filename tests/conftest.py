@@ -7,7 +7,7 @@ from stock_backtesting.market import Market
 from stock_backtesting.position import PositionMode
 
 
-class MockMarket(Market):
+class MarketMock(Market):
     def __init__(self):
         super().__init__(data=np.array([]))
         self.price = 0.0
@@ -17,8 +17,8 @@ class MockMarket(Market):
 
 
 @pytest.fixture
-def mock_market() -> MockMarket:
-    return MockMarket()
+def market_mock() -> MarketMock:
+    return MarketMock()
 
 
 @pytest.fixture
@@ -27,14 +27,14 @@ def test_account() -> Account:
 
 
 @pytest.fixture
-def test_broker_accumulate(mock_market: MockMarket, test_account: Account) -> Broker:
+def test_broker_accumulate(market_mock: MarketMock, test_account: Account) -> Broker:
     return Broker(
-        position_mode=PositionMode.ACCUMULATE, market=mock_market, accout=test_account
+        position_mode=PositionMode.ACCUMULATE, market=market_mock, accout=test_account
     )
 
 
 @pytest.fixture
-def test_broker_distinct(mock_market: MockMarket, test_account: Account) -> Broker:
+def test_broker_distinct(market_mock: MarketMock, test_account: Account) -> Broker:
     return Broker(
-        position_mode=PositionMode.DISTINCT, market=mock_market, accout=test_account
+        position_mode=PositionMode.DISTINCT, market=market_mock, accout=test_account
     )
