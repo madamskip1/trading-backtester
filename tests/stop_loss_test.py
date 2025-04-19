@@ -153,7 +153,7 @@ class SellOnOpenFirstDayStrategyStopLoss(Strategy):
         return []
 
 
-def test_stop_loss_on_close_greater_short():
+def test_stop_loss_on_close_less_short():
     data = np.array(
         [
             (16.0, 15.0, 18.0, 19.5),
@@ -215,7 +215,7 @@ def test_stop_loss_on_close_equal_short():
     assert stats["max_drawdown_percentage"] == pytest.approx(1.0, abs=0.01)
 
 
-def test_stop_loss_on_open_greater_short():
+def test_stop_loss_on_open_less_short():
     data = np.array(
         [
             (16.0, 15.0, 18.0, 17.5),
