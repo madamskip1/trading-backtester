@@ -48,6 +48,20 @@ class Market:
 
         return self.__data[self.__current_day]["close"]
 
+    def get_current_session_min_price(self) -> float:
+        return (
+            self.__data[self.__current_day]["min"]
+            if self.__current_time == MarketTime.CLOSE
+            else self.__data[self.__current_day]["open"]
+        )
+
+    def get_current_session_max_price(self) -> float:
+        return (
+            self.__data[self.__current_day]["max"]
+            if self.__current_time == MarketTime.CLOSE
+            else self.__data[self.__current_day]["open"]
+        )
+
     def get_open_price_on_nth_day_ago(self, n: int) -> Optional[float]:
         if n < 1:
             raise ValueError("To look into the past, n must be greater than 0.")

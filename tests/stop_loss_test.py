@@ -30,7 +30,7 @@ class BuyOnOpenFirstDayStrategyStopLoss(Strategy):
 def test_stop_loss_on_close_greater_long():
     data = np.array(
         [
-            (18.0, 16.0, 18.0, 16.5),
+            (18.0, 16.5, 18.0, 16.5),
         ],
         dtype=BacktestingDataType,
     )
@@ -45,18 +45,18 @@ def test_stop_loss_on_close_greater_long():
     assert stats["total_close_long_trades"] == 1
     assert stats["total_open_short_trades"] == 0
     assert stats["total_close_short_trades"] == 0
-    assert stats["final_money"] == pytest.approx(98.5, abs=0.01)
+    assert stats["final_money"] == pytest.approx(99.0, abs=0.01)
     assert stats["final_assets_value"] == pytest.approx(0.0, abs=0.01)
-    assert stats["final_total_equity"] == pytest.approx(98.5, abs=0.01)
-    assert stats["return"] == pytest.approx(-1.5, abs=0.01)
-    assert stats["max_drawdown"] == pytest.approx(1.5, abs=0.01)
-    assert stats["max_drawdown_percentage"] == pytest.approx(1.5, abs=0.01)
+    assert stats["final_total_equity"] == pytest.approx(99.0, abs=0.01)
+    assert stats["return"] == pytest.approx(-1.0, abs=0.01)
+    assert stats["max_drawdown"] == pytest.approx(1.0, abs=0.01)
+    assert stats["max_drawdown_percentage"] == pytest.approx(1.0, abs=0.01)
 
 
 def test_stop_loss_on_close_equal_long():
     data = np.array(
         [
-            (18.0, 15.0, 18.0, 17.0),
+            (18.0, 17.0, 18.0, 17.0),
         ],
         dtype=BacktestingDataType,
     )
@@ -82,7 +82,7 @@ def test_stop_loss_on_close_equal_long():
 def test_stop_loss_on_open_greater_long():
     data = np.array(
         [
-            (18.0, 15.0, 18.0, 17.5),
+            (18.0, 17.1, 18.0, 17.5),
             (16.5, 15.0, 18.5, 18.5),
         ],
         dtype=BacktestingDataType,
@@ -174,12 +174,12 @@ def test_stop_loss_on_close_less_short():
     assert stats["total_close_long_trades"] == 0
     assert stats["total_open_short_trades"] == 1
     assert stats["total_close_short_trades"] == 1
-    assert stats["final_money"] == pytest.approx(98.5, abs=0.01)
+    assert stats["final_money"] == pytest.approx(99.0, abs=0.01)
     assert stats["final_assets_value"] == pytest.approx(0.0, abs=0.01)
-    assert stats["final_total_equity"] == pytest.approx(98.5, abs=0.01)
-    assert stats["return"] == pytest.approx(-1.5, abs=0.01)
-    assert stats["max_drawdown"] == pytest.approx(1.5, abs=0.01)
-    assert stats["max_drawdown_percentage"] == pytest.approx(1.5, abs=0.01)
+    assert stats["final_total_equity"] == pytest.approx(99.0, abs=0.01)
+    assert stats["return"] == pytest.approx(-1.0, abs=0.01)
+    assert stats["max_drawdown"] == pytest.approx(1.0, abs=0.01)
+    assert stats["max_drawdown_percentage"] == pytest.approx(1.0, abs=0.01)
 
 
 def test_stop_loss_on_close_equal_short():
@@ -298,8 +298,8 @@ class BuyOnOpenStrategyStopLoss(Strategy):
 def test_rewrite_stop_loss_accumulate_mode_long():
     data = np.array(
         [
-            (18.0, 15.0, 18.0, 17.5),
-            (17.1, 15.0, 17.1, 16.9),
+            (18.0, 17.2, 18.0, 17.5),
+            (17.1, 16.2, 17.1, 16.9),
         ],
         dtype=BacktestingDataType,
     )
@@ -325,8 +325,8 @@ def test_rewrite_stop_loss_accumulate_mode_long():
 def test_stop_loss_distinct_mode_long():
     data = np.array(
         [
-            (18.0, 15.0, 18.0, 17.5),
-            (17.1, 15.0, 17.1, 16.5),
+            (18.0, 17.1, 18.0, 17.5),
+            (17.1, 16.2, 17.1, 16.5),
         ],
         dtype=BacktestingDataType,
     )
@@ -346,12 +346,12 @@ def test_stop_loss_distinct_mode_long():
     assert stats["total_close_long_trades"] == 1
     assert stats["total_open_short_trades"] == 0
     assert stats["total_close_short_trades"] == 0
-    assert stats["final_money"] == pytest.approx(81.4, abs=0.01)
+    assert stats["final_money"] == pytest.approx(81.9, abs=0.01)
     assert stats["final_assets_value"] == pytest.approx(16.5, abs=0.01)
-    assert stats["final_total_equity"] == pytest.approx(97.9, abs=0.01)
-    assert stats["return"] == pytest.approx(-2.1, abs=0.01)
-    assert stats["max_drawdown"] == pytest.approx(2.1, abs=0.01)
-    assert stats["max_drawdown_percentage"] == pytest.approx(2.1, abs=0.01)
+    assert stats["final_total_equity"] == pytest.approx(98.4, abs=0.01)
+    assert stats["return"] == pytest.approx(-1.6, abs=0.01)
+    assert stats["max_drawdown"] == pytest.approx(1.6, abs=0.01)
+    assert stats["max_drawdown_percentage"] == pytest.approx(1.6, abs=0.01)
 
 
 class SellOnOpenStrategyStopLoss(Strategy):

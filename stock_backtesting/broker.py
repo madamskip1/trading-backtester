@@ -40,42 +40,56 @@ class Broker:
         return assets_value
 
     def process_stop_losses(self) -> None:
+        min_price = self.__market.get_current_session_min_price()
+        max_price = self.__market.get_current_session_max_price()
+
         for position in self.__positions:
             if position.stop_loss is None:
                 continue
             if position.position_type == PositionType.LONG:
-                if position.stop_loss >= self.__market.get_current_price():
+                print(position.stop_loss, min_price)
+                if position.stop_loss >= min_price:
                     order = Order(
                         order_type=OrderType.MARKET_ORDER,
                         size=position.size,
                         action=OrderAction.CLOSE,
                         position_to_close=position,
                     )
-                    self.__process_close_order(order)
+                    print(max_price, position.stop_loss)
+                    price = min(max_price, position.stop_loss)
+                    print(price)
+                    self.__process_close_order(order, price)
 
             elif position.position_type == PositionType.SHORT:
-                if position.stop_loss <= self.__market.get_current_price():
+                if position.stop_loss <= max_price:
                     order = Order(
                         order_type=OrderType.MARKET_ORDER,
                         size=position.size,
                         action=OrderAction.CLOSE,
                         position_to_close=position,
                     )
-                    self.__process_close_order(order)
+
+                    price = max(min_price, position.stop_loss)
+                    self.__process_close_order(order, price)
 
     def process_take_profits(self) -> None:
+        min_price = self.__market.get_current_session_min_price()
+        max_price = self.__market.get_current_session_max_price()
+
         for position in self.__positions:
             if position.take_profit is None:
                 continue
             if position.position_type == PositionType.LONG:
-                if position.take_profit <= self.__market.get_current_price():
+                if position.take_profit <= max_price:
                     order = Order(
                         order_type=OrderType.MARKET_ORDER,
                         size=position.size,
                         action=OrderAction.CLOSE,
                         position_to_close=position,
                     )
-                    self.__process_close_order(order)
+
+                    price = max(min_price, position.take_profit)
+                    self.__process_close_order(order, price)
 
             elif position.position_type == PositionType.SHORT:
                 if position.take_profit >= self.__market.get_current_price():
@@ -85,7 +99,9 @@ class Broker:
                         action=OrderAction.CLOSE,
                         position_to_close=position,
                     )
-                    self.__process_close_order(order)
+
+                    price = min(max_price, position.take_profit)
+                    self.__process_close_order(order, price)
 
     def process_open_orders(self, orders: List[Order]) -> None:
         for order in orders:
@@ -137,12 +153,12 @@ class Broker:
             if order.action != OrderAction.CLOSE:
                 continue
 
-            self.__process_close_order(order)
+            self.__process_close_order(order, self.__market.get_current_price())
 
-    def __process_close_order(self, order: Order) -> None:
+    def __process_close_order(self, order: Order, price: float) -> None:
         if self.__position_mode == PositionMode.ACCUMULATE:
             self.__reduce(self.__positions[0], order.size)
-            money = order.size * self.__market.get_current_price()
+            money = order.size * price
             self.__account.update_money(money)
             order.position_type = PositionType.LONG
         elif self.__position_mode == PositionMode.DISTINCT:
@@ -151,13 +167,12 @@ class Broker:
 
             if order.position_to_close.position_type == PositionType.LONG:
                 self.__reduce(order.position_to_close, order.size)
-                money = order.size * self.__market.get_current_price()
+                money = order.size * price
                 self.__account.update_money(money)
             elif order.position_to_close.position_type == PositionType.SHORT:
                 self.__reduce(order.position_to_close, order.size)
                 money = order.size * (
-                    2 * order.position_to_close.avg_bought_price
-                    - self.__market.get_current_price()
+                    2 * order.position_to_close.avg_bought_price - price
                 )
                 self.__account.update_money(money)
 
@@ -166,7 +181,7 @@ class Broker:
         self.__trades.append(
             Trade(
                 order,
-                self.__market.get_current_price(),
+                price,
                 self.__market.get_current_day(),
             )
         )

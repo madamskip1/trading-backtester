@@ -45,10 +45,10 @@ def test_take_profit_on_close_greater_long():
     assert stats["total_close_long_trades"] == 1
     assert stats["total_open_short_trades"] == 0
     assert stats["total_close_short_trades"] == 0
-    assert stats["final_money"] == pytest.approx(101.5, abs=0.01)
+    assert stats["final_money"] == pytest.approx(101.0, abs=0.01)
     assert stats["final_assets_value"] == pytest.approx(0.0, abs=0.01)
-    assert stats["final_total_equity"] == pytest.approx(101.5, abs=0.01)
-    assert stats["return"] == pytest.approx(1.5, abs=0.01)
+    assert stats["final_total_equity"] == pytest.approx(101.0, abs=0.01)
+    assert stats["return"] == pytest.approx(1.0, abs=0.01)
     assert stats["max_drawdown"] == pytest.approx(0, abs=0.01)
     assert stats["max_drawdown_percentage"] == pytest.approx(0, abs=0.01)
 
@@ -174,10 +174,10 @@ def test_take_profit_on_close_less_short():
     assert stats["total_close_long_trades"] == 0
     assert stats["total_open_short_trades"] == 1
     assert stats["total_close_short_trades"] == 1
-    assert stats["final_money"] == pytest.approx(101.5, abs=0.01)
+    assert stats["final_money"] == pytest.approx(101.0, abs=0.01)
     assert stats["final_assets_value"] == pytest.approx(0.0, abs=0.01)
-    assert stats["final_total_equity"] == pytest.approx(101.5, abs=0.01)
-    assert stats["return"] == pytest.approx(1.5, abs=0.01)
+    assert stats["final_total_equity"] == pytest.approx(101.0, abs=0.01)
+    assert stats["return"] == pytest.approx(1.0, abs=0.01)
     assert stats["max_drawdown"] == pytest.approx(0.0, abs=0.01)
     assert stats["max_drawdown_percentage"] == pytest.approx(0.0, abs=0.01)
 
