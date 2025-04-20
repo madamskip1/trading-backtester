@@ -1,25 +1,28 @@
 import pytest
 
 from stock_backtesting.broker import Broker
+from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import Order, OrderAction, OrderType
 from stock_backtesting.position import PositionType
 
-from ..conftest import MarketMock
 
-
-def test_long_equal(market_mock: MarketMock, test_broker_accumulate: Broker):
+@pytest.mark.parametrize(
+    "market_data", [[(None, None, None, 100.0), (101.0, None, None, None)]]
+)
+def test_long_equal_on_open_time(test_market: Market, test_broker_accumulate: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.LONG,
-        take_profit=101,
+        take_profit=101.0,
     )
-    market_mock.price = 100
+
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_open_orders([open_order])
     opened_position = test_broker_accumulate.get_positions()[0]
 
-    market_mock.price = 101
+    test_market.next_day()
     test_broker_accumulate.process_take_profits()
 
     assert len(test_broker_accumulate.get_positions()) == 0
@@ -30,7 +33,9 @@ def test_long_equal(market_mock: MarketMock, test_broker_accumulate: Broker):
         == OrderType.MARKET_ORDER
     )
     assert test_broker_accumulate.get_trades()[1].order.action == OrderAction.CLOSE
-    assert test_broker_accumulate.get_trades()[1].price == pytest.approx(101, abs=0.01)
+    assert test_broker_accumulate.get_trades()[1].price == pytest.approx(
+        101.0, abs=0.01
+    )
     assert test_broker_accumulate.get_trades()[1].order.size == 1
     assert (
         test_broker_accumulate.get_trades()[1].order.position_to_close
@@ -40,20 +45,23 @@ def test_long_equal(market_mock: MarketMock, test_broker_accumulate: Broker):
     assert test_broker_accumulate.get_assets_value() == 0
 
 
-def test_long_greater(market_mock: MarketMock, test_broker_accumulate: Broker):
+@pytest.mark.parametrize(
+    "market_data", [[(None, None, None, 100.0), (102.0, None, None, None)]]
+)
+def test_long_greater_on_open_time(test_market: Market, test_broker_accumulate: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.LONG,
-        take_profit=101,
+        take_profit=101.0,
     )
 
-    market_mock.price = 100
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_open_orders([open_order])
     opened_position = test_broker_accumulate.get_positions()[0]
 
-    market_mock.price = 102
+    test_market.next_day()
     test_broker_accumulate.process_take_profits()
 
     assert len(test_broker_accumulate.get_positions()) == 0
@@ -65,7 +73,9 @@ def test_long_greater(market_mock: MarketMock, test_broker_accumulate: Broker):
         == OrderType.MARKET_ORDER
     )
     assert test_broker_accumulate.get_trades()[1].order.action == OrderAction.CLOSE
-    assert test_broker_accumulate.get_trades()[1].price == pytest.approx(102, abs=0.01)
+    assert test_broker_accumulate.get_trades()[1].price == pytest.approx(
+        102.0, abs=0.01
+    )
     assert test_broker_accumulate.get_trades()[1].order.size == 1
     assert (
         test_broker_accumulate.get_trades()[1].order.position_to_close
@@ -73,18 +83,22 @@ def test_long_greater(market_mock: MarketMock, test_broker_accumulate: Broker):
     )
 
 
-def test_long_less(market_mock: MarketMock, test_broker_accumulate: Broker):
+@pytest.mark.parametrize(
+    "market_data", [[(None, None, None, 100.0), (100.5, None, None, None)]]
+)
+def test_long_less_on_open_time(test_market: Market, test_broker_accumulate: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.LONG,
-        take_profit=101,
+        take_profit=101.0,
     )
-    market_mock.price = 100
+
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_open_orders([open_order])
 
-    market_mock.price = 100.5
+    test_market.next_day()
     test_broker_accumulate.process_take_profits()
 
     assert len(test_broker_accumulate.get_positions()) == 1
@@ -93,19 +107,58 @@ def test_long_less(market_mock: MarketMock, test_broker_accumulate: Broker):
     assert test_broker_accumulate.get_trades()[0].order == open_order
 
 
-def test_short_equal(market_mock: MarketMock, test_broker_distinct: Broker):
+@pytest.mark.parametrize("market_data", [[(100.0, 100.0, 101.0, 101.0)]])
+def test_long_on_close_time(test_market: Market, test_broker_accumulate: Broker):
+    open_order = Order(
+        order_type=OrderType.MARKET_ORDER,
+        size=1,
+        action=OrderAction.OPEN,
+        position_type=PositionType.LONG,
+        take_profit=101.0,
+    )
+
+    test_broker_accumulate.process_open_orders([open_order])
+    opened_position = test_broker_accumulate.get_positions()[0]
+
+    test_market.set_current_time(MarketTime.CLOSE)
+    test_broker_accumulate.process_take_profits()
+
+    assert len(test_broker_accumulate.get_positions()) == 0
+    assert len(test_broker_accumulate.get_trades()) == 2
+    assert test_broker_accumulate.get_assets_value() == 0
+    assert test_broker_accumulate.get_trades()[0].order == open_order
+    assert (
+        test_broker_accumulate.get_trades()[1].order.order_type
+        == OrderType.MARKET_ORDER
+    )
+    assert test_broker_accumulate.get_trades()[1].order.action == OrderAction.CLOSE
+    assert test_broker_accumulate.get_trades()[1].price == pytest.approx(
+        101.0, abs=0.01
+    )
+    assert test_broker_accumulate.get_trades()[1].order.size == 1
+    assert (
+        test_broker_accumulate.get_trades()[1].order.position_to_close
+        == opened_position
+    )
+
+
+@pytest.mark.parametrize(
+    "market_data", [[(None, None, None, 100.0), (99.0, None, None, None)]]
+)
+def test_short_equal_on_open_time(test_market: Market, test_broker_distinct: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
-        take_profit=99,
+        take_profit=99.0,
     )
-    market_mock.price = 100
+
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_open_orders([open_order])
     opened_position = test_broker_distinct.get_positions()[0]
 
-    market_mock.price = 99
+    test_market.next_day()
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 0
@@ -115,7 +168,7 @@ def test_short_equal(market_mock: MarketMock, test_broker_distinct: Broker):
         test_broker_distinct.get_trades()[1].order.order_type == OrderType.MARKET_ORDER
     )
     assert test_broker_distinct.get_trades()[1].order.action == OrderAction.CLOSE
-    assert test_broker_distinct.get_trades()[1].price == pytest.approx(99, abs=0.01)
+    assert test_broker_distinct.get_trades()[1].price == pytest.approx(99.0, abs=0.01)
     assert test_broker_distinct.get_trades()[1].order.size == 1
     assert (
         test_broker_distinct.get_trades()[1].order.position_to_close == opened_position
@@ -124,19 +177,23 @@ def test_short_equal(market_mock: MarketMock, test_broker_distinct: Broker):
     assert test_broker_distinct.get_assets_value() == 0
 
 
-def test_short_less(market_mock: MarketMock, test_broker_distinct: Broker):
+@pytest.mark.parametrize(
+    "market_data", [[(None, None, None, 100.0), (98.0, None, None, None)]]
+)
+def test_short_less_on_open_time(test_market: Market, test_broker_distinct: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
-        take_profit=99,
+        take_profit=99.0,
     )
-    market_mock.price = 100
+
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_open_orders([open_order])
     opened_position = test_broker_distinct.get_positions()[0]
 
-    market_mock.price = 98
+    test_market.next_day()
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 0
@@ -147,25 +204,29 @@ def test_short_less(market_mock: MarketMock, test_broker_distinct: Broker):
         test_broker_distinct.get_trades()[1].order.order_type == OrderType.MARKET_ORDER
     )
     assert test_broker_distinct.get_trades()[1].order.action == OrderAction.CLOSE
-    assert test_broker_distinct.get_trades()[1].price == pytest.approx(98, abs=0.01)
+    assert test_broker_distinct.get_trades()[1].price == pytest.approx(98.0, abs=0.01)
     assert test_broker_distinct.get_trades()[1].order.size == 1
     assert (
         test_broker_distinct.get_trades()[1].order.position_to_close == opened_position
     )
 
 
-def test_short_greater(market_mock: MarketMock, test_broker_distinct: Broker):
+@pytest.mark.parametrize(
+    "market_data", [[(None, None, None, 100.0), (99.5, None, None, None)]]
+)
+def test_short_greater_on_open_time(test_market: Market, test_broker_distinct: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
-        take_profit=99,
+        take_profit=99.0,
     )
-    market_mock.price = 100
+
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_open_orders([open_order])
 
-    market_mock.price = 99.5
+    test_market.next_day()
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 1
@@ -174,55 +235,85 @@ def test_short_greater(market_mock: MarketMock, test_broker_distinct: Broker):
     assert test_broker_distinct.get_trades()[0].order == open_order
 
 
-def test_take_profit_not_set_long(
-    market_mock: MarketMock, test_broker_accumulate: Broker
-):
+@pytest.mark.parametrize("market_data", [[(100.0, 99.0, 101.0, 99.0)]])
+def test_short_less_on_close_time(test_market: Market, test_broker_distinct: Broker):
+    open_order = Order(
+        order_type=OrderType.MARKET_ORDER,
+        size=1,
+        action=OrderAction.OPEN,
+        position_type=PositionType.SHORT,
+        take_profit=99.0,
+    )
+
+    test_broker_distinct.process_open_orders([open_order])
+    opened_position = test_broker_distinct.get_positions()[0]
+
+    test_market.set_current_time(MarketTime.CLOSE)
+    test_broker_distinct.process_take_profits()
+
+    assert len(test_broker_distinct.get_positions()) == 0
+    assert len(test_broker_distinct.get_trades()) == 2
+    assert test_broker_distinct.get_assets_value() == 0
+    assert test_broker_distinct.get_trades()[0].order == open_order
+    assert (
+        test_broker_distinct.get_trades()[1].order.order_type == OrderType.MARKET_ORDER
+    )
+    assert test_broker_distinct.get_trades()[1].order.action == OrderAction.CLOSE
+    assert test_broker_distinct.get_trades()[1].price == pytest.approx(99.0, abs=0.01)
+    assert test_broker_distinct.get_trades()[1].order.size == 1
+    assert (
+        test_broker_distinct.get_trades()[1].order.position_to_close == opened_position
+    )
+
+
+@pytest.mark.parametrize("market_data", [[(100.0, 100.0, 101.0, 101.0)]])
+def test_take_profit_not_set_long(test_market: Market, test_broker_accumulate: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
-    market_mock.price = 100
+
     test_broker_accumulate.process_open_orders([open_order])
 
-    market_mock.price = 101
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_take_profits()
 
     assert len(test_broker_accumulate.get_positions()) == 1
     assert len(test_broker_accumulate.get_trades()) == 1
-    assert test_broker_accumulate.get_assets_value() == pytest.approx(101, abs=0.01)
+    assert test_broker_accumulate.get_assets_value() == pytest.approx(101.0, abs=0.01)
     assert test_broker_accumulate.get_trades()[0].order == open_order
 
 
-def test_take_profit_not_set_short(
-    market_mock: MarketMock, test_broker_distinct: Broker
-):
+@pytest.mark.parametrize("market_data", [[(100.0, 99.0, 100.0, 99.0)]])
+def test_take_profit_not_set_short(test_market: Market, test_broker_distinct: Broker):
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
-    market_mock.price = 100
+
     test_broker_distinct.process_open_orders([open_order])
 
-    market_mock.price = 99
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 1
     assert len(test_broker_distinct.get_trades()) == 1
-    assert test_broker_distinct.get_assets_value() == pytest.approx(101, abs=0.01)
+    assert test_broker_distinct.get_assets_value() == pytest.approx(101.0, abs=0.01)
     assert test_broker_distinct.get_trades()[0].order == open_order
 
 
-def test_multiple_long_positions(market_mock: MarketMock, test_broker_distinct: Broker):
+@pytest.mark.parametrize("market_data", [[(50.0, 50.0, 51.0, 51.0)]])
+def test_multiple_long_positions(test_market: Market, test_broker_distinct: Broker):
     open_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.LONG,
-        take_profit=51,
+        take_profit=51.0,
     )
 
     open_order2 = Order(
@@ -230,19 +321,18 @@ def test_multiple_long_positions(market_mock: MarketMock, test_broker_distinct: 
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.LONG,
-        take_profit=52,
+        take_profit=52.0,
     )
 
-    market_mock.price = 50
     test_broker_distinct.process_open_orders([open_order1, open_order2])
     opened_position1 = test_broker_distinct.get_positions()[0]
 
-    market_mock.price = 51
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 1
     assert len(test_broker_distinct.get_trades()) == 3
-    assert test_broker_distinct.get_assets_value() == pytest.approx(51, abs=0.01)
+    assert test_broker_distinct.get_assets_value() == pytest.approx(51.0, abs=0.01)
     assert test_broker_distinct.get_trades()[0].order == open_order1
     assert test_broker_distinct.get_trades()[1].order == open_order2
     assert (
@@ -256,15 +346,14 @@ def test_multiple_long_positions(market_mock: MarketMock, test_broker_distinct: 
     )
 
 
-def test_multiple_short_positions(
-    market_mock: MarketMock, test_broker_distinct: Broker
-):
+@pytest.mark.parametrize("market_data", [[(50.0, 49.0, 50.0, 49.0)]])
+def test_multiple_short_positions(test_market: Market, test_broker_distinct: Broker):
     open_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
-        take_profit=49,
+        take_profit=49.0,
     )
 
     open_order2 = Order(
@@ -272,26 +361,25 @@ def test_multiple_short_positions(
         size=1,
         action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
-        take_profit=48,
+        take_profit=48.0,
     )
 
-    market_mock.price = 50
     test_broker_distinct.process_open_orders([open_order1, open_order2])
     opened_position1 = test_broker_distinct.get_positions()[0]
 
-    market_mock.price = 49
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_take_profits()
 
     assert len(test_broker_distinct.get_positions()) == 1
     assert len(test_broker_distinct.get_trades()) == 3
-    assert test_broker_distinct.get_assets_value() == pytest.approx(51, abs=0.01)
+    assert test_broker_distinct.get_assets_value() == pytest.approx(51.0, abs=0.01)
     assert test_broker_distinct.get_trades()[0].order == open_order1
     assert test_broker_distinct.get_trades()[1].order == open_order2
     assert (
         test_broker_distinct.get_trades()[2].order.order_type == OrderType.MARKET_ORDER
     )
     assert test_broker_distinct.get_trades()[2].order.action == OrderAction.CLOSE
-    assert test_broker_distinct.get_trades()[2].price == pytest.approx(49, abs=0.01)
+    assert test_broker_distinct.get_trades()[2].price == pytest.approx(49.0, abs=0.01)
     assert test_broker_distinct.get_trades()[2].order.size == 1
     assert (
         test_broker_distinct.get_trades()[2].order.position_to_close == opened_position1

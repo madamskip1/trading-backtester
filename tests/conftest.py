@@ -1,25 +1,14 @@
+from typing import Any
+
 import numpy as np
 import pytest
 
 from stock_backtesting.account import Account
+from stock_backtesting.backtest import BacktestingDataType
 from stock_backtesting.broker import Broker
 from stock_backtesting.market import Market
 from stock_backtesting.position import PositionMode
 from stock_backtesting.stats import Statistics
-
-
-class MarketMock(Market):
-    def __init__(self):
-        super().__init__(data=np.array([]))
-        self.price = 0.0
-
-    def get_current_price(self) -> float:
-        return self.price
-
-
-@pytest.fixture
-def market_mock() -> MarketMock:
-    return MarketMock()
 
 
 class AccountMock(Account):
@@ -55,16 +44,26 @@ def test_account() -> Account:
 
 
 @pytest.fixture
-def test_broker_accumulate(market_mock: MarketMock, test_account: Account) -> Broker:
+def test_market(market_data: np.ndarray[Any, np.dtype[Any]]) -> Market:
+    market_data = np.array(
+        market_data,
+        dtype=BacktestingDataType,
+    )
+
+    return Market(data=market_data)
+
+
+@pytest.fixture
+def test_broker_accumulate(test_market: Market, test_account: Account) -> Broker:
     return Broker(
-        position_mode=PositionMode.ACCUMULATE, market=market_mock, accout=test_account
+        position_mode=PositionMode.ACCUMULATE, market=test_market, accout=test_account
     )
 
 
 @pytest.fixture
-def test_broker_distinct(market_mock: MarketMock, test_account: Account) -> Broker:
+def test_broker_distinct(test_market: Market, test_account: Account) -> Broker:
     return Broker(
-        position_mode=PositionMode.DISTINCT, market=market_mock, accout=test_account
+        position_mode=PositionMode.DISTINCT, market=test_market, accout=test_account
     )
 
 

@@ -36,7 +36,6 @@ class Backtest:
         print(f"Initial money: {self.__account.get_current_money()}")
 
         for _ in range(self.__data_len):
-            self.__market.increment_day()
             self.__market.set_current_time(MarketTime.OPEN)
 
             self.__broker.process_stop_losses()
@@ -47,8 +46,6 @@ class Backtest:
             )
             self.__broker.process_close_orders(orders)
             self.__broker.process_open_orders(orders)
-
-            self.__market.set_current_time(MarketTime.MID_DAY)
 
             self.__market.set_current_time(MarketTime.CLOSE)
 
@@ -65,6 +62,8 @@ class Backtest:
                 self.__market.get_current_day(), self.__broker.get_assets_value()
             )
             self.__account.calculate_equity(self.__market.get_current_day())
+
+            self.__market.next_day()
 
         print("Backtest finished.")
         print(self.__statistics)

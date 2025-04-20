@@ -14,14 +14,15 @@ class Market:
 
     def __init__(self, data: np.ndarray[Any, np.dtype[Any]]):
         self.__data = data
-        self.__current_day = -1  # not started yet
+        self.__current_day = 0
         self.__current_time = MarketTime.OPEN
 
     def get_current_day(self) -> int:
         return self.__current_day
 
-    def increment_day(self):
+    def next_day(self):
         self.__current_day += 1
+        self.__current_time = MarketTime.OPEN
 
     def set_current_time(self, time: MarketTime):
         self.__current_time = time

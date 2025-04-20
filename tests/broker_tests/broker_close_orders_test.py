@@ -2,17 +2,15 @@ import pytest
 
 from stock_backtesting.account import Account
 from stock_backtesting.broker import Broker
+from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import Order, OrderAction, OrderType
 from stock_backtesting.position import PositionType
 
-from ..conftest import MarketMock
 
-
+@pytest.mark.parametrize("market_data", [[(100.0, None, None, 150.0)]])
 def test_close_long_accumulate_single(
-    market_mock: MarketMock, test_account: Account, test_broker_accumulate: Broker
+    test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    market_mock.price = 100.0
-
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -21,8 +19,6 @@ def test_close_long_accumulate_single(
     )
     test_broker_accumulate.process_open_orders([open_order])
 
-    market_mock.price = 150.0
-
     close_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -30,6 +26,8 @@ def test_close_long_accumulate_single(
         position_type=PositionType.LONG,
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
+
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_close_orders([close_order])
 
     assert len(test_broker_accumulate.get_trades()) == 2
@@ -41,11 +39,10 @@ def test_close_long_accumulate_single(
     assert test_account.get_current_money() == pytest.approx(150.0, abs=0.01)
 
 
+@pytest.mark.parametrize("market_data", [[(25.0, None, None, 50.0)]])
 def test_close_long_accumulate_reduce_multiple_in_single_day(
-    market_mock: MarketMock, test_account: Account, test_broker_accumulate: Broker
+    test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    market_mock.price = 25.0
-
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=4,
@@ -54,8 +51,6 @@ def test_close_long_accumulate_reduce_multiple_in_single_day(
     )
 
     test_broker_accumulate.process_open_orders([open_order])
-
-    market_mock.price = 50.0
 
     close_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
@@ -72,6 +67,7 @@ def test_close_long_accumulate_reduce_multiple_in_single_day(
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
 
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_close_orders([close_order1, close_order2])
 
     assert len(test_broker_accumulate.get_trades()) == 3
@@ -92,11 +88,12 @@ def test_close_long_accumulate_reduce_multiple_in_single_day(
     assert test_account.get_current_money() == pytest.approx(150.0, abs=0.01)
 
 
+@pytest.mark.parametrize(
+    "market_data", [[(25.0, None, None, 50.0), (25.0, None, None, None)]]
+)
 def test_close_long_accumulate_reduce_multiple_in_multiple_days(
-    market_mock: MarketMock, test_account: Account, test_broker_accumulate: Broker
+    test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    market_mock.price = 25.0
-
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=4,
@@ -106,8 +103,6 @@ def test_close_long_accumulate_reduce_multiple_in_multiple_days(
 
     test_broker_accumulate.process_open_orders([open_order])
 
-    market_mock.price = 50.0
-
     close_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -116,9 +111,8 @@ def test_close_long_accumulate_reduce_multiple_in_multiple_days(
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
 
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_close_orders([close_order1])
-
-    market_mock.price = 25.0
 
     close_order2 = Order(
         order_type=OrderType.MARKET_ORDER,
@@ -128,6 +122,7 @@ def test_close_long_accumulate_reduce_multiple_in_multiple_days(
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
 
+    test_market.next_day()
     test_broker_accumulate.process_close_orders([close_order2])
 
     assert len(test_broker_accumulate.get_trades()) == 3
@@ -140,11 +135,10 @@ def test_close_long_accumulate_reduce_multiple_in_multiple_days(
     assert test_account.get_current_money() == pytest.approx(125.0, abs=0.01)
 
 
+@pytest.mark.parametrize("market_data", [[(100.0, None, None, 150)]])
 def test_close_long_distinct_single(
-    market_mock: MarketMock, test_account: Account, test_broker_distinct: Broker
+    test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    market_mock.price = 100.0
-
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -154,8 +148,6 @@ def test_close_long_distinct_single(
 
     test_broker_distinct.process_open_orders([open_order])
 
-    market_mock.price = 150.0
-
     close_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -164,6 +156,7 @@ def test_close_long_distinct_single(
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_close_orders([close_order])
 
     assert len(test_broker_distinct.get_trades()) == 2
@@ -175,11 +168,12 @@ def test_close_long_distinct_single(
     assert test_account.get_current_money() == pytest.approx(150.0, abs=0.01)
 
 
+@pytest.mark.parametrize(
+    "market_data", [[(40.0, None, None, 20.0), (50.0, None, None, 75.0)]]
+)
 def test_close_long_distinct_reduce_multiple_in_single_day(
-    market_mock: MarketMock, test_account: Account, test_broker_distinct: Broker
+    test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    market_mock.price = 40.0
-
     open_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -189,8 +183,6 @@ def test_close_long_distinct_reduce_multiple_in_single_day(
 
     test_broker_distinct.process_open_orders([open_order1])
 
-    market_mock.price = 20.0
-
     open_order2 = Order(
         order_type=OrderType.MARKET_ORDER,
         size=3,
@@ -198,9 +190,8 @@ def test_close_long_distinct_reduce_multiple_in_single_day(
         position_type=PositionType.LONG,
     )
 
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_open_orders([open_order2])
-
-    market_mock.price = 50.0
 
     close_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
@@ -218,9 +209,8 @@ def test_close_long_distinct_reduce_multiple_in_single_day(
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
+    test_market.next_day()
     test_broker_distinct.process_close_orders([close_order1, close_order2])
-
-    market_mock.price = 75.0
 
     close_order3 = Order(
         order_type=OrderType.MARKET_ORDER,
@@ -230,6 +220,7 @@ def test_close_long_distinct_reduce_multiple_in_single_day(
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_close_orders([close_order3])
 
     assert len(test_broker_distinct.get_trades()) == 5
@@ -252,11 +243,12 @@ def test_close_long_distinct_reduce_multiple_in_single_day(
     assert test_account.get_current_money() == pytest.approx(175.0, abs=0.01)
 
 
+@pytest.mark.parametrize(
+    "market_data", [[(40.0, None, None, 20.0), (50.0, None, None, 75.0)]]
+)
 def test_close_long_distinct_reduce_multiple_in_multiple_days(
-    market_mock: MarketMock, test_account: Account, test_broker_distinct: Broker
+    test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    market_mock.price = 40.0
-
     open_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -266,8 +258,6 @@ def test_close_long_distinct_reduce_multiple_in_multiple_days(
 
     test_broker_distinct.process_open_orders([open_order1])
 
-    market_mock.price = 20.0
-
     open_order2 = Order(
         order_type=OrderType.MARKET_ORDER,
         size=3,
@@ -275,9 +265,8 @@ def test_close_long_distinct_reduce_multiple_in_multiple_days(
         position_type=PositionType.LONG,
     )
 
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_open_orders([open_order2])
-
-    market_mock.price = 50.0
 
     close_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
@@ -295,9 +284,8 @@ def test_close_long_distinct_reduce_multiple_in_multiple_days(
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
+    test_market.next_day()
     test_broker_distinct.process_close_orders([close_order1, close_order2])
-
-    market_mock.price = 75.0
 
     close_order3 = Order(
         order_type=OrderType.MARKET_ORDER,
@@ -307,6 +295,7 @@ def test_close_long_distinct_reduce_multiple_in_multiple_days(
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_close_orders([close_order3])
 
     assert len(test_broker_distinct.get_trades()) == 5
@@ -329,11 +318,10 @@ def test_close_long_distinct_reduce_multiple_in_multiple_days(
     assert test_account.get_current_money() == pytest.approx(175.0, abs=0.01)
 
 
+@pytest.mark.parametrize("market_data", [[(100.0, None, None, 50)]])
 def test_close_short_distinct_single(
-    market_mock: MarketMock, test_account: Account, test_broker_distinct: Broker
+    test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    market_mock.price = 100.0
-
     open_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -343,8 +331,6 @@ def test_close_short_distinct_single(
 
     test_broker_distinct.process_open_orders([open_order])
 
-    market_mock.price = 50.0
-
     close_order = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -353,6 +339,7 @@ def test_close_short_distinct_single(
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_close_orders([close_order])
 
     assert len(test_broker_distinct.get_trades()) == 2
@@ -364,11 +351,10 @@ def test_close_short_distinct_single(
     assert test_account.get_current_money() == pytest.approx(150.0, abs=0.01)
 
 
+@pytest.mark.parametrize("market_data", [[(25.0, None, None, 20.0)]])
 def test_open_short_distinct_reduce_multiple_in_single_day(
-    market_mock: MarketMock, test_account: Account, test_broker_distinct: Broker
+    test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    market_mock.price = 25.0
-
     open_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -401,8 +387,7 @@ def test_open_short_distinct_reduce_multiple_in_single_day(
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
-    market_mock.price = 20.0
-
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_close_orders([close_order1, close_order2])
 
     assert len(test_broker_distinct.get_trades()) == 4
@@ -424,11 +409,12 @@ def test_open_short_distinct_reduce_multiple_in_single_day(
     assert test_account.get_current_money() == pytest.approx(60.0, abs=0.01)
 
 
+@pytest.mark.parametrize(
+    "market_data", [[(50.0, None, None, 25.0), (20.0, None, None, 15.0)]]
+)
 def test_open_short_distinct_multiple_in_multiple_days(
-    market_mock: MarketMock, test_account: Account, test_broker_distinct: Broker
+    test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    market_mock.price = 50.0
-
     open_order1 = Order(
         order_type=OrderType.MARKET_ORDER,
         size=1,
@@ -445,8 +431,7 @@ def test_open_short_distinct_multiple_in_multiple_days(
         position_type=PositionType.SHORT,
     )
 
-    market_mock.price = 25.0
-
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_open_orders([open_order2])
 
     close_order1 = Order(
@@ -465,8 +450,7 @@ def test_open_short_distinct_multiple_in_multiple_days(
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
-    market_mock.price = 20.0
-
+    test_market.next_day()
     test_broker_distinct.process_close_orders([close_order1, close_order2])
 
     close_order3 = Order(
@@ -477,8 +461,7 @@ def test_open_short_distinct_multiple_in_multiple_days(
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
-    market_mock.price = 15.0
-
+    test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_close_orders([close_order3])
 
     assert len(test_broker_distinct.get_trades()) == 5
