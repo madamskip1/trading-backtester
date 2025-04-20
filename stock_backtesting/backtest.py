@@ -11,7 +11,7 @@ from .strategy import Strategy
 from .trade import Trade
 
 BacktestingDataType = np.dtype(
-    [("min", "f8"), ("max", "f8"), ("open", "f8"), ("close", "f8")]
+    [("open", "f8"), ("min", "f8"), ("max", "f8"), ("close", "f8")]
 )
 
 

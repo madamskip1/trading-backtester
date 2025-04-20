@@ -11,5 +11,5 @@ def load_csv(file_path: str) -> np.ndarray[Any, np.dtype[Any]]:
         delimiter=",",
         skip_header=1,
         dtype=BacktestingDataType,
-        usecols=(2, 3, 1, 4),
+        usecols=(1, 2, 3, 4),
     )

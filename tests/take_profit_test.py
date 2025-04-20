@@ -30,7 +30,7 @@ class BuyOnOpenFirstDayStrategyTakeProfit(Strategy):
 def test_take_profit_on_close_greater_long():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 19.5),
+            (18.0, 15.0, 19.5, 19.5),
         ],
         dtype=BacktestingDataType,
     )
@@ -56,7 +56,7 @@ def test_take_profit_on_close_greater_long():
 def test_take_profit_on_close_equal_long():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 19.0),
+            (18.0, 15.0, 19.0, 19.0),
         ],
         dtype=BacktestingDataType,
     )
@@ -82,8 +82,8 @@ def test_take_profit_on_close_equal_long():
 def test_take_profit_on_open_greater_long():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 18.5),
-            (16.0, 15.0, 19.5, 18.5),
+            (18.0, 15.0, 18.5, 18.5),
+            (19.5, 15.0, 19.5, 18.5),
         ],
         dtype=BacktestingDataType,
     )
@@ -109,8 +109,8 @@ def test_take_profit_on_open_greater_long():
 def test_take_profit_on_open_equal_long():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 18.5),
-            (16.0, 15.0, 19.0, 18.0),
+            (18.0, 15.0, 18.5, 18.5),
+            (19.0, 15.0, 19.0, 18.0),
         ],
         dtype=BacktestingDataType,
     )
@@ -154,7 +154,7 @@ class SellOnOpenFirstDayStrategyTakeProfit(Strategy):
 def test_take_profit_on_close_less_short():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 16.5),
+            (18.0, 15.0, 18.0, 16.5),
         ],
         dtype=BacktestingDataType,
     )
@@ -185,7 +185,7 @@ def test_take_profit_on_close_less_short():
 def test_take_profit_on_close_equal_short():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 17.0),
+            (18.0, 15.0, 18.0, 17.0),
         ],
         dtype=BacktestingDataType,
     )
@@ -216,8 +216,8 @@ def test_take_profit_on_close_equal_short():
 def test_take_profit_on_open_less_short():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 17.5),
-            (16.0, 15.0, 16.5, 18.5),
+            (18.0, 15.0, 18.0, 17.5),
+            (16.5, 15.0, 18.5, 18.5),
         ],
         dtype=BacktestingDataType,
     )
@@ -248,8 +248,8 @@ def test_take_profit_on_open_less_short():
 def test_take_profit_on_open_equal_short():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 17.5),
-            (16.0, 15.0, 17.0, 18.0),
+            (18.0, 15.0, 18.0, 17.5),
+            (17.0, 15.0, 18.0, 18.0),
         ],
         dtype=BacktestingDataType,
     )
@@ -298,8 +298,8 @@ class BuyOnOpenStrategyTakeProfit(Strategy):
 def test_rewrite_take_profit_accumulate_mode_long():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 17.5),
-            (16.0, 15.0, 18.9, 19.0),
+            (18.0, 15.0, 18.0, 17.5),
+            (18.9, 15.0, 19.0, 19.0),
         ],
         dtype=BacktestingDataType,
     )
@@ -325,8 +325,8 @@ def test_rewrite_take_profit_accumulate_mode_long():
 def test_take_profit_distinct_mode_long():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 17.5),
-            (16.0, 15.0, 18.9, 19.0),
+            (18.0, 15.0, 18.0, 17.5),
+            (18.9, 15.0, 19.0, 19.0),
         ],
         dtype=BacktestingDataType,
     )
@@ -375,8 +375,8 @@ class SellOnOpenStrategyTakeProfit(Strategy):
 def test_take_profit_distinct_mode_short():
     data = np.array(
         [
-            (16.0, 15.0, 18.0, 17.5),
-            (16.0, 15.0, 17.1, 17.0),
+            (18.0, 15.0, 18.0, 17.5),
+            (17.1, 15.0, 17.1, 17.0),
         ],
         dtype=BacktestingDataType,
     )
