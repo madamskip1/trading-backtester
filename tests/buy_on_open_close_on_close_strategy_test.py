@@ -5,7 +5,7 @@ import pytest
 
 from stock_backtesting.backtest import Backtest
 from stock_backtesting.market import MarketTime
-from stock_backtesting.order import Order, OrderAction, OrderType
+from stock_backtesting.order import CloseOrder, OpenOrder, Order, OrderType
 from stock_backtesting.position import PositionMode, PositionType
 from stock_backtesting.strategy import Strategy
 
@@ -18,20 +18,20 @@ class BuyOnOpenCloseOnCloseAccumulateStrategy(Strategy):
         if market_time == MarketTime.OPEN:
             # Buy on open
             return [
-                Order(
+                OpenOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.OPEN,
+                    size=1,
+                    position_type=PositionType.LONG,
                 )
             ]
 
         elif market_time == MarketTime.CLOSE:
             # Close on close
             return [
-                Order(
+                CloseOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.CLOSE,
+                    size=1,
+                    position_to_close=self._positions[0],
                 )
             ]
 
@@ -69,22 +69,19 @@ class BuyOnOpenCloseOnCloseDistinctStrategy(Strategy):
         if market_time == MarketTime.OPEN:
             # Buy on open
             return [
-                Order(
+                OpenOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.OPEN,
-                    PositionType.LONG,
+                    size=1,
+                    position_type=PositionType.LONG,
                 )
             ]
 
         elif market_time == MarketTime.CLOSE:
             # Close on close
             return [
-                Order(
+                CloseOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.CLOSE,
-                    PositionType.LONG,
+                    size=1,
                     position_to_close=self._positions[0],
                 )
             ]
@@ -128,10 +125,9 @@ class SellOnOpenCloseOnCloseAccumulateStrategy(Strategy):
         if market_time == MarketTime.OPEN:
             # Sell on open
             return [
-                Order(
+                OpenOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.OPEN,
+                    size=1,
                     position_type=PositionType.SHORT,
                 )
             ]
@@ -139,10 +135,10 @@ class SellOnOpenCloseOnCloseAccumulateStrategy(Strategy):
         elif market_time == MarketTime.CLOSE:
             # Close on close
             return [
-                Order(
+                CloseOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.CLOSE,
+                    size=1,
+                    position_to_close=self._positions[0],
                 )
             ]
 
@@ -166,22 +162,19 @@ class SellOnOpenCloseOnCloseDistinctStrategy(Strategy):
         if market_time == MarketTime.OPEN:
             # Sell on open
             return [
-                Order(
+                OpenOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.OPEN,
-                    PositionType.SHORT,
+                    size=1,
+                    position_type=PositionType.SHORT,
                 )
             ]
 
         elif market_time == MarketTime.CLOSE:
             # Close on close
             return [
-                Order(
+                CloseOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.CLOSE,
-                    PositionType.SHORT,
+                    size=1,
                     position_to_close=self._positions[0],
                 )
             ]

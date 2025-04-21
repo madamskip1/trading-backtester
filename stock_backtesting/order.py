@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Optional
 
@@ -14,14 +15,15 @@ class OrderAction(Enum):
     CLOSE = 2
 
 
-class Order:
+class Order(ABC):
+    @abstractmethod
     def __init__(
         self,
         order_type: OrderType,
         size: int,
         action: OrderAction,
-        position_type: Optional[PositionType] = None,  # only for open in distinct mode
-        position_to_close: Optional[Position] = None,  # only for close in distinct mode
+        position_type: PositionType,
+        position_to_close: Optional[Position] = None,
         stop_loss: Optional[float] = None,
         take_profit: Optional[float] = None,
         # limit_price: Optional[float] = None,  # only for limit orders TODO
@@ -37,3 +39,38 @@ class Order:
         self.stop_loss = stop_loss
         self.take_profit = take_profit
         # self.limit_price = limit_price
+
+
+class OpenOrder(Order):
+    def __init__(
+        self,
+        order_type: OrderType,
+        size: int,
+        position_type: PositionType,
+        stop_loss: Optional[float] = None,
+        take_profit: Optional[float] = None,
+    ):
+        super().__init__(
+            order_type=order_type,
+            size=size,
+            action=OrderAction.OPEN,
+            position_type=position_type,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+        )
+
+
+class CloseOrder(Order):
+    def __init__(
+        self,
+        order_type: OrderType,
+        size: int,
+        position_to_close: Position,
+    ):
+        super().__init__(
+            order_type=order_type,
+            size=size,
+            action=OrderAction.CLOSE,
+            position_to_close=position_to_close,
+            position_type=position_to_close.position_type,
+        )

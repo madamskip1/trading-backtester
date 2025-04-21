@@ -3,7 +3,7 @@ import pytest
 from stock_backtesting.account import Account
 from stock_backtesting.broker import Broker
 from stock_backtesting.market import Market, MarketTime
-from stock_backtesting.order import Order, OrderAction, OrderType
+from stock_backtesting.order import CloseOrder, OpenOrder, OrderType
 from stock_backtesting.position import PositionType
 
 
@@ -11,19 +11,16 @@ from stock_backtesting.position import PositionType
 def test_close_long_accumulate_single(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
     test_broker_accumulate.process_open_orders([open_order])
 
-    close_order = Order(
+    close_order = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
 
@@ -43,27 +40,22 @@ def test_close_long_accumulate_single(
 def test_close_long_accumulate_reduce_multiple_in_single_day(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=4,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
     test_broker_accumulate.process_open_orders([open_order])
 
-    close_order1 = Order(
+    close_order1 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
-    close_order2 = Order(
+    close_order2 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=2,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
 
@@ -94,31 +86,26 @@ def test_close_long_accumulate_reduce_multiple_in_single_day(
 def test_close_long_accumulate_reduce_multiple_in_multiple_days(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=4,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
     test_broker_accumulate.process_open_orders([open_order])
 
-    close_order1 = Order(
+    close_order1 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_close_orders([close_order1])
 
-    close_order2 = Order(
+    close_order2 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=3,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
 
@@ -139,20 +126,17 @@ def test_close_long_accumulate_reduce_multiple_in_multiple_days(
 def test_close_long_distinct_single(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
     test_broker_distinct.process_open_orders([open_order])
 
-    close_order = Order(
+    close_order = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
@@ -174,49 +158,41 @@ def test_close_long_distinct_single(
 def test_close_long_distinct_reduce_multiple_in_single_day(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
     test_broker_distinct.process_open_orders([open_order1])
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=3,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_open_orders([open_order2])
 
-    close_order1 = Order(
+    close_order1 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
-    close_order2 = Order(
+    close_order2 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
     test_market.next_day()
     test_broker_distinct.process_close_orders([close_order1, close_order2])
 
-    close_order3 = Order(
+    close_order3 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
@@ -249,49 +225,41 @@ def test_close_long_distinct_reduce_multiple_in_single_day(
 def test_close_long_distinct_reduce_multiple_in_multiple_days(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
     test_broker_distinct.process_open_orders([open_order1])
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=3,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_open_orders([open_order2])
 
-    close_order1 = Order(
+    close_order1 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
-    close_order2 = Order(
+    close_order2 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
     test_market.next_day()
     test_broker_distinct.process_close_orders([close_order1, close_order2])
 
-    close_order3 = Order(
+    close_order3 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.LONG,
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
@@ -322,20 +290,17 @@ def test_close_long_distinct_reduce_multiple_in_multiple_days(
 def test_close_short_distinct_single(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
     test_broker_distinct.process_open_orders([open_order])
 
-    close_order = Order(
+    close_order = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.SHORT,
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
@@ -355,35 +320,29 @@ def test_close_short_distinct_single(
 def test_open_short_distinct_reduce_multiple_in_single_day(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=3,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
     test_broker_distinct.process_open_orders([open_order1, open_order2])
 
-    close_order1 = Order(
+    close_order1 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.SHORT,
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
-    close_order2 = Order(
+    close_order2 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.SHORT,
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
@@ -415,49 +374,41 @@ def test_open_short_distinct_reduce_multiple_in_single_day(
 def test_open_short_distinct_multiple_in_multiple_days(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
     test_broker_distinct.process_open_orders([open_order1])
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=2,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_open_orders([open_order2])
 
-    close_order1 = Order(
+    close_order1 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.SHORT,
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 
-    close_order2 = Order(
+    close_order2 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.SHORT,
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
     test_market.next_day()
     test_broker_distinct.process_close_orders([close_order1, close_order2])
 
-    close_order3 = Order(
+    close_order3 = CloseOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.CLOSE,
-        position_type=PositionType.SHORT,
         position_to_close=test_broker_distinct.get_positions()[0],
     )
 

@@ -2,7 +2,7 @@ from typing import List
 
 from stock_backtesting.account import Account
 from stock_backtesting.market import Market
-from stock_backtesting.order import Order, OrderAction, OrderType
+from stock_backtesting.order import CloseOrder, Order, OrderAction, OrderType
 from stock_backtesting.trade import Trade
 
 from .position import Position, PositionMode, PositionType
@@ -49,10 +49,9 @@ class Broker:
             if position.position_type == PositionType.LONG:
                 print(position.stop_loss, min_price)
                 if position.stop_loss >= min_price:
-                    order = Order(
+                    order = CloseOrder(
                         order_type=OrderType.MARKET_ORDER,
                         size=position.size,
-                        action=OrderAction.CLOSE,
                         position_to_close=position,
                     )
                     print(max_price, position.stop_loss)
@@ -62,10 +61,9 @@ class Broker:
 
             elif position.position_type == PositionType.SHORT:
                 if position.stop_loss <= max_price:
-                    order = Order(
+                    order = CloseOrder(
                         order_type=OrderType.MARKET_ORDER,
                         size=position.size,
-                        action=OrderAction.CLOSE,
                         position_to_close=position,
                     )
 
@@ -81,10 +79,9 @@ class Broker:
                 continue
             if position.position_type == PositionType.LONG:
                 if position.take_profit <= max_price:
-                    order = Order(
+                    order = CloseOrder(
                         order_type=OrderType.MARKET_ORDER,
                         size=position.size,
-                        action=OrderAction.CLOSE,
                         position_to_close=position,
                     )
 
@@ -93,10 +90,9 @@ class Broker:
 
             elif position.position_type == PositionType.SHORT:
                 if position.take_profit >= self.__market.get_current_price():
-                    order = Order(
+                    order = CloseOrder(
                         order_type=OrderType.MARKET_ORDER,
                         size=position.size,
-                        action=OrderAction.CLOSE,
                         position_to_close=position,
                     )
 

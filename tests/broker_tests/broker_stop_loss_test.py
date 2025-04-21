@@ -2,7 +2,7 @@ import pytest
 
 from stock_backtesting.broker import Broker
 from stock_backtesting.market import Market, MarketTime
-from stock_backtesting.order import Order, OrderAction, OrderType
+from stock_backtesting.order import OpenOrder, OrderAction, OrderType
 from stock_backtesting.position import PositionType
 
 
@@ -10,10 +10,9 @@ from stock_backtesting.position import PositionType
     "market_data", [[(None, None, None, 100.0), (99.0, None, None, None)]]
 )
 def test_long_equal_on_open_time(test_market: Market, test_broker_accumulate: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
         stop_loss=99.0,
     )
@@ -46,10 +45,9 @@ def test_long_equal_on_open_time(test_market: Market, test_broker_accumulate: Br
     "market_data", [[(None, None, None, 100.0), (98.0, None, None, None)]]
 )
 def test_long_greater_on_open_time(test_market: Market, test_broker_accumulate: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
         stop_loss=99.0,
     )
@@ -81,10 +79,9 @@ def test_long_greater_on_open_time(test_market: Market, test_broker_accumulate: 
     "market_data", [[(None, None, None, 100.0), (99.5, None, None, None)]]
 )
 def test_long_less_on_open_time(test_market: Market, test_broker_accumulate: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
         stop_loss=99.0,
     )
@@ -102,10 +99,9 @@ def test_long_less_on_open_time(test_market: Market, test_broker_accumulate: Bro
 
 @pytest.mark.parametrize("market_data", [[(100.0, 99.0, 100.0, 99.0)]])
 def test_long_on_close_time(test_market: Market, test_broker_accumulate: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
         stop_loss=99.0,
     )
@@ -136,10 +132,9 @@ def test_long_on_close_time(test_market: Market, test_broker_accumulate: Broker)
 
 @pytest.mark.parametrize("market_data", [[(100.0, 98.0, 100.0, 99.5)]])
 def test_long_during_day(test_market: Market, test_broker_accumulate: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
         stop_loss=99.0,
     )
@@ -172,10 +167,9 @@ def test_long_during_day(test_market: Market, test_broker_accumulate: Broker):
 def test_long_not_happend_during_day(
     test_market: Market, test_broker_accumulate: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
         stop_loss=99.0,
     )
@@ -195,10 +189,9 @@ def test_long_not_happend_during_day(
     "market_data", [[(None, None, None, 100.0), (101.0, None, None, None)]]
 )
 def test_short_equal_on_open_time(test_market: Market, test_broker_distinct: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
         stop_loss=101.0,
     )
@@ -229,10 +222,9 @@ def test_short_equal_on_open_time(test_market: Market, test_broker_distinct: Bro
     "market_data", [[(None, None, None, 100.0), (102.0, None, None, None)]]
 )
 def test_short_less_on_open_time(test_market: Market, test_broker_distinct: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
         stop_loss=101.0,
     )
@@ -262,10 +254,9 @@ def test_short_less_on_open_time(test_market: Market, test_broker_distinct: Brok
     "market_data", [[(None, None, None, 100.0), (100.5, None, None, None)]]
 )
 def test_short_greater_on_open_time(test_market: Market, test_broker_distinct: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
         stop_loss=101.0,
     )
@@ -284,10 +275,9 @@ def test_short_greater_on_open_time(test_market: Market, test_broker_distinct: B
 
 @pytest.mark.parametrize("market_data", [[(100.0, 100.0, 101.0, 101.0)]])
 def test_short_equal_on_close_time(test_market: Market, test_broker_distinct: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
         stop_loss=101.0,
     )
@@ -316,10 +306,9 @@ def test_short_equal_on_close_time(test_market: Market, test_broker_distinct: Br
 
 @pytest.mark.parametrize("market_data", [[(100.0, 100.0, 101.0, 100.5)]])
 def test_short_equal_during_day(test_market: Market, test_broker_distinct: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
         stop_loss=101.0,
     )
@@ -350,10 +339,9 @@ def test_short_equal_during_day(test_market: Market, test_broker_distinct: Broke
 def test_short_equal_not_happend_during_day(
     test_market: Market, test_broker_distinct: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
         stop_loss=101.0,
     )
@@ -372,10 +360,9 @@ def test_short_equal_not_happend_during_day(
 
 @pytest.mark.parametrize("market_data", [[(100.0, 99.0, 100.0, 99.0)]])
 def test_stop_loss_not_set_long(test_market: Market, test_broker_accumulate: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
@@ -392,10 +379,9 @@ def test_stop_loss_not_set_long(test_market: Market, test_broker_accumulate: Bro
 
 @pytest.mark.parametrize("market_data", [[(100.0, 100.0, 101.0, 101.0)]])
 def test_stop_loss_not_set_short(test_market: Market, test_broker_distinct: Broker):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
@@ -412,18 +398,16 @@ def test_stop_loss_not_set_short(test_market: Market, test_broker_distinct: Brok
 
 @pytest.mark.parametrize("market_data", [[(50.0, 49.0, 50.0, 49.0)]])
 def test_multiple_long_positions(test_market: Market, test_broker_distinct: Broker):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
         stop_loss=49.0,
     )
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
         stop_loss=48.0,
     )
@@ -452,18 +436,16 @@ def test_multiple_long_positions(test_market: Market, test_broker_distinct: Brok
 
 @pytest.mark.parametrize("market_data", [[(50.0, 50.0, 51.0, 51.0)]])
 def test_multiple_short_positions(test_market: Market, test_broker_distinct: Broker):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
         stop_loss=51.0,
     )
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
         stop_loss=52.0,
     )

@@ -3,7 +3,7 @@ import pytest
 from stock_backtesting.account import Account
 from stock_backtesting.broker import Broker
 from stock_backtesting.market import Market, MarketTime
-from stock_backtesting.order import Order, OrderAction, OrderType
+from stock_backtesting.order import OpenOrder, OrderType
 from stock_backtesting.position import PositionType
 
 
@@ -11,10 +11,9 @@ from stock_backtesting.position import PositionType
 def test_open_long_accumulate_single(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
     test_broker_accumulate.process_open_orders([open_order])
@@ -40,17 +39,15 @@ def test_open_long_accumulate_single(
 def test_open_long_accumulate_multiple_in_single_process(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=2,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
@@ -78,19 +75,17 @@ def test_open_long_accumulate_multiple_in_single_process(
 def test_open_long_accumulate_multiple_in_multiple_processes(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
     test_broker_accumulate.process_open_orders([open_order1])
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=2,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
@@ -119,10 +114,9 @@ def test_open_long_accumulate_multiple_in_multiple_processes(
 def test_open_long_distinct_single(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
@@ -149,17 +143,15 @@ def test_open_long_distinct_single(
 def test_open_long_distinct_multiple_in_single_process(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=2,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
@@ -191,19 +183,17 @@ def test_open_long_distinct_multiple_in_single_process(
 def test_open_long_distinct_multiple_in_multiple_processes(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
     test_broker_distinct.process_open_orders([open_order1])
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=2,
-        action=OrderAction.OPEN,
         position_type=PositionType.LONG,
     )
 
@@ -236,10 +226,9 @@ def test_open_long_distinct_multiple_in_multiple_processes(
 def test_open_short_accumulate(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
@@ -251,10 +240,9 @@ def test_open_short_accumulate(
 def test_open_short_distinct_single(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order = Order(
+    open_order = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
@@ -281,17 +269,15 @@ def test_open_short_distinct_single(
 def test_open_short_distinct_multiple_in_single_process(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=2,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
@@ -323,19 +309,17 @@ def test_open_short_distinct_multiple_in_single_process(
 def test_open_short_distinct_multiple_in_multiple_processes(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
-    open_order1 = Order(
+    open_order1 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=1,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 
     test_broker_distinct.process_open_orders([open_order1])
 
-    open_order2 = Order(
+    open_order2 = OpenOrder(
         order_type=OrderType.MARKET_ORDER,
         size=2,
-        action=OrderAction.OPEN,
         position_type=PositionType.SHORT,
     )
 

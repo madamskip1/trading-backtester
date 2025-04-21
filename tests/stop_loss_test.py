@@ -5,7 +5,7 @@ import pytest
 
 from stock_backtesting.backtest import Backtest, BacktestingDataType
 from stock_backtesting.market import MarketTime
-from stock_backtesting.order import Order, OrderAction, OrderType
+from stock_backtesting.order import OpenOrder, Order, OrderType
 from stock_backtesting.position import PositionMode, PositionType
 from stock_backtesting.strategy import Strategy
 
@@ -16,10 +16,10 @@ class BuyOnOpenFirstDayStrategyStopLoss(Strategy):
         if market_time == MarketTime.OPEN and self._market.get_current_day() == 0:
             # Buy on open
             return [
-                Order(
+                OpenOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.OPEN,
+                    size=1,
+                    position_type=PositionType.LONG,
                     stop_loss=price - 1.0,
                 )
             ]
@@ -139,10 +139,9 @@ class SellOnOpenFirstDayStrategyStopLoss(Strategy):
         if market_time == MarketTime.OPEN and self._market.get_current_day() == 0:
             # Sell on open
             return [
-                Order(
+                OpenOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.OPEN,
+                    size=1,
                     position_type=PositionType.SHORT,
                     stop_loss=price + 1.0,
                 )
@@ -283,10 +282,9 @@ class BuyOnOpenStrategyStopLoss(Strategy):
         if market_time == MarketTime.OPEN:
             # Buy on open
             return [
-                Order(
+                OpenOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.OPEN,
+                    size=1,
                     position_type=PositionType.LONG,
                     stop_loss=price - 1.0,
                 )
@@ -360,10 +358,9 @@ class SellOnOpenStrategyStopLoss(Strategy):
         if market_time == MarketTime.OPEN:
             # Sell on open
             return [
-                Order(
+                OpenOrder(
                     OrderType.MARKET_ORDER,
-                    1,
-                    OrderAction.OPEN,
+                    size=1,
                     position_type=PositionType.SHORT,
                     stop_loss=price + 1.0,
                 )
