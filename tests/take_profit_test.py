@@ -5,7 +5,7 @@ import pytest
 
 from stock_backtesting.backtest import Backtest, BacktestingDataType
 from stock_backtesting.market import MarketTime
-from stock_backtesting.order import OpenOrder, Order, OrderType
+from stock_backtesting.order import OpenOrder, Order
 from stock_backtesting.position import PositionMode, PositionType
 from stock_backtesting.strategy import Strategy
 
@@ -17,7 +17,6 @@ class BuyOnOpenFirstDayStrategyTakeProfit(Strategy):
             # Buy on open
             return [
                 OpenOrder(
-                    OrderType.MARKET_ORDER,
                     size=1,
                     position_type=PositionType.LONG,
                     take_profit=price + 1.0,
@@ -140,7 +139,6 @@ class SellOnOpenFirstDayStrategyTakeProfit(Strategy):
             # Sell on open
             return [
                 OpenOrder(
-                    OrderType.MARKET_ORDER,
                     size=1,
                     position_type=PositionType.SHORT,
                     take_profit=price - 1.0,
@@ -283,7 +281,6 @@ class BuyOnOpenStrategyTakeProfit(Strategy):
             # Buy on open
             return [
                 OpenOrder(
-                    OrderType.MARKET_ORDER,
                     size=1,
                     position_type=PositionType.LONG,
                     take_profit=price + 1.0,
@@ -359,7 +356,6 @@ class SellOnOpenStrategyTakeProfit(Strategy):
             # Sell on open
             return [
                 OpenOrder(
-                    OrderType.MARKET_ORDER,
                     size=1,
                     position_type=PositionType.SHORT,
                     take_profit=price - 1.0,

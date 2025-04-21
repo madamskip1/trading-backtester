@@ -5,7 +5,7 @@ import pytest
 
 from stock_backtesting.backtest import Backtest
 from stock_backtesting.market import MarketTime
-from stock_backtesting.order import OpenOrder, Order, OrderType
+from stock_backtesting.order import OpenOrder, Order
 from stock_backtesting.position import PositionType
 from stock_backtesting.strategy import Strategy
 
@@ -19,7 +19,6 @@ class BuyOnOpenStrategy(Strategy):
             # Buy on open
             return [
                 OpenOrder(
-                    OrderType.MARKET_ORDER,
                     size=1,
                     position_type=PositionType.LONG,
                 )
