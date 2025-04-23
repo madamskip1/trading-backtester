@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from stock_backtesting.account import Account
 from stock_backtesting.market import Market
@@ -44,57 +44,57 @@ class Broker:
         min_price = self.__market.get_current_session_min_price()
         max_price = self.__market.get_current_session_max_price()
 
+        close_orders: List[Tuple[CloseOrder, float]] = []
+
         for position in self.__positions:
             if position.stop_loss is None:
                 continue
-            if position.position_type == PositionType.LONG:
-                print(position.stop_loss, min_price)
-                if position.stop_loss >= min_price:
-                    order = CloseOrder(
-                        size=position.size,
-                        position_to_close=position,
-                    )
-                    print(max_price, position.stop_loss)
-                    price = min(max_price, position.stop_loss)
-                    print(price)
-                    self.__process_close_order(order, price)
 
-            elif position.position_type == PositionType.SHORT:
-                if position.stop_loss <= max_price:
-                    order = CloseOrder(
-                        size=position.size,
-                        position_to_close=position,
-                    )
+            if not self.__check_stop_loss_price(
+                position.stop_loss, min_price, max_price, position.position_type
+            ):
+                continue
 
-                    price = max(min_price, position.stop_loss)
-                    self.__process_close_order(order, price)
+            price = self.__get_stop_loss_order_price(
+                position.stop_loss, min_price, max_price, position.position_type
+            )
+            order = CloseOrder(
+                size=position.size,
+                position_to_close=position,
+            )
+
+            close_orders.append((order, price))
+
+        for order, price in close_orders:
+            self.__process_close_order(order, price)
 
     def process_take_profits(self) -> None:
         min_price = self.__market.get_current_session_min_price()
         max_price = self.__market.get_current_session_max_price()
 
+        close_orders: List[Tuple[CloseOrder, float]] = []
+
         for position in self.__positions:
             if position.take_profit is None:
                 continue
-            if position.position_type == PositionType.LONG:
-                if position.take_profit <= max_price:
-                    order = CloseOrder(
-                        size=position.size,
-                        position_to_close=position,
-                    )
 
-                    price = max(min_price, position.take_profit)
-                    self.__process_close_order(order, price)
+            if not self.__check_take_profit_price(
+                position.take_profit, min_price, max_price, position.position_type
+            ):
+                continue
 
-            elif position.position_type == PositionType.SHORT:
-                if position.take_profit >= self.__market.get_current_price():
-                    order = CloseOrder(
-                        size=position.size,
-                        position_to_close=position,
-                    )
+            price = self.__get_take_profit_order_price(
+                position.take_profit, min_price, max_price, position.position_type
+            )
+            order = CloseOrder(
+                size=position.size,
+                position_to_close=position,
+            )
 
-                    price = min(max_price, position.take_profit)
-                    self.__process_close_order(order, price)
+            close_orders.append((order, price))
+
+        for order, price in close_orders:
+            self.__process_close_order(order, price)
 
     def process_orders(self, new_orders: List[Order] = []) -> None:
         price = self.__market.get_current_price()
@@ -120,7 +120,9 @@ class Broker:
         min_price = self.__market.get_current_session_min_price()
         max_price = self.__market.get_current_session_max_price()
 
-        for order in self.__limit_orders:
+        orders_to_remove: List[Order] = []
+
+        for order in self.__limit_orders.copy():
             assert order.limit_price is not None
             if order.action == OrderAction.OPEN:
                 if not self.__check_limit_price(
@@ -132,7 +134,10 @@ class Broker:
                     order.limit_price, min_price, max_price, order.position_type
                 )
                 self.__process_open_order(order, order_price)
-                self.__limit_orders.remove(order)
+                orders_to_remove.append(order)
+
+        for order in orders_to_remove:
+            self.__limit_orders.remove(order)
 
     def __process_open_order(self, order: Order, price: float) -> None:
         money = order.size * price
@@ -236,4 +241,59 @@ class Broker:
             min(max_price, limit_price)
             if position_type == PositionType.LONG
             else max(min_price, limit_price)
+        )
+
+    def __check_stop_loss_price(
+        self,
+        stop_loss_price: float,
+        min_price: float,
+        max_price: float,
+        position_type: PositionType,
+    ) -> bool:
+        return (
+            stop_loss_price >= min_price
+            if position_type == PositionType.LONG
+            else stop_loss_price <= max_price
+        )
+
+    def __get_stop_loss_order_price(
+        self,
+        stop_loss_price: float,
+        min_price: float,
+        max_price: float,
+        position_type: PositionType,
+    ) -> float:
+        return (
+            min(max_price, stop_loss_price)
+            if position_type == PositionType.LONG
+            else max(min_price, stop_loss_price)
+        )
+
+    def __check_take_profit_price(
+        self,
+        take_profit_price: float,
+        min_price: float,
+        max_price: float,
+        position_type: PositionType,
+    ) -> bool:
+        print(
+            f"Checking take profit price: {take_profit_price}, min: {min_price}, max: {max_price}, position type: {position_type}"
+        )
+        return (
+            take_profit_price <= max_price
+            if position_type == PositionType.LONG
+            else take_profit_price >= min_price
+        )
+
+    def __get_take_profit_order_price(
+        self,
+        take_profit_price: float,
+        min_price: float,
+        max_price: float,
+        position_type: PositionType,
+    ) -> float:
+        return (
+            max(min_price, take_profit_price)
+            if position_type == PositionType.LONG
+            else min(max_price, take_profit_price)
         )

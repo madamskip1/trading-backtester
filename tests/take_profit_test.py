@@ -213,7 +213,7 @@ def test_take_profit_on_close_equal_short():
 def test_take_profit_on_open_less_short():
     data = np.array(
         [
-            (18.0, 15.0, 18.0, 17.5),
+            (18.0, 17.1, 18.0, 17.5),
             (16.5, 15.0, 18.5, 18.5),
         ],
         dtype=BacktestingDataType,
@@ -353,6 +353,7 @@ class SellOnOpenStrategyTakeProfit(Strategy):
 
     def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
         if market_time == MarketTime.OPEN:
+            print("return open with ", price, (price - 1.0))
             # Sell on open
             return [
                 OpenOrder(
@@ -368,8 +369,8 @@ class SellOnOpenStrategyTakeProfit(Strategy):
 def test_take_profit_distinct_mode_short():
     data = np.array(
         [
-            (18.0, 15.0, 18.0, 17.5),
-            (17.1, 15.0, 17.1, 17.0),
+            (18.0, 17.5, 18.0, 17.5),
+            (17.1, 16.6, 17.1, 17.0),
         ],
         dtype=BacktestingDataType,
     )
