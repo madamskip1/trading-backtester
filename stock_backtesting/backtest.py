@@ -4,15 +4,11 @@ import numpy as np
 
 from .account import Account
 from .broker import Broker
+from .data import Data
 from .market import Market, MarketTime
 from .position import PositionMode
 from .stats import Statistics
 from .strategy import Strategy
-from .trade import Trade
-
-BacktestingDataType = np.dtype(
-    [("open", "f8"), ("min", "f8"), ("max", "f8"), ("close", "f8")]
-)
 
 
 class Backtest:
@@ -24,7 +20,8 @@ class Backtest:
         position_mode: PositionMode = PositionMode.ACCUMULATE,
     ):
         self.__data_len = len(data)
-        self.__market = Market(data)
+        self.__data = Data(data)
+        self.__market = Market(self.__data)
         self.__account = Account(data_size=len(data), initial_money=money)
         self.__broker = Broker(position_mode, self.__market, self.__account)
         self.__statistics = Statistics(self.__broker.get_trades(), self.__account)
@@ -42,7 +39,7 @@ class Backtest:
             self.__broker.process_take_profits()
 
             new_orders = self.__strategy.collect_orders(
-                self.__market.get_current_time(), self.__market.get_today_open_price()
+                self.__market.get_current_time(), self.__market.get_current_open_price()
             )
             self.__broker.process_orders(new_orders=new_orders)
 
@@ -52,16 +49,17 @@ class Backtest:
             self.__broker.process_take_profits()
 
             new_orders = self.__strategy.collect_orders(
-                self.__market.get_current_time(), self.__market.get_today_close_price()
+                self.__market.get_current_time(),
+                self.__market.get_current_close_price(),
             )
             self.__broker.process_orders(new_orders=new_orders)
 
             self.__account.update_assets_value(
-                self.__market.get_current_day(), self.__broker.get_assets_value()
+                self.__data.get_current_data_index(), self.__broker.get_assets_value()
             )
-            self.__account.calculate_equity(self.__market.get_current_day())
+            self.__account.calculate_equity(self.__data.get_current_data_index())
 
-            self.__market.next_day()
+            self.__data.increment_data_index()
 
         print("Backtest finished.")
         print(self.__statistics)

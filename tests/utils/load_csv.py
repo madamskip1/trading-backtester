@@ -2,7 +2,7 @@ from typing import Any
 
 import numpy as np
 
-from stock_backtesting.backtest import BacktestingDataType
+from stock_backtesting.data import DATA_TYPE
 
 
 def load_csv(file_path: str) -> np.ndarray[Any, np.dtype[Any]]:
@@ -10,6 +10,6 @@ def load_csv(file_path: str) -> np.ndarray[Any, np.dtype[Any]]:
         file_path,
         delimiter=",",
         skip_header=1,
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
         usecols=(1, 2, 3, 4),
     )

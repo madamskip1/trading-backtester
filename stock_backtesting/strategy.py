@@ -1,9 +1,8 @@
 from typing import List
 
+from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import Order
 from stock_backtesting.position import Position
-
-from .market import Market, MarketTime
 
 
 class Strategy:

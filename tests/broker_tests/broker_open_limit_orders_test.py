@@ -2,6 +2,7 @@ import pytest
 
 from stock_backtesting.account import Account
 from stock_backtesting.broker import Broker
+from stock_backtesting.data import Data
 from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import OpenOrder
 from stock_backtesting.position import PositionType
@@ -65,14 +66,18 @@ def test_open_long_accumulate_during_day(
     "market_data", [[(None, None, None, 95.0), (90.0, None, None, None)]]
 )
 def test_open_long_accumulate_on_open_equal(
-    test_market: Market, test_account: Account, test_broker_accumulate: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_accumulate: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_orders([open_order])
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_accumulate.process_orders()
 
     assert len(test_broker_accumulate.get_trades()) == 1
@@ -96,14 +101,18 @@ def test_open_long_accumulate_on_open_equal(
     "market_data", [[(None, None, None, 95.0), (85.0, None, None, None)]]
 )
 def test_open_long_accumulate_on_open_less(
-    test_market: Market, test_account: Account, test_broker_accumulate: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_accumulate: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_orders([open_order])
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_accumulate.process_orders()
 
     assert len(test_broker_accumulate.get_trades()) == 1
@@ -127,14 +136,18 @@ def test_open_long_accumulate_on_open_less(
     "market_data", [[(None, None, None, 95.0), (95.0, None, None, None)]]
 )
 def test_open_long_accumulate_on_open_greater_not_opened(
-    test_market: Market, test_account: Account, test_broker_accumulate: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_accumulate: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_accumulate.process_orders([open_order])
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_accumulate.process_orders()
 
     assert len(test_broker_accumulate.get_trades()) == 0
@@ -201,14 +214,18 @@ def test_open_long_distinct_during_day(
     "market_data", [[(None, None, None, 95.0), (90.0, None, None, None)]]
 )
 def test_open_long_distinct_on_open_equal(
-    test_market: Market, test_account: Account, test_broker_distinct: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_distinct: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_orders([open_order])
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_distinct.process_orders()
 
     assert len(test_broker_distinct.get_trades()) == 1
@@ -232,14 +249,18 @@ def test_open_long_distinct_on_open_equal(
     "market_data", [[(None, None, None, 100.0), (85.0, None, None, None)]]
 )
 def test_open_long_distinct_on_open_less(
-    test_market: Market, test_account: Account, test_broker_distinct: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_distinct: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_orders([open_order])
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_distinct.process_orders()
 
     assert len(test_broker_distinct.get_trades()) == 1
@@ -263,14 +284,18 @@ def test_open_long_distinct_on_open_less(
     "market_data", [[(None, None, None, 100.0), (95.0, None, None, None)]]
 )
 def test_open_long_distinct_on_open_greater_not_opened(
-    test_market: Market, test_account: Account, test_broker_distinct: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_distinct: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_orders([open_order])
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_distinct.process_orders()
 
     assert len(test_broker_distinct.get_trades()) == 0
@@ -337,14 +362,18 @@ def test_open_short_distinct_during_day(
     "market_data", [[(None, None, None, 90.0), (100.0, None, None, None)]]
 )
 def test_open_short_distinct_on_open_equal(
-    test_market: Market, test_account: Account, test_broker_distinct: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_distinct: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_orders([open_order])
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_distinct.process_orders()
 
     assert len(test_broker_distinct.get_trades()) == 1
@@ -368,14 +397,18 @@ def test_open_short_distinct_on_open_equal(
     "market_data", [[(None, None, None, 90.0), (100.0, None, None, None)]]
 )
 def test_open_short_distinct_on_open_less(
-    test_market: Market, test_account: Account, test_broker_distinct: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_distinct: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_orders([open_order])
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_distinct.process_orders()
 
     assert len(test_broker_distinct.get_trades()) == 1
@@ -399,14 +432,18 @@ def test_open_short_distinct_on_open_less(
     "market_data", [[(None, None, None, 90.0), (95.0, None, None, None)]]
 )
 def test_open_short_distinct_on_open_greater_not_opened(
-    test_market: Market, test_account: Account, test_broker_distinct: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_distinct: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
 
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker_distinct.process_orders([open_order])
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_distinct.process_orders()
 
     assert len(test_broker_distinct.get_trades()) == 0

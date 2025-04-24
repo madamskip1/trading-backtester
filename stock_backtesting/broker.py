@@ -41,8 +41,8 @@ class Broker:
         return assets_value
 
     def process_stop_losses(self) -> None:
-        min_price = self.__market.get_current_session_min_price()
-        max_price = self.__market.get_current_session_max_price()
+        min_price = self.__market.get_current_min_price()
+        max_price = self.__market.get_current_max_price()
 
         close_orders: List[Tuple[CloseOrder, float]] = []
 
@@ -69,8 +69,8 @@ class Broker:
             self.__process_close_order(order, price)
 
     def process_take_profits(self) -> None:
-        min_price = self.__market.get_current_session_min_price()
-        max_price = self.__market.get_current_session_max_price()
+        min_price = self.__market.get_current_min_price()
+        max_price = self.__market.get_current_max_price()
 
         close_orders: List[Tuple[CloseOrder, float]] = []
 
@@ -117,8 +117,8 @@ class Broker:
 
     def __process_limit_orders(self) -> None:
         price = self.__market.get_current_price()
-        min_price = self.__market.get_current_session_min_price()
-        max_price = self.__market.get_current_session_max_price()
+        min_price = self.__market.get_current_min_price()
+        max_price = self.__market.get_current_max_price()
 
         orders_to_remove: List[Order] = []
 
@@ -174,7 +174,7 @@ class Broker:
                 order,
                 self.__market.get_current_price(),
                 market_order=(order.limit_price is None),
-                date_index=self.__market.get_current_day(),
+                date_index=self.__market.get_data_index(),
             )
         )
 
@@ -206,7 +206,7 @@ class Broker:
                 order,
                 price,
                 market_order=(order.limit_price is None),
-                date_index=self.__market.get_current_day(),
+                date_index=self.__market.get_data_index(),
             )
         )
 

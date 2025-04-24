@@ -2,6 +2,7 @@ import pytest
 
 from stock_backtesting.account import Account
 from stock_backtesting.broker import Broker
+from stock_backtesting.data import Data
 from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import CloseOrder, OpenOrder
 from stock_backtesting.position import PositionType
@@ -84,7 +85,10 @@ def test_close_long_accumulate_reduce_multiple_in_single_day(
     "market_data", [[(25.0, None, None, 50.0), (25.0, None, None, None)]]
 )
 def test_close_long_accumulate_reduce_multiple_in_multiple_days(
-    test_market: Market, test_account: Account, test_broker_accumulate: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_accumulate: Broker,
 ):
     open_order = OpenOrder(
         size=4,
@@ -106,7 +110,8 @@ def test_close_long_accumulate_reduce_multiple_in_multiple_days(
         position_to_close=test_broker_accumulate.get_positions()[0],
     )
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_accumulate.process_orders([close_order2])
 
     assert len(test_broker_accumulate.get_trades()) == 3
@@ -156,7 +161,10 @@ def test_close_long_distinct_single(
     "market_data", [[(40.0, None, None, 20.0), (50.0, None, None, 75.0)]]
 )
 def test_close_long_distinct_reduce_multiple_in_single_day(
-    test_market: Market, test_account: Account, test_broker_distinct: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_distinct: Broker,
 ):
     open_order1 = OpenOrder(
         size=1,
@@ -183,7 +191,8 @@ def test_close_long_distinct_reduce_multiple_in_single_day(
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_distinct.process_orders([close_order1, close_order2])
 
     close_order3 = CloseOrder(
@@ -223,7 +232,10 @@ def test_close_long_distinct_reduce_multiple_in_single_day(
     "market_data", [[(40.0, None, None, 20.0), (50.0, None, None, 75.0)]]
 )
 def test_close_long_distinct_reduce_multiple_in_multiple_days(
-    test_market: Market, test_account: Account, test_broker_distinct: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_distinct: Broker,
 ):
     open_order1 = OpenOrder(
         size=1,
@@ -250,7 +262,8 @@ def test_close_long_distinct_reduce_multiple_in_multiple_days(
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_distinct.process_orders([close_order1, close_order2])
 
     close_order3 = CloseOrder(
@@ -286,7 +299,7 @@ def test_close_long_distinct_reduce_multiple_in_multiple_days(
     assert test_account.get_current_money() == pytest.approx(175.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(100.0, None, None, 50)]])
+@pytest.mark.parametrize("market_data", [[(100.0, None, None, 50.0)]])
 def test_close_short_distinct_single(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -372,7 +385,10 @@ def test_open_short_distinct_reduce_multiple_in_single_day(
     "market_data", [[(50.0, None, None, 25.0), (20.0, None, None, 15.0)]]
 )
 def test_open_short_distinct_multiple_in_multiple_days(
-    test_market: Market, test_account: Account, test_broker_distinct: Broker
+    test_data: Data,
+    test_market: Market,
+    test_account: Account,
+    test_broker_distinct: Broker,
 ):
     open_order1 = OpenOrder(
         size=1,
@@ -399,7 +415,8 @@ def test_open_short_distinct_multiple_in_multiple_days(
         position_to_close=test_broker_distinct.get_positions()[1],
     )
 
-    test_market.next_day()
+    test_data.increment_data_index()
+    test_market.set_current_time(MarketTime.OPEN)
     test_broker_distinct.process_orders([close_order1, close_order2])
 
     close_order3 = CloseOrder(

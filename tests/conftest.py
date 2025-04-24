@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 
 from stock_backtesting.account import Account
-from stock_backtesting.backtest import BacktestingDataType
 from stock_backtesting.broker import Broker
+from stock_backtesting.data import DATA_TYPE, Data
 from stock_backtesting.market import Market
 from stock_backtesting.position import PositionMode
 from stock_backtesting.stats import Statistics
@@ -44,13 +44,17 @@ def test_account() -> Account:
 
 
 @pytest.fixture
-def test_market(market_data: np.ndarray[Any, np.dtype[Any]]) -> Market:
+def test_data(market_data: np.ndarray[Any, np.dtype[Any]]) -> Data:
     market_data = np.array(
         market_data,
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
+    return Data(market_data)
 
-    return Market(data=market_data)
+
+@pytest.fixture
+def test_market(test_data: Data) -> Market:
+    return Market(test_data)
 
 
 @pytest.fixture

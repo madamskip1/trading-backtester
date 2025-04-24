@@ -3,7 +3,8 @@ from typing import List
 import numpy as np
 import pytest
 
-from stock_backtesting.backtest import Backtest, BacktestingDataType
+from stock_backtesting.backtest import Backtest
+from stock_backtesting.data import DATA_TYPE
 from stock_backtesting.market import MarketTime
 from stock_backtesting.order import OpenOrder, Order
 from stock_backtesting.position import PositionMode, PositionType
@@ -13,7 +14,7 @@ from stock_backtesting.strategy import Strategy
 class BuyOnOpenFirstDayStrategyStopLoss(Strategy):
 
     def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
-        if market_time == MarketTime.OPEN and self._market.get_current_day() == 0:
+        if market_time == MarketTime.OPEN and self._market.get_data_index() == 0:
             # Buy on open
             return [
                 OpenOrder(
@@ -31,7 +32,7 @@ def test_stop_loss_on_close_greater_long():
         [
             (18.0, 16.5, 18.0, 16.5),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(data, BuyOnOpenFirstDayStrategyStopLoss, money=100.0)
@@ -57,7 +58,7 @@ def test_stop_loss_on_close_equal_long():
         [
             (18.0, 17.0, 18.0, 17.0),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(data, BuyOnOpenFirstDayStrategyStopLoss, money=100.0)
@@ -84,7 +85,7 @@ def test_stop_loss_on_open_greater_long():
             (18.0, 17.1, 18.0, 17.5),
             (16.5, 15.0, 18.5, 18.5),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(data, BuyOnOpenFirstDayStrategyStopLoss, money=100.0)
@@ -111,7 +112,7 @@ def test_stop_loss_on_open_equal_long():
             (18.0, 15.0, 18.0, 17.5),
             (17.0, 15.0, 18.0, 18.0),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(data, BuyOnOpenFirstDayStrategyStopLoss, money=100.0)
@@ -135,7 +136,7 @@ def test_stop_loss_on_open_equal_long():
 class SellOnOpenFirstDayStrategyStopLoss(Strategy):
 
     def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
-        if market_time == MarketTime.OPEN and self._market.get_current_day() == 0:
+        if market_time == MarketTime.OPEN and self._market.get_data_index() == 0:
             # Sell on open
             return [
                 OpenOrder(
@@ -153,7 +154,7 @@ def test_stop_loss_on_close_less_short():
         [
             (18.0, 15.0, 19.5, 19.5),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(
@@ -184,7 +185,7 @@ def test_stop_loss_on_close_equal_short():
         [
             (18.0, 15.0, 19.0, 19.0),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(
@@ -216,7 +217,7 @@ def test_stop_loss_on_open_less_short():
             (18.0, 15.0, 18.0, 17.5),
             (19.5, 15.0, 19.5, 18.5),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(
@@ -248,7 +249,7 @@ def test_stop_loss_on_open_equal_short():
             (18.0, 15.0, 18.0, 17.5),
             (19.0, 15.0, 19.0, 18.0),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(
@@ -296,7 +297,7 @@ def test_rewrite_stop_loss_accumulate_mode_long():
             (18.0, 17.2, 18.0, 17.5),
             (17.1, 16.2, 17.1, 16.9),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(data, BuyOnOpenStrategyStopLoss, money=100.0)
@@ -323,7 +324,7 @@ def test_stop_loss_distinct_mode_long():
             (18.0, 17.1, 18.0, 17.5),
             (17.1, 16.2, 17.1, 16.5),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(
@@ -371,7 +372,7 @@ def test_stop_loss_distinct_mode_short():
             (18.0, 15.0, 18.0, 17.5),
             (18.1, 15.0, 19.0, 19.0),
         ],
-        dtype=BacktestingDataType,
+        dtype=DATA_TYPE,
     )
 
     backtest = Backtest(

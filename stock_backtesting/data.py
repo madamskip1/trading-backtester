@@ -1,0 +1,31 @@
+from typing import Any
+
+import numpy as np
+
+DATA_TYPE = np.dtype(
+    [
+        ("open", "f8"),
+        ("min", "f8"),
+        ("max", "f8"),
+        ("close", "f8"),
+    ]
+)
+
+
+class Data:
+
+    def __init__(self, data: np.ndarray[Any, np.dtype[Any]]):
+        self.__data = data
+        self.__current_data_index = 0
+
+    def increment_data_index(self) -> None:
+        self.__current_data_index += 1
+
+    def get_data(self, index: int, key: str) -> float:
+        return self.__data[index][key]
+
+    def get_current_data_index(self) -> int:
+        return self.__current_data_index
+
+    def get_current_data(self, key: str) -> float:
+        return self.__data[self.__current_data_index][key]

@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Any, Optional
+from typing import Optional
 
-import numpy as np
+from stock_backtesting.data import Data
 
 
 class MarketTime(Enum):
@@ -12,70 +12,65 @@ class MarketTime(Enum):
 
 class Market:
 
-    def __init__(self, data: np.ndarray[Any, np.dtype[Any]]):
+    def __init__(self, data: Data):
         self.__data = data
-        self.__current_day = 0
         self.__current_time = MarketTime.OPEN
 
-    def get_current_day(self) -> int:
-        return self.__current_day
-
-    def next_day(self):
-        self.__current_day += 1
-        self.__current_time = MarketTime.OPEN
-
-    def set_current_time(self, time: MarketTime):
+    def set_current_time(self, time: MarketTime) -> None:
         self.__current_time = time
 
     def get_current_time(self) -> MarketTime:
         return self.__current_time
 
+    def get_data_index(self) -> int:
+        return self.__data.get_current_data_index()
+
     def get_current_price(self) -> float:
-        if self.__current_time == MarketTime.OPEN:
-            return self.__data[self.__current_day]["open"]
+        return (
+            self.__data.get_current_data("open")
+            if self.__current_time == MarketTime.OPEN
+            else self.__data.get_current_data("close")
+        )
 
-        if self.__current_time == MarketTime.MID_DAY:
-            raise NotImplementedError("Mid-day price not implemented")
+    def get_current_open_price(self) -> float:
+        return self.__data.get_current_data("open")
 
-        return self.__data[self.__current_day]["close"]
-
-    def get_today_open_price(self) -> float:
-        return self.__data[self.__current_day]["open"]
-
-    def get_today_close_price(self) -> float:
+    def get_current_close_price(self) -> float:
         if self.__current_time != MarketTime.CLOSE:
-            raise ValueError("Market is not closed yet. Can't look into the future.")
+            raise ValueError(
+                "Candlestick is not closed yet. Can't look into the future."
+            )
 
-        return self.__data[self.__current_day]["close"]
+        return self.__data.get_current_data("close")
 
-    def get_current_session_min_price(self) -> float:
+    def get_current_min_price(self) -> float:
         return (
-            self.__data[self.__current_day]["min"]
+            self.__data.get_current_data("min")
             if self.__current_time == MarketTime.CLOSE
-            else self.__data[self.__current_day]["open"]
+            else self.__data.get_current_data("open")
         )
 
-    def get_current_session_max_price(self) -> float:
+    def get_current_max_price(self) -> float:
         return (
-            self.__data[self.__current_day]["max"]
+            self.__data.get_current_data("max")
             if self.__current_time == MarketTime.CLOSE
-            else self.__data[self.__current_day]["open"]
+            else self.__data.get_current_data("open")
         )
 
-    def get_open_price_on_nth_day_ago(self, n: int) -> Optional[float]:
+    def get_open_price_on_nth_ago(self, n: int) -> Optional[float]:
         if n < 1:
             raise ValueError("To look into the past, n must be greater than 0.")
 
-        if self.__current_day - n < 0:
+        if self.__data.get_current_data_index() - n < 0:
             return None
 
-        return self.__data[self.__current_day - n]["open"]
+        return self.__data.get_data(self.__data.get_current_data_index() - n, "open")
 
-    def get_close_price_on_nth_day_ago(self, n: int) -> Optional[float]:
+    def get_close_price_on_nth_ago(self, n: int) -> Optional[float]:
         if n < 1:
             raise ValueError("To look into the past, n must be greater than 0.")
 
-        if self.__current_day - n < 0:
+        if self.__data.get_current_data_index() - n < 0:
             return None
 
-        return self.__data[self.__current_day - n]["close"]
+        return self.__data.get_data(self.__data.get_current_data_index() - n, "close")
