@@ -39,7 +39,9 @@ class Backtest:
             self.__broker.process_take_profits()
 
             new_orders = self.__strategy.collect_orders(
-                self.__market.get_current_time(), self.__market.get_current_open_price()
+                self.__market.get_current_time(),
+                self.__market.get_current_open_price(),
+                self.__data.get_current_datatime(),
             )
             self.__broker.process_orders(new_orders=new_orders)
 
@@ -51,6 +53,7 @@ class Backtest:
             new_orders = self.__strategy.collect_orders(
                 self.__market.get_current_time(),
                 self.__market.get_current_close_price(),
+                self.__data.get_current_datatime(),
             )
             self.__broker.process_orders(new_orders=new_orders)
 

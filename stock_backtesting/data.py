@@ -1,9 +1,11 @@
+from datetime import datetime
 from typing import Any
 
 import numpy as np
 
 DATA_TYPE = np.dtype(
     [
+        ("datetime", "datetime64[ns]"),
         ("open", "f8"),
         ("min", "f8"),
         ("max", "f8"),
@@ -29,3 +31,10 @@ class Data:
 
     def get_current_data(self, key: str) -> float:
         return self.__data[self.__current_data_index][key]
+
+    def get_current_datatime(self) -> datetime:
+        return (
+            self.__data[self.__current_data_index]["datetime"]
+            .astype("M8[ms]")
+            .astype(datetime)
+        )

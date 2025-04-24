@@ -7,7 +7,7 @@ from stock_backtesting.order import OpenOrder
 from stock_backtesting.position import PositionType
 
 
-@pytest.mark.parametrize("market_data", [[(100.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, None)]])
 def test_open_long_accumulate_single(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
@@ -35,7 +35,7 @@ def test_open_long_accumulate_single(
     assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(25.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, None)]])
 def test_open_long_accumulate_multiple_in_single_process(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
@@ -71,7 +71,7 @@ def test_open_long_accumulate_multiple_in_single_process(
     assert test_account.get_current_money() == pytest.approx(25.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(50.0, None, None, 25.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0)]])
 def test_open_long_accumulate_multiple_in_multiple_processes(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
@@ -110,7 +110,7 @@ def test_open_long_accumulate_multiple_in_multiple_processes(
     assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(100.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, None)]])
 def test_open_long_distinct_single(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -139,7 +139,7 @@ def test_open_long_distinct_single(
     assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(25.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, None)]])
 def test_open_long_distinct_multiple_in_single_process(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -179,7 +179,7 @@ def test_open_long_distinct_multiple_in_single_process(
     assert test_account.get_current_money() == pytest.approx(25.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(50.0, None, None, 25.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0)]])
 def test_open_long_distinct_multiple_in_multiple_processes(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -222,7 +222,7 @@ def test_open_long_distinct_multiple_in_multiple_processes(
     assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(100.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, None)]])
 def test_open_short_accumulate(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
@@ -235,7 +235,7 @@ def test_open_short_accumulate(
         test_broker_accumulate.process_orders([open_order])
 
 
-@pytest.mark.parametrize("market_data", [[(100.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, None)]])
 def test_open_short_distinct_single(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -264,7 +264,7 @@ def test_open_short_distinct_single(
     assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(25.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, None)]])
 def test_open_short_distinct_multiple_in_single_process(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -304,7 +304,7 @@ def test_open_short_distinct_multiple_in_single_process(
     assert test_account.get_current_money() == pytest.approx(25.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(50.0, None, None, 25.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0)]])
 def test_open_short_distinct_multiple_in_multiple_processes(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):

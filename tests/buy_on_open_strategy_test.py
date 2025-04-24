@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import List
 
 import pytest
@@ -14,7 +15,9 @@ from .utils.load_csv import load_csv
 
 class BuyOnOpenStrategy(Strategy):
 
-    def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
+    def collect_orders(
+        self, market_time: MarketTime, price: float, date_time: datetime
+    ) -> List[Order]:
         if market_time == MarketTime.OPEN:
             # Buy on open
             return [

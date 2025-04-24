@@ -8,7 +8,7 @@ from stock_backtesting.order import CloseOrder, OpenOrder
 from stock_backtesting.position import PositionType
 
 
-@pytest.mark.parametrize("market_data", [[(100.0, None, None, 150.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, 150.0)]])
 def test_close_long_accumulate_single(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
@@ -37,7 +37,7 @@ def test_close_long_accumulate_single(
     assert test_account.get_current_money() == pytest.approx(150.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(25.0, None, None, 50.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, 50.0)]])
 def test_close_long_accumulate_reduce_multiple_in_single_day(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
@@ -82,7 +82,7 @@ def test_close_long_accumulate_reduce_multiple_in_single_day(
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(25.0, None, None, 50.0), (25.0, None, None, None)]]
+    "market_data", [[(None, 25.0, None, None, 50.0), (None, 25.0, None, None, None)]]
 )
 def test_close_long_accumulate_reduce_multiple_in_multiple_days(
     test_data: Data,
@@ -127,7 +127,7 @@ def test_close_long_accumulate_reduce_multiple_in_multiple_days(
     assert test_account.get_current_money() == pytest.approx(125.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(100.0, None, None, 150)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, 150)]])
 def test_close_long_distinct_single(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -158,7 +158,7 @@ def test_close_long_distinct_single(
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(40.0, None, None, 20.0), (50.0, None, None, 75.0)]]
+    "market_data", [[(None, 40.0, None, None, 20.0), (None, 50.0, None, None, 75.0)]]
 )
 def test_close_long_distinct_reduce_multiple_in_single_day(
     test_data: Data,
@@ -229,7 +229,7 @@ def test_close_long_distinct_reduce_multiple_in_single_day(
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(40.0, None, None, 20.0), (50.0, None, None, 75.0)]]
+    "market_data", [[(None, 40.0, None, None, 20.0), (None, 50.0, None, None, 75.0)]]
 )
 def test_close_long_distinct_reduce_multiple_in_multiple_days(
     test_data: Data,
@@ -299,7 +299,7 @@ def test_close_long_distinct_reduce_multiple_in_multiple_days(
     assert test_account.get_current_money() == pytest.approx(175.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(100.0, None, None, 50.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, 50.0)]])
 def test_close_short_distinct_single(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -329,7 +329,7 @@ def test_close_short_distinct_single(
     assert test_account.get_current_money() == pytest.approx(150.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(25.0, None, None, 20.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, 20.0)]])
 def test_open_short_distinct_reduce_multiple_in_single_day(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -382,7 +382,7 @@ def test_open_short_distinct_reduce_multiple_in_single_day(
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(50.0, None, None, 25.0), (20.0, None, None, 15.0)]]
+    "market_data", [[(None, 50.0, None, None, 25.0), (None, 20.0, None, None, 15.0)]]
 )
 def test_open_short_distinct_multiple_in_multiple_days(
     test_data: Data,

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from stock_backtesting.market import Market, MarketTime
@@ -10,5 +11,7 @@ class Strategy:
         self._market = market
         self._positions = positions
 
-    def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
+    def collect_orders(
+        self, market_time: MarketTime, price: float, date_time: datetime
+    ) -> List[Order]:
         raise NotImplementedError("This method should be implemented in subclasses.")

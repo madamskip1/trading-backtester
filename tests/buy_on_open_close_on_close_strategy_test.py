@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import List
 
 import pytest
@@ -14,7 +15,9 @@ from .utils.load_csv import load_csv
 
 class BuyOnOpenCloseOnCloseAccumulateStrategy(Strategy):
 
-    def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
+    def collect_orders(
+        self, market_time: MarketTime, price: float, date_time: datetime
+    ) -> List[Order]:
         if market_time == MarketTime.OPEN:
             # Buy on open
             return [
@@ -63,7 +66,9 @@ def test_single_day_profit_long_accumulate():
 
 class BuyOnOpenCloseOnCloseDistinctStrategy(Strategy):
 
-    def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
+    def collect_orders(
+        self, market_time: MarketTime, price: float, date_time: datetime
+    ) -> List[Order]:
         if market_time == MarketTime.OPEN:
             # Buy on open
             return [
@@ -117,7 +122,9 @@ def test_single_day_profit_long_distinct():
 
 class SellOnOpenCloseOnCloseAccumulateStrategy(Strategy):
 
-    def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
+    def collect_orders(
+        self, market_time: MarketTime, price: float, date_time: datetime
+    ) -> List[Order]:
         if market_time == MarketTime.OPEN:
             # Sell on open
             return [
@@ -152,7 +159,9 @@ def test_single_day_profit_short_accumulate():
 
 
 class SellOnOpenCloseOnCloseDistinctStrategy(Strategy):
-    def collect_orders(self, market_time: MarketTime, price: float) -> List[Order]:
+    def collect_orders(
+        self, market_time: MarketTime, price: float, date_time: datetime
+    ) -> List[Order]:
         if market_time == MarketTime.OPEN:
             # Sell on open
             return [
