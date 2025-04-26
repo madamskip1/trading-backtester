@@ -174,7 +174,6 @@ class Broker:
                 order,
                 self.__market.get_current_price(),
                 market_order=(order.limit_price is None),
-                date_index=self.__market.get_data_index(),
             )
         )
 
@@ -206,7 +205,6 @@ class Broker:
                 order,
                 price,
                 market_order=(order.limit_price is None),
-                date_index=self.__market.get_data_index(),
             )
         )
 

@@ -20,7 +20,6 @@ def test_open_long_position(account_mock: AccountMock):
             ),
             price=100,
             market_order=True,
-            date_index=0,
         )
     )
 
@@ -49,7 +48,6 @@ def test_open_short_position(account_mock: AccountMock):
             ),
             price=100,
             market_order=True,
-            date_index=0,
         )
     )
 
@@ -76,7 +74,6 @@ def test_close_long_position(account_mock: AccountMock):
             ),
             price=100,
             market_order=True,
-            date_index=0,
         )
     )
 
@@ -103,7 +100,6 @@ def test_close_short_position(account_mock: AccountMock):
             ),
             price=100,
             market_order=True,
-            date_index=0,
         )
     )
 
@@ -130,7 +126,6 @@ def test_open_and_close_long_position(account_mock: AccountMock):
             ),
             price=100,
             market_order=True,
-            date_index=0,
         )
     )
 
@@ -142,7 +137,6 @@ def test_open_and_close_long_position(account_mock: AccountMock):
             ),
             price=100,
             market_order=True,
-            date_index=0,
         )
     )
 
@@ -169,7 +163,6 @@ def test_open_and_close_short_position(account_mock: AccountMock):
             ),
             price=100,
             market_order=True,
-            date_index=0,
         )
     )
 
@@ -181,7 +174,6 @@ def test_open_and_close_short_position(account_mock: AccountMock):
             ),
             price=100,
             market_order=True,
-            date_index=0,
         )
     )
 

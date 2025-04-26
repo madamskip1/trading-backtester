@@ -22,9 +22,6 @@ class Market:
     def get_current_time(self) -> MarketTime:
         return self.__current_time
 
-    def get_data_index(self) -> int:
-        return self.__data.get_current_data_index()
-
     def get_current_price(self) -> float:
         return (
             self.__data.get_current_data("open")

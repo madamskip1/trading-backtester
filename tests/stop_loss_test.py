@@ -6,28 +6,37 @@ import pytest
 
 from stock_backtesting.backtest import Backtest
 from stock_backtesting.data import DATA_TYPE
-from stock_backtesting.market import MarketTime
+from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import OpenOrder, Order
-from stock_backtesting.position import PositionMode, PositionType
+from stock_backtesting.position import Position, PositionMode, PositionType
 from stock_backtesting.strategy import Strategy
 
 
 class BuyOnOpenFirstDayStrategyStopLoss(Strategy):
 
+    def __init__(self, market: Market, positions: List[Position]):
+        super().__init__(market, positions)
+
+        self.had_trade = False
+
     def collect_orders(
         self, market_time: MarketTime, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.OPEN and self._market.get_data_index() == 0:
-            # Buy on open
-            return [
-                OpenOrder(
-                    size=1,
-                    position_type=PositionType.LONG,
-                    stop_loss=price - 1.0,
-                )
-            ]
+        if self.had_trade:
+            return []
 
-        return []
+        if market_time == MarketTime.CLOSE:
+            return []
+
+        self.had_trade = True
+        # Buy on open
+        return [
+            OpenOrder(
+                size=1,
+                position_type=PositionType.LONG,
+                stop_loss=price - 1.0,
+            )
+        ]
 
 
 def test_stop_loss_on_close_greater_long():
@@ -138,20 +147,29 @@ def test_stop_loss_on_open_equal_long():
 
 class SellOnOpenFirstDayStrategyStopLoss(Strategy):
 
+    def __init__(self, market: Market, positions: List[Position]):
+        super().__init__(market, positions)
+
+        self.had_trade = False
+
     def collect_orders(
         self, market_time: MarketTime, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.OPEN and self._market.get_data_index() == 0:
-            # Sell on open
-            return [
-                OpenOrder(
-                    size=1,
-                    position_type=PositionType.SHORT,
-                    stop_loss=price + 1.0,
-                )
-            ]
+        if self.had_trade:
+            return []
 
-        return []
+        if market_time == MarketTime.CLOSE:
+            return []
+
+        self.had_trade = True
+        # Sell on open
+        return [
+            OpenOrder(
+                size=1,
+                position_type=PositionType.SHORT,
+                stop_loss=price + 1.0,
+            )
+        ]
 
 
 def test_stop_loss_on_close_less_short():
@@ -285,17 +303,17 @@ class BuyOnOpenStrategyStopLoss(Strategy):
     def collect_orders(
         self, market_time: MarketTime, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.OPEN:
-            # Buy on open
-            return [
-                OpenOrder(
-                    size=1,
-                    position_type=PositionType.LONG,
-                    stop_loss=price - 1.0,
-                )
-            ]
+        if market_time == MarketTime.CLOSE:
+            return []
 
-        return []
+        # Buy on open
+        return [
+            OpenOrder(
+                size=1,
+                position_type=PositionType.LONG,
+                stop_loss=price - 1.0,
+            )
+        ]
 
 
 def test_rewrite_stop_loss_accumulate_mode_long():
@@ -362,17 +380,17 @@ class SellOnOpenStrategyStopLoss(Strategy):
     def collect_orders(
         self, market_time: MarketTime, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.OPEN:
-            # Sell on open
-            return [
-                OpenOrder(
-                    size=1,
-                    position_type=PositionType.SHORT,
-                    stop_loss=price + 1.0,
-                )
-            ]
+        if market_time == MarketTime.CLOSE:
+            return []
 
-        return []
+        # Sell on open
+        return [
+            OpenOrder(
+                size=1,
+                position_type=PositionType.SHORT,
+                stop_loss=price + 1.0,
+            )
+        ]
 
 
 def test_stop_loss_distinct_mode_short():

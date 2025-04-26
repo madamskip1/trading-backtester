@@ -6,28 +6,37 @@ import pytest
 
 from stock_backtesting.backtest import Backtest
 from stock_backtesting.data import DATA_TYPE
-from stock_backtesting.market import MarketTime
+from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import OpenOrder, Order
-from stock_backtesting.position import PositionMode, PositionType
+from stock_backtesting.position import Position, PositionMode, PositionType
 from stock_backtesting.strategy import Strategy
 
 
 class BuyOnOpenFirstDayStrategyTakeProfit(Strategy):
 
+    def __init__(self, market: Market, positions: List[Position]):
+        super().__init__(market, positions)
+
+        self.had_trade = False
+
     def collect_orders(
         self, market_time: MarketTime, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.OPEN and self._market.get_data_index() == 0:
-            # Buy on open
-            return [
-                OpenOrder(
-                    size=1,
-                    position_type=PositionType.LONG,
-                    take_profit=price + 1.0,
-                )
-            ]
+        if self.had_trade:
+            return []
 
-        return []
+        if market_time == MarketTime.CLOSE:
+            return []
+
+        self.had_trade = True
+        # Buy on open
+        return [
+            OpenOrder(
+                size=1,
+                position_type=PositionType.LONG,
+                take_profit=price + 1.0,
+            )
+        ]
 
 
 def test_take_profit_on_close_greater_long():
@@ -138,20 +147,29 @@ def test_take_profit_on_open_equal_long():
 
 class SellOnOpenFirstDayStrategyTakeProfit(Strategy):
 
+    def __init__(self, market: Market, positions: List[Position]):
+        super().__init__(market, positions)
+
+        self.had_trade = False
+
     def collect_orders(
         self, market_time: MarketTime, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.OPEN and self._market.get_data_index() == 0:
-            # Sell on open
-            return [
-                OpenOrder(
-                    size=1,
-                    position_type=PositionType.SHORT,
-                    take_profit=price - 1.0,
-                )
-            ]
+        if self.had_trade:
+            return []
 
-        return []
+        if market_time == MarketTime.CLOSE:
+            return []
+
+        self.had_trade = True
+        # Sell on open
+        return [
+            OpenOrder(
+                size=1,
+                position_type=PositionType.SHORT,
+                take_profit=price - 1.0,
+            )
+        ]
 
 
 def test_take_profit_on_close_less_short():
