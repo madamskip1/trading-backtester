@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 
@@ -20,11 +20,14 @@ class Data:
         self.__data = data
         self.__current_data_index = 0
 
+    def __getitem__(self, index: int) -> Any:
+        return self.__data[index]
+
     def increment_data_index(self) -> None:
         self.__current_data_index += 1
 
-    def get_data(self, index: int, key: str) -> float:
-        return self.__data[index][key]
+    def get_data(self, key: Optional[str] = None) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__data[key] if key else self.__data
 
     def get_current_data_index(self) -> int:
         return self.__current_data_index

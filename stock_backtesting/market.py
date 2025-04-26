@@ -61,7 +61,7 @@ class Market:
         if self.__data.get_current_data_index() - n < 0:
             return None
 
-        return self.__data.get_data(self.__data.get_current_data_index() - n, "open")
+        return self.__data[self.__data.get_current_data_index() - n]["open"]
 
     def get_close_price_on_nth_ago(self, n: int) -> Optional[float]:
         if n < 1:
@@ -70,4 +70,4 @@ class Market:
         if self.__data.get_current_data_index() - n < 0:
             return None
 
-        return self.__data.get_data(self.__data.get_current_data_index() - n, "close")
+        return self.__data[self.__data.get_current_data_index() - n]["close"]
