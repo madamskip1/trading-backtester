@@ -11,8 +11,6 @@ from stock_backtesting.order import OpenOrder, Order
 from stock_backtesting.position import PositionType
 from stock_backtesting.strategy import Strategy
 
-from .utils.load_csv import load_csv
-
 
 class BuyOnOpenStrategy(Strategy):
 
@@ -32,13 +30,11 @@ class BuyOnOpenStrategy(Strategy):
 
 
 def test_single_day_profit():
-    data_csv = load_csv(
-        os.path.join(
+    data = Data.from_csv(
+        file_path=os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
-
-    data = Data(data_csv)
     backtest = Backtest(data, BuyOnOpenStrategy, money=50000)
     stats = backtest.run()
 

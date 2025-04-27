@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, List, Optional, Tuple
 
 import numpy as np
 
@@ -60,3 +60,31 @@ class Data:
     @property
     def close(self) -> np.ndarray[Any, np.dtype[Any]]:
         return self.__data["close"]
+
+    @staticmethod
+    def from_array(
+        data: List[
+            Tuple[
+                Any, Optional[float], Optional[float], Optional[float], Optional[float]
+            ]
+        ],
+    ) -> "Data":
+        data_array = np.array(
+            data,
+            dtype=DATA_TYPE,
+        )
+        return Data(data_array)
+
+    @staticmethod
+    def from_csv(
+        file_path: str,
+        delimiter: str = ",",
+    ) -> "Data":
+        data_np = np.genfromtxt(
+            file_path,
+            delimiter=delimiter,
+            skip_header=1,
+            dtype=DATA_TYPE,
+            usecols=(0, 1, 2, 3, 4),
+        )
+        return Data(data_np)

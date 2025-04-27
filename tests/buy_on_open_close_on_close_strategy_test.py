@@ -11,8 +11,6 @@ from stock_backtesting.order import CloseOrder, OpenOrder, Order
 from stock_backtesting.position import PositionMode, PositionType
 from stock_backtesting.strategy import Strategy
 
-from .utils.load_csv import load_csv
-
 
 class BuyOnOpenCloseOnCloseAccumulateStrategy(Strategy):
 
@@ -41,13 +39,11 @@ class BuyOnOpenCloseOnCloseAccumulateStrategy(Strategy):
 
 
 def test_single_day_profit_long_accumulate():
-    data_csv = load_csv(
-        os.path.join(
+    data = Data.from_csv(
+        file_path=os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
-
-    data = Data(data_csv)
     backtest = Backtest(data, BuyOnOpenCloseOnCloseAccumulateStrategy, money=50000)
     stats = backtest.run()
 
@@ -93,13 +89,11 @@ class BuyOnOpenCloseOnCloseDistinctStrategy(Strategy):
 
 
 def test_single_day_profit_long_distinct():
-    data_csv = load_csv(
-        os.path.join(
+    data = Data.from_csv(
+        file_path=os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
-
-    data = Data(data_csv)
     backtest = Backtest(
         data,
         BuyOnOpenCloseOnCloseDistinctStrategy,
@@ -150,13 +144,11 @@ class SellOnOpenCloseOnCloseAccumulateStrategy(Strategy):
 
 
 def test_single_day_profit_short_accumulate():
-    data_csv = load_csv(
-        os.path.join(
+    data = Data.from_csv(
+        file_path=os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
-
-    data = Data(data_csv)
     backtest = Backtest(data, SellOnOpenCloseOnCloseAccumulateStrategy, money=50000)
     with pytest.raises(ValueError):
         backtest.run()
@@ -188,13 +180,11 @@ class SellOnOpenCloseOnCloseDistinctStrategy(Strategy):
 
 
 def test_single_day_profit_short_distinct():
-    data_csv = load_csv(
-        os.path.join(
+    data = Data.from_csv(
+        file_path=os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
-
-    data = Data(data_csv)
     backtest = Backtest(
         data,
         SellOnOpenCloseOnCloseDistinctStrategy,

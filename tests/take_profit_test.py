@@ -1,11 +1,10 @@
 from datetime import datetime
 from typing import List
 
-import numpy as np
 import pytest
 
 from stock_backtesting.backtest import Backtest
-from stock_backtesting.data import DATA_TYPE, Data
+from stock_backtesting.data import Data
 from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import OpenOrder, Order
 from stock_backtesting.position import Position, PositionMode, PositionType
@@ -40,14 +39,11 @@ class BuyOnOpenFirstDayStrategyTakeProfit(Strategy):
 
 
 def test_take_profit_on_close_greater_long():
-    data_np = np.array(
-        [
-            (None, 18.0, 19.5, 15.0, 19.5),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 19.5, 15.0, 19.5),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(data, BuyOnOpenFirstDayStrategyTakeProfit, money=100.0)
     stats = backtest.run()
 
@@ -67,14 +63,11 @@ def test_take_profit_on_close_greater_long():
 
 
 def test_take_profit_on_close_equal_long():
-    data_np = np.array(
-        [
-            (None, 18.0, 19.0, 15.0, 19.0),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 19.0, 15.0, 19.0),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(data, BuyOnOpenFirstDayStrategyTakeProfit, money=100.0)
     stats = backtest.run()
 
@@ -94,15 +87,12 @@ def test_take_profit_on_close_equal_long():
 
 
 def test_take_profit_on_open_greater_long():
-    data_np = np.array(
-        [
-            (None, 18.0, 18.5, 15.0, 18.5),
-            (None, 19.5, 19.5, 15.0, 18.5),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 18.5, 15.0, 18.5),
+        (None, 19.5, 19.5, 15.0, 18.5),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(data, BuyOnOpenFirstDayStrategyTakeProfit, money=100.0)
     stats = backtest.run()
 
@@ -122,15 +112,12 @@ def test_take_profit_on_open_greater_long():
 
 
 def test_take_profit_on_open_equal_long():
-    data_np = np.array(
-        [
-            (None, 18.0, 18.5, 15.0, 18.5),
-            (None, 19.0, 19.0, 15.0, 18.0),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 18.5, 15.0, 18.5),
+        (None, 19.0, 19.0, 15.0, 18.0),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(data, BuyOnOpenFirstDayStrategyTakeProfit, money=100.0)
     stats = backtest.run()
 
@@ -177,14 +164,11 @@ class SellOnOpenFirstDayStrategyTakeProfit(Strategy):
 
 
 def test_take_profit_on_close_less_short():
-    data_np = np.array(
-        [
-            (None, 18.0, 18.0, 15.0, 16.5),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 18.0, 15.0, 16.5),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(
         data,
         SellOnOpenFirstDayStrategyTakeProfit,
@@ -209,14 +193,11 @@ def test_take_profit_on_close_less_short():
 
 
 def test_take_profit_on_close_equal_short():
-    data_np = np.array(
-        [
-            (None, 18.0, 18.0, 15.0, 17.0),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 18.0, 15.0, 17.0),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(
         data,
         SellOnOpenFirstDayStrategyTakeProfit,
@@ -241,15 +222,12 @@ def test_take_profit_on_close_equal_short():
 
 
 def test_take_profit_on_open_less_short():
-    data_np = np.array(
-        [
-            (None, 18.0, 18.0, 17.1, 17.5),
-            (None, 16.5, 18.5, 15.0, 18.5),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 18.0, 17.1, 17.5),
+        (None, 16.5, 18.5, 15.0, 18.5),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(
         data,
         SellOnOpenFirstDayStrategyTakeProfit,
@@ -274,15 +252,12 @@ def test_take_profit_on_open_less_short():
 
 
 def test_take_profit_on_open_equal_short():
-    data_np = np.array(
-        [
-            (None, 18.0, 18.0, 15.0, 17.5),
-            (None, 17.0, 18.0, 15.0, 18.0),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 18.0, 15.0, 17.5),
+        (None, 17.0, 18.0, 15.0, 18.0),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(
         data,
         SellOnOpenFirstDayStrategyTakeProfit,
@@ -325,15 +300,12 @@ class BuyOnOpenStrategyTakeProfit(Strategy):
 
 
 def test_rewrite_take_profit_accumulate_mode_long():
-    data_np = np.array(
-        [
-            (None, 18.0, 18.0, 15.0, 17.5),
-            (None, 18.9, 19.0, 15.0, 19.0),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 18.0, 15.0, 17.5),
+        (None, 18.9, 19.0, 15.0, 19.0),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(data, BuyOnOpenStrategyTakeProfit, money=100.0)
     stats = backtest.run()
 
@@ -353,15 +325,12 @@ def test_rewrite_take_profit_accumulate_mode_long():
 
 
 def test_take_profit_distinct_mode_long():
-    data_np = np.array(
-        [
-            (None, 18.0, 18.0, 15.0, 17.5),
-            (None, 18.9, 19.0, 15.0, 19.0),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 18.0, 15.0, 17.5),
+        (None, 18.9, 19.0, 15.0, 19.0),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(
         data,
         BuyOnOpenStrategyTakeProfit,
@@ -405,15 +374,12 @@ class SellOnOpenStrategyTakeProfit(Strategy):
 
 
 def test_take_profit_distinct_mode_short():
-    data_np = np.array(
-        [
-            (None, 18.0, 18.0, 17.5, 17.5),
-            (None, 17.1, 17.1, 16.6, 17.0),
-        ],
-        dtype=DATA_TYPE,
-    )
+    data_array = [
+        (None, 18.0, 18.0, 17.5, 17.5),
+        (None, 17.1, 17.1, 16.6, 17.0),
+    ]
 
-    data = Data(data_np)
+    data = Data.from_array(data_array)
     backtest = Backtest(
         data,
         SellOnOpenStrategyTakeProfit,
