@@ -5,6 +5,7 @@ from typing import List
 import pytest
 
 from stock_backtesting.backtest import Backtest
+from stock_backtesting.data import Data
 from stock_backtesting.market import MarketTime
 from stock_backtesting.order import OpenOrder, Order
 from stock_backtesting.position import PositionType
@@ -31,12 +32,13 @@ class BuyOnOpenStrategy(Strategy):
 
 
 def test_single_day_profit():
-    data = load_csv(
+    data_csv = load_csv(
         os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
 
+    data = Data(data_csv)
     backtest = Backtest(data, BuyOnOpenStrategy, money=50000)
     stats = backtest.run()
 

@@ -5,6 +5,7 @@ from typing import List
 import pytest
 
 from stock_backtesting.backtest import Backtest
+from stock_backtesting.data import Data
 from stock_backtesting.market import MarketTime
 from stock_backtesting.order import CloseOrder, OpenOrder, Order
 from stock_backtesting.position import PositionMode, PositionType
@@ -40,12 +41,13 @@ class BuyOnOpenCloseOnCloseAccumulateStrategy(Strategy):
 
 
 def test_single_day_profit_long_accumulate():
-    data = load_csv(
+    data_csv = load_csv(
         os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
 
+    data = Data(data_csv)
     backtest = Backtest(data, BuyOnOpenCloseOnCloseAccumulateStrategy, money=50000)
     stats = backtest.run()
 
@@ -91,12 +93,13 @@ class BuyOnOpenCloseOnCloseDistinctStrategy(Strategy):
 
 
 def test_single_day_profit_long_distinct():
-    data = load_csv(
+    data_csv = load_csv(
         os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
 
+    data = Data(data_csv)
     backtest = Backtest(
         data,
         BuyOnOpenCloseOnCloseDistinctStrategy,
@@ -147,12 +150,13 @@ class SellOnOpenCloseOnCloseAccumulateStrategy(Strategy):
 
 
 def test_single_day_profit_short_accumulate():
-    data = load_csv(
+    data_csv = load_csv(
         os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
 
+    data = Data(data_csv)
     backtest = Backtest(data, SellOnOpenCloseOnCloseAccumulateStrategy, money=50000)
     with pytest.raises(ValueError):
         backtest.run()
@@ -184,12 +188,13 @@ class SellOnOpenCloseOnCloseDistinctStrategy(Strategy):
 
 
 def test_single_day_profit_short_distinct():
-    data = load_csv(
+    data_csv = load_csv(
         os.path.join(
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
 
+    data = Data(data_csv)
     backtest = Backtest(
         data,
         SellOnOpenCloseOnCloseDistinctStrategy,

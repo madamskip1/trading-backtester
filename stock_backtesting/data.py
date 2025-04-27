@@ -23,6 +23,9 @@ class Data:
     def __getitem__(self, index: int) -> Any:
         return self.__data[index]
 
+    def __len__(self) -> int:
+        return len(self.__data)
+
     def increment_data_index(self) -> None:
         self.__current_data_index += 1
 
