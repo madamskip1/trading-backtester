@@ -7,8 +7,8 @@ DATA_TYPE = np.dtype(
     [
         ("datetime", "datetime64[ns]"),
         ("open", "f8"),
-        ("min", "f8"),
-        ("max", "f8"),
+        ("low", "f8"),
+        ("high", "f8"),
         ("close", "f8"),
     ]
 )
@@ -47,11 +47,11 @@ class Data:
         return self.__data["open"]
 
     @property
-    def min(self) -> np.ndarray[Any, np.dtype[Any]]:
+    def low(self) -> np.ndarray[Any, np.dtype[Any]]:
         return self.__data["min"]
 
     @property
-    def max(self) -> np.ndarray[Any, np.dtype[Any]]:
+    def high(self) -> np.ndarray[Any, np.dtype[Any]]:
         return self.__data["max"]
 
     @property

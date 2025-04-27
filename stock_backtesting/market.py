@@ -40,16 +40,16 @@ class Market:
 
         return self.__data.get_current_data("close")
 
-    def get_current_min_price(self) -> float:
+    def get_current_low_price(self) -> float:
         return (
-            self.__data.get_current_data("min")
+            self.__data.get_current_data("low")
             if self.__current_time == MarketTime.CLOSE
             else self.__data.get_current_data("open")
         )
 
-    def get_current_max_price(self) -> float:
+    def get_current_high_price(self) -> float:
         return (
-            self.__data.get_current_data("max")
+            self.__data.get_current_data("high")
             if self.__current_time == MarketTime.CLOSE
             else self.__data.get_current_data("open")
         )
