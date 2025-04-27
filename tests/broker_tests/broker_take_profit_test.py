@@ -105,7 +105,7 @@ def test_long_less_on_open_time(
     assert test_broker_accumulate.get_trades()[0].order == open_order
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 101.0, 101.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 100.0, 101.0)]])
 def test_long_on_close_time(test_market: Market, test_broker_accumulate: Broker):
     open_order = OpenOrder(
         size=1,
@@ -135,7 +135,7 @@ def test_long_on_close_time(test_market: Market, test_broker_accumulate: Broker)
     )
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 102.0, 101.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 102.0, 100.0, 101.0)]])
 def test_long_during_day(test_market: Market, test_broker_accumulate: Broker):
     open_order = OpenOrder(
         size=1,
@@ -165,7 +165,7 @@ def test_long_during_day(test_market: Market, test_broker_accumulate: Broker):
     )
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 100.9, 100.5)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.9, 100.0, 100.5)]])
 def test_long_less_not_happend_during_day(
     test_market: Market, test_broker_accumulate: Broker
 ):
@@ -278,7 +278,7 @@ def test_short_greater_on_open_time(
     assert test_broker_distinct.get_trades()[0].order == open_order
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 99.0, 101.0, 99.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 99.0, 99.0)]])
 def test_short_less_on_close_time(test_market: Market, test_broker_distinct: Broker):
     open_order = OpenOrder(
         size=1,
@@ -305,7 +305,7 @@ def test_short_less_on_close_time(test_market: Market, test_broker_distinct: Bro
     )
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 98.0, 101.0, 98.5)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 98.0, 98.5)]])
 def test_short_less_during_day(test_market: Market, test_broker_distinct: Broker):
     open_order = OpenOrder(
         size=1,
@@ -332,7 +332,7 @@ def test_short_less_during_day(test_market: Market, test_broker_distinct: Broker
     )
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 99.1, 101.0, 99.5)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 99.1, 99.5)]])
 def test_short_not_happend_during_day(
     test_market: Market, test_broker_distinct: Broker
 ):
@@ -353,7 +353,7 @@ def test_short_not_happend_during_day(
     assert test_broker_distinct.get_trades()[0].order == open_order
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 101.0, 101.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 100.0, 101.0)]])
 def test_take_profit_not_set_long(test_market: Market, test_broker_accumulate: Broker):
     open_order = OpenOrder(
         size=1,
@@ -371,7 +371,7 @@ def test_take_profit_not_set_long(test_market: Market, test_broker_accumulate: B
     assert test_broker_accumulate.get_trades()[0].order == open_order
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 99.0, 100.0, 99.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 99.0, 99.0)]])
 def test_take_profit_not_set_short(test_market: Market, test_broker_distinct: Broker):
     open_order = OpenOrder(
         size=1,
@@ -389,7 +389,7 @@ def test_take_profit_not_set_short(test_market: Market, test_broker_distinct: Br
     assert test_broker_distinct.get_trades()[0].order == open_order
 
 
-@pytest.mark.parametrize("market_data", [[(None, 50.0, 50.0, 51.0, 51.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 50.0, 51.0, 50.0, 51.0)]])
 def test_multiple_long_positions(test_market: Market, test_broker_distinct: Broker):
     open_order1 = OpenOrder(
         size=1,
@@ -423,7 +423,7 @@ def test_multiple_long_positions(test_market: Market, test_broker_distinct: Brok
     )
 
 
-@pytest.mark.parametrize("market_data", [[(None, 50.0, 49.0, 50.0, 49.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 50.0, 50.0, 49.0, 49.0)]])
 def test_multiple_short_positions(test_market: Market, test_broker_distinct: Broker):
     open_order1 = OpenOrder(
         size=1,

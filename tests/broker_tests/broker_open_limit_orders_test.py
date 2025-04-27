@@ -8,7 +8,7 @@ from stock_backtesting.order import OpenOrder
 from stock_backtesting.position import PositionType
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 90.0, 100.0, 90.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 90.0, 90.0)]])
 def test_open_long_accumulate_on_close(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
@@ -35,7 +35,7 @@ def test_open_long_accumulate_on_close(
     assert test_account.get_current_money() == pytest.approx(10.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 85.0, 100.0, 90.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 85.0, 90.0)]])
 def test_open_long_accumulate_during_day(
     test_market: Market, test_account: Account, test_broker_accumulate: Broker
 ):
@@ -156,7 +156,7 @@ def test_open_long_accumulate_on_open_greater_not_opened(
     assert test_account.get_current_money() == pytest.approx(100.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 90.0, 100.0, 90.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 90.0, 90.0)]])
 def test_open_long_distinct_on_close(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -183,7 +183,7 @@ def test_open_long_distinct_on_close(
     assert test_account.get_current_money() == pytest.approx(10.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 85.0, 100.0, 90.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 85.0, 90.0)]])
 def test_open_long_distinct_during_day(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -304,7 +304,7 @@ def test_open_long_distinct_on_open_greater_not_opened(
     assert test_account.get_current_money() == pytest.approx(100.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 90.0, 90.0, 100.0, 100.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 90.0, 100.0, 90.0, 100.0)]])
 def test_open_short_distinct_on_close(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):
@@ -331,7 +331,7 @@ def test_open_short_distinct_on_close(
     assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 90.0, 90.0, 105.0, 100.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 90.0, 105.0, 90.0, 100.0)]])
 def test_open_short_distinct_during_day(
     test_market: Market, test_account: Account, test_broker_distinct: Broker
 ):

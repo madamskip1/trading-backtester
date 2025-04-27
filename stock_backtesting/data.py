@@ -7,8 +7,8 @@ DATA_TYPE = np.dtype(
     [
         ("datetime", "datetime64[ns]"),
         ("open", "f8"),
-        ("low", "f8"),
         ("high", "f8"),
+        ("low", "f8"),
         ("close", "f8"),
     ]
 )
