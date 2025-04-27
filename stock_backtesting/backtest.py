@@ -32,7 +32,11 @@ class Backtest:
         print("Starting backtest...")
         print(f"Initial money: {self.__account.get_current_money()}")
 
-        for _ in range(len(self.__data)):
+        candlesticks_to_skip = self.__strategy.candletsticks_to_skip()
+        for _ in range(candlesticks_to_skip):
+            self.__data.increment_data_index()
+
+        for _ in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
             self.__market.set_current_time(MarketTime.OPEN)
 
             self.__broker.process_stop_losses()
