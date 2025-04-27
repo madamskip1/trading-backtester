@@ -26,6 +26,7 @@ class Backtest:
         self.__statistics = Statistics(self.__broker.get_trades(), self.__account)
 
         self.__strategy = strategy(self.__market, self.__broker.get_positions())
+        self.__strategy.prepare_indicators(self.__data)
 
     def run(self) -> Dict[str, Any]:
         print("Starting backtest...")

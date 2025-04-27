@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List
 
+from stock_backtesting.data import Data
+from stock_backtesting.indicator import Indicator
 from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import Order
 from stock_backtesting.position import Position
@@ -15,3 +17,9 @@ class Strategy:
         self, market_time: MarketTime, price: float, date_time: datetime
     ) -> List[Order]:
         raise NotImplementedError("This method should be implemented in subclasses.")
+
+    def prepare_indicators(self, data: Data):
+        for member_name in dir(self):
+            member = getattr(self, member_name)
+            if isinstance(member, Indicator):
+                member.prepare_indicator(data)
