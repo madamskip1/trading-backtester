@@ -41,3 +41,19 @@ class Data:
             .astype("M8[ms]")
             .astype(datetime)
         )
+
+    @property
+    def open(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__data["open"]
+
+    @property
+    def min(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__data["min"]
+
+    @property
+    def max(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__data["max"]
+
+    @property
+    def close(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__data["close"]
