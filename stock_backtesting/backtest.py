@@ -6,7 +6,6 @@ from .account import Account
 from .broker import Broker
 from .data import Data
 from .market import Market, MarketTime
-from .position import PositionMode
 from .stats import Statistics
 from .strategy import Strategy
 
@@ -17,12 +16,11 @@ class Backtest:
         data: Data,
         strategy: Type[Strategy],
         money: float = 1000.0,
-        position_mode: PositionMode = PositionMode.ACCUMULATE,
     ):
         self.__data = data
         self.__market = Market(self.__data)
         self.__account = Account(data_size=len(data), initial_money=money)
-        self.__broker = Broker(position_mode, self.__market, self.__account)
+        self.__broker = Broker(self.__market, self.__account)
         self.__statistics = Statistics(self.__broker.get_trades(), self.__account)
 
         self.__strategy = strategy(self.__market, self.__broker.get_positions())

@@ -7,11 +7,6 @@ class PositionType(Enum):
     SHORT = 2
 
 
-class PositionMode(Enum):
-    ACCUMULATE = 1  # Assume only long
-    DISTINCT = 2
-
-
 class Position:
     def __init__(
         self,

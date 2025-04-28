@@ -5,17 +5,15 @@ from stock_backtesting.market import Market
 from stock_backtesting.order import CloseOrder, Order, OrderAction
 from stock_backtesting.trade import Trade
 
-from .position import Position, PositionMode, PositionType
+from .position import Position, PositionType
 
 
 class Broker:
     def __init__(
         self,
-        position_mode: PositionMode,
         market: Market,
         accout: Account,
     ):
-        self.__position_mode = position_mode
         self.__market = market
         self.__account = accout
         self.__positions: List[Position] = []
@@ -144,30 +142,16 @@ class Broker:
         if self.__account.get_current_money() < money:
             return
 
-        if self.__position_mode == PositionMode.ACCUMULATE:
-            if order.position_type == PositionType.SHORT:
-                raise ValueError("Cannot open short position in accumulate mode")
-
-            if len(self.__positions) == 0:
-                self.__positions.append(Position(PositionType.LONG))
-            self.__accumulate(
-                self.__positions[0], self.__market.get_current_price(), order.size
+        self.__positions.append(
+            Position(
+                order.position_type,
+                self.__market.get_current_price(),
+                order.size,
+                order.stop_loss,
+                order.take_profit,
             )
-            self.__positions[0].stop_loss = order.stop_loss
-            self.__positions[0].take_profit = order.take_profit
-            self.__account.update_money(-money)
-            order.position_type = PositionType.LONG
-        elif self.__position_mode == PositionMode.DISTINCT:
-            self.__positions.append(
-                Position(
-                    order.position_type,
-                    self.__market.get_current_price(),
-                    order.size,
-                    order.stop_loss,
-                    order.take_profit,
-                )
-            )
-            self.__account.update_money(-money)
+        )
+        self.__account.update_money(-money)
 
         self.__trades.append(
             Trade(
@@ -178,46 +162,71 @@ class Broker:
         )
 
     def __process_close_order(self, order: Order, price: float) -> None:
-        if self.__position_mode == PositionMode.ACCUMULATE:
-            self.__reduce(self.__positions[0], order.size)
-            money = order.size * price
-            self.__account.update_money(money)
-            order.position_type = PositionType.LONG
-        elif self.__position_mode == PositionMode.DISTINCT:
-            if order.position_to_close is None:
-                raise ValueError("Order must has position_to_close in distinct mode")
-
-            if order.position_to_close.position_type == PositionType.LONG:
-                self.__reduce(order.position_to_close, order.size)
-                money = order.size * price
-                self.__account.update_money(money)
-            elif order.position_to_close.position_type == PositionType.SHORT:
-                self.__reduce(order.position_to_close, order.size)
-                money = order.size * (
-                    2 * order.position_to_close.avg_bought_price - price
+        if order.position_to_close is not None:
+            if order.size > order.position_to_close.size:
+                raise ValueError(
+                    "if order.position_to_close is specified, order.size must be less than or equal to order.position_to_close.size"
                 )
-                self.__account.update_money(money)
 
-            order.position_type = order.position_to_close.position_type
-
-        self.__trades.append(
-            Trade(
-                order,
-                price,
-                market_order=(order.limit_price is None),
+            self.__account.update_money(
+                self.__calc_money_from_close(order.position_to_close, price, order.size)
             )
+
+            if order.size == order.position_to_close.size:
+                self.__positions.remove(order.position_to_close)
+            else:
+                order.position_to_close.size -= order.size
+
+            self.__trades.append(
+                Trade(
+                    order,
+                    price,
+                    market_order=(order.limit_price is None),
+                )
+            )
+        else:
+            size_to_reduce_left = order.size
+            positions_to_close: List[Position] = []
+            for position in self.__positions:
+                if position.position_type != order.position_type:
+                    continue
+
+                reduce_size = min(size_to_reduce_left, position.size)
+
+                if reduce_size < position.size:
+                    self.__account.update_money(
+                        self.__calc_money_from_close(position, price, reduce_size)
+                    )
+                    position.size -= reduce_size
+                else:
+                    self.__account.update_money(
+                        self.__calc_money_from_close(position, price, reduce_size)
+                    )
+                    positions_to_close.append(position)
+
+                size_to_reduce_left -= reduce_size
+                if size_to_reduce_left == 0:
+                    break
+
+            self.__trades.append(
+                Trade(
+                    order,
+                    price,
+                    market_order=(order.limit_price is None),
+                )
+            )
+
+            for position in positions_to_close:
+                self.__positions.remove(position)
+
+    def __calc_money_from_close(
+        self, position: Position, current_price: float, size: int
+    ) -> float:
+        return (
+            size * current_price
+            if position.position_type == PositionType.LONG
+            else size * (2 * position.avg_bought_price - current_price)
         )
-
-    def __accumulate(self, position: Position, price: float, size: int) -> None:
-        position.avg_bought_price = (
-            position.avg_bought_price * position.size + price * size
-        ) / (position.size + size)
-        position.size += size
-
-    def __reduce(self, position: Position, size: int) -> None:
-        position.size -= size
-        if position.size == 0:
-            self.__positions.remove(position)
 
     def __check_limit_price(
         self, limit_price: float, price: float, position_type: PositionType

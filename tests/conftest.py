@@ -7,7 +7,6 @@ from stock_backtesting.account import Account
 from stock_backtesting.broker import Broker
 from stock_backtesting.data import Data
 from stock_backtesting.market import Market
-from stock_backtesting.position import PositionMode
 from stock_backtesting.stats import Statistics
 
 
@@ -58,17 +57,8 @@ def test_market(test_data: Data) -> Market:
 
 
 @pytest.fixture
-def test_broker_accumulate(test_market: Market, test_account: Account) -> Broker:
-    return Broker(
-        position_mode=PositionMode.ACCUMULATE, market=test_market, accout=test_account
-    )
-
-
-@pytest.fixture
-def test_broker_distinct(test_market: Market, test_account: Account) -> Broker:
-    return Broker(
-        position_mode=PositionMode.DISTINCT, market=test_market, accout=test_account
-    )
+def test_broker(test_market: Market, test_account: Account) -> Broker:
+    return Broker(market=test_market, accout=test_account)
 
 
 @pytest.fixture

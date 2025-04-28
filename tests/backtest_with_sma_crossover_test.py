@@ -9,7 +9,7 @@ from stock_backtesting.data import Data
 from stock_backtesting.indicator import Indicator
 from stock_backtesting.market import Market, MarketTime
 from stock_backtesting.order import CloseOrder, OpenOrder, Order
-from stock_backtesting.position import Position, PositionMode, PositionType
+from stock_backtesting.position import Position, PositionType
 from stock_backtesting.strategy import Strategy
 
 
@@ -56,7 +56,7 @@ class SMACrossoverStrategy(Strategy):
             current_short_sma < current_long_sma
             and previous_short_sma >= previous_long_sma
         ):
-            orders.append(CloseOrder(size=1, position_to_close=self._positions[0]))
+            orders.append(CloseOrder(size=1, position_type=PositionType.LONG))
 
         return orders
 
@@ -91,7 +91,6 @@ def test_sma_crossover_strategy(test_data: Data):
         data=test_data,
         strategy=SMACrossoverStrategy,
         money=10.0,
-        position_mode=PositionMode.ACCUMULATE,
     )
     stats = backtest.run()
 

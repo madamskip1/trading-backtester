@@ -54,11 +54,22 @@ class CloseOrder(Order):
     def __init__(
         self,
         size: int,
-        position_to_close: Position,
+        position_type: Optional[PositionType] = None,
+        position_to_close: Optional[Position] = None,
     ):
+        if position_to_close is None and position_type is None:
+            raise ValueError(
+                "Either position_to_close or position_type must be provided."
+            )
+
+        if position_to_close is not None:
+            position_type = position_to_close.position_type
+
+        assert position_type is not None
+
         super().__init__(
             size=size,
             action=OrderAction.CLOSE,
+            position_type=position_type,
             position_to_close=position_to_close,
-            position_type=position_to_close.position_type,
         )
