@@ -16,11 +16,12 @@ class Backtest:
         data: Data,
         strategy: Type[Strategy],
         money: float = 1000.0,
+        spread: float = 0.0,
     ):
         self.__data = data
         self.__market = Market(self.__data)
         self.__account = Account(data_size=len(data), initial_money=money)
-        self.__broker = Broker(self.__market, self.__account)
+        self.__broker = Broker(self.__market, self.__account, spread)
         self.__statistics = Statistics(self.__broker.get_trades(), self.__account)
 
         self.__strategy = strategy(self.__market, self.__broker.get_positions())

@@ -419,3 +419,101 @@ def test_multiple_short_positions(test_market: Market, test_broker: Broker):
     assert test_broker.get_trades()[2].price == pytest.approx(49.0, abs=0.01)
     assert test_broker.get_trades()[2].order.size == 1
     assert test_broker.get_trades()[2].order.position_to_close == opened_position1
+
+
+@pytest.mark.parametrize(
+    "market_data, spread", [([(None, 90.0, 95.0, 90.0, 95.0)], 2.2)]
+)
+def test_long_with_spread_exact_price(
+    test_market: Market,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.LONG,
+        take_profit=95.0,
+    )
+    test_broker.process_orders([open_order])
+
+    test_market.set_current_time(MarketTime.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 1
+    assert len(test_broker.get_trades()) == 1
+    assert test_broker.get_trades()[0].order == open_order
+    assert test_broker.get_trades()[0].market_order is True
+
+
+@pytest.mark.parametrize(
+    "market_data, spread", [([(None, 90.0, 97.2, 90.0, 97.2)], 2.2)]
+)
+def test_long_with_spread_enough_price(
+    test_market: Market,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.LONG,
+        take_profit=95.0,
+    )
+    test_broker.process_orders([open_order])
+
+    test_market.set_current_time(MarketTime.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 0
+    assert len(test_broker.get_trades()) == 2
+    assert test_broker.get_trades()[0].order == open_order
+    assert test_broker.get_trades()[0].market_order is True
+    assert test_broker.get_trades()[1].order.action == OrderAction.CLOSE
+    assert test_broker.get_trades()[1].price == pytest.approx(95.0, abs=0.01)
+    assert test_broker.get_trades()[1].order.size == 1
+
+
+@pytest.mark.parametrize(
+    "market_data, spread", [([(None, 90.0, 90.0, 85.0, 85.0)], 2.2)]
+)
+def test_short_with_spread_exact_price(
+    test_market: Market,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.SHORT,
+        take_profit=85.0,
+    )
+    test_broker.process_orders([open_order])
+
+    test_market.set_current_time(MarketTime.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 1
+    assert len(test_broker.get_trades()) == 1
+    assert test_broker.get_trades()[0].order == open_order
+    assert test_broker.get_trades()[0].market_order is True
+
+
+@pytest.mark.parametrize(
+    "market_data, spread", [([(None, 90.0, 90.0, 82.8, 82.8)], 2.2)]
+)
+def test_short_with_spread_enough_price(
+    test_market: Market,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.LONG,
+        take_profit=85.0,
+    )
+    test_broker.process_orders([open_order])
+
+    test_market.set_current_time(MarketTime.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 0
+    assert len(test_broker.get_trades()) == 2
+    assert test_broker.get_trades()[0].order == open_order
+    assert test_broker.get_trades()[0].market_order is True
+    assert test_broker.get_trades()[1].order.action == OrderAction.CLOSE
+    assert test_broker.get_trades()[1].price == pytest.approx(85.0, abs=0.01)
+    assert test_broker.get_trades()[1].order.size == 1

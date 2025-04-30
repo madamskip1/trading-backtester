@@ -719,3 +719,71 @@ def test_open_short_reduce_in_multiple_candlesticks(
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
     assert test_account.get_current_money() == pytest.approx(130.0, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, spread", [([(None, 90.0, None, None, 95.0)], 2.2)]
+)
+def test_close_long_with_spread(
+    test_market: Market,
+    test_account: Account,
+    test_broker: Broker,
+    # spread: float
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.LONG,
+    )
+    test_broker.process_orders([open_order])
+
+    close_order = CloseOrder(
+        size=1,
+        position_type=PositionType.LONG,
+    )
+
+    test_market.set_current_time(MarketTime.CLOSE)
+    test_broker.process_orders([close_order])
+
+    assert len(test_broker.get_trades()) == 2
+    assert test_broker.get_trades()[0].order == open_order
+    assert test_broker.get_trades()[0].market_order is True
+    assert test_broker.get_trades()[1].order == close_order
+    assert test_broker.get_trades()[1].market_order is True
+
+    assert len(test_broker.get_positions()) == 0
+    assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
+    assert test_account.get_current_money() == pytest.approx(100.6, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, spread", [([(None, 90.0, None, None, 85.0)], 2.2)]
+)
+def test_close_short_with_spread(
+    test_market: Market,
+    test_account: Account,
+    test_broker: Broker,
+    # spread: float
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.SHORT,
+    )
+    test_broker.process_orders([open_order])
+
+    close_order = CloseOrder(
+        size=1,
+        position_type=PositionType.SHORT,
+    )
+
+    test_market.set_current_time(MarketTime.CLOSE)
+    test_broker.process_orders([close_order])
+
+    assert len(test_broker.get_trades()) == 2
+    assert test_broker.get_trades()[0].order == open_order
+    assert test_broker.get_trades()[0].market_order is True
+    assert test_broker.get_trades()[1].order == close_order
+    assert test_broker.get_trades()[1].market_order is True
+
+    assert len(test_broker.get_positions()) == 0
+    assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
+    assert test_account.get_current_money() == pytest.approx(100.6, abs=0.01)

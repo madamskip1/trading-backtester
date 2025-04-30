@@ -13,9 +13,11 @@ class Broker:
         self,
         market: Market,
         accout: Account,
+        spread: float,
     ):
         self.__market = market
         self.__account = accout
+        self.__spread = spread
         self.__positions: List[Position] = []
         self.__trades: List[Trade] = []
         self.__limit_orders: List[Order] = []
@@ -56,6 +58,7 @@ class Broker:
             price = self.__get_stop_loss_order_price(
                 position.stop_loss, low_price, high_price, position.position_type
             )
+
             order = CloseOrder(
                 size=position.size,
                 position_to_close=position,
@@ -102,14 +105,22 @@ class Broker:
                 if order.limit_price is not None:
                     self.__limit_orders.append(order)
                     continue
-                self.__process_close_order(order, price)
+
+                adjusted_price = self.__adjust_close_price_by_spread(
+                    price, order.position_type
+                )
+                self.__process_close_order(order, adjusted_price)
 
         for order in new_orders:
             if order.action == OrderAction.OPEN:
                 if order.limit_price is not None:
                     self.__limit_orders.append(order)
                     continue
-                self.__process_open_order(order, price)
+
+                adjusted_price = self.__adjust_open_price_by_spread(
+                    price, order.position_type
+                )
+                self.__process_open_order(order, adjusted_price)
 
         self.__process_limit_orders()
 
@@ -139,13 +150,14 @@ class Broker:
 
     def __process_open_order(self, order: Order, price: float) -> None:
         money = order.size * price
+
         if self.__account.get_current_money() < money:
             return
 
         self.__positions.append(
             Position(
                 order.position_type,
-                self.__market.get_current_price(),
+                price,
                 order.size,
                 order.stop_loss,
                 order.take_profit,
@@ -156,7 +168,7 @@ class Broker:
         self.__trades.append(
             Trade(
                 order,
-                self.__market.get_current_price(),
+                price,
                 market_order=(order.limit_price is None),
             )
         )
@@ -219,6 +231,24 @@ class Broker:
             for position in positions_to_close:
                 self.__positions.remove(position)
 
+    def __adjust_open_price_by_spread(
+        self, price: float, position_type: PositionType
+    ) -> float:
+        return (
+            price + self.__spread
+            if position_type == PositionType.LONG
+            else price - self.__spread
+        )
+
+    def __adjust_close_price_by_spread(
+        self, price: float, position_type: PositionType
+    ) -> float:
+        return (
+            price - self.__spread
+            if position_type == PositionType.LONG
+            else price + self.__spread
+        )
+
     def __calc_money_from_close(
         self, position: Position, current_price: float, size: int
     ) -> float:
@@ -231,6 +261,7 @@ class Broker:
     def __check_limit_price(
         self, limit_price: float, price: float, position_type: PositionType
     ) -> bool:
+        price = self.__adjust_open_price_by_spread(price, position_type)
         return (
             limit_price >= price
             if position_type == PositionType.LONG
@@ -257,10 +288,17 @@ class Broker:
         high_price: float,
         position_type: PositionType,
     ) -> bool:
+        adjusted_low_price = self.__adjust_close_price_by_spread(
+            low_price, position_type
+        )
+        adjusted_high_price = self.__adjust_close_price_by_spread(
+            high_price, position_type
+        )
+
         return (
-            stop_loss_price >= low_price
+            stop_loss_price >= adjusted_low_price
             if position_type == PositionType.LONG
-            else stop_loss_price <= high_price
+            else stop_loss_price <= adjusted_high_price
         )
 
     def __get_stop_loss_order_price(
@@ -283,10 +321,17 @@ class Broker:
         high_price: float,
         position_type: PositionType,
     ) -> bool:
+        adjusted_low_price = self.__adjust_close_price_by_spread(
+            low_price, position_type
+        )
+        adjusted_high_price = self.__adjust_close_price_by_spread(
+            high_price, position_type
+        )
+
         return (
-            take_profit_price <= high_price
+            take_profit_price <= adjusted_high_price
             if position_type == PositionType.LONG
-            else take_profit_price >= low_price
+            else take_profit_price >= adjusted_low_price
         )
 
     def __get_take_profit_order_price(
