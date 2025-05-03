@@ -1,9 +1,9 @@
 from typing import List
 
-from stock_backtesting.order import CloseOrder, OpenOrder
-from stock_backtesting.position import Position, PositionType
-from stock_backtesting.stats import Statistics
-from stock_backtesting.trade import Trade
+from trading_backtester.order import CloseOrder, OpenOrder
+from trading_backtester.position import Position, PositionType
+from trading_backtester.stats import Statistics
+from trading_backtester.trade import Trade
 
 from ..conftest import AccountMock
 

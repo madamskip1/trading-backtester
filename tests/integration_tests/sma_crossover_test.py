@@ -4,13 +4,13 @@ from typing import Any, List
 import numpy as np
 import pytest
 
-from stock_backtesting.backtest import Backtest
-from stock_backtesting.data import Data
-from stock_backtesting.indicator import Indicator
-from stock_backtesting.market import Market, MarketTime
-from stock_backtesting.order import CloseOrder, OpenOrder, Order
-from stock_backtesting.position import Position, PositionType
-from stock_backtesting.strategy import Strategy
+from trading_backtester.backtest import Backtester
+from trading_backtester.data import Data
+from trading_backtester.indicator import Indicator
+from trading_backtester.market import Market, MarketTime
+from trading_backtester.order import CloseOrder, OpenOrder, Order
+from trading_backtester.position import Position, PositionType
+from trading_backtester.strategy import Strategy
 
 
 class SMAIndicator(Indicator):
@@ -87,7 +87,7 @@ class SMACrossoverStrategy(Strategy):
     ],
 )
 def test_sma_crossover_strategy(test_data: Data):
-    backtest = Backtest(
+    backtest = Backtester(
         data=test_data,
         strategy=SMACrossoverStrategy,
         money=10.0,

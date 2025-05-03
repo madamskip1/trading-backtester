@@ -1,6 +1,6 @@
 import pytest
 
-from stock_backtesting.stats import Statistics
+from trading_backtester.stats import Statistics
 
 from ..conftest import AccountMock
 

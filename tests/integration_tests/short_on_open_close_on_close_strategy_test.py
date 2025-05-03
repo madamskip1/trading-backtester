@@ -4,12 +4,12 @@ from typing import List
 
 import pytest
 
-from stock_backtesting.backtest import Backtest
-from stock_backtesting.data import Data
-from stock_backtesting.market import MarketTime
-from stock_backtesting.order import CloseOrder, OpenOrder, Order
-from stock_backtesting.position import PositionType
-from stock_backtesting.strategy import Strategy
+from trading_backtester.backtest import Backtester
+from trading_backtester.data import Data
+from trading_backtester.market import MarketTime
+from trading_backtester.order import CloseOrder, OpenOrder, Order
+from trading_backtester.position import PositionType
+from trading_backtester.strategy import Strategy
 
 
 class SellOnOpenCloseOnCloseStrategy(Strategy):
@@ -43,7 +43,7 @@ def test_single_day_profit_short():
             os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
         )
     )
-    backtest = Backtest(data, SellOnOpenCloseOnCloseStrategy, money=50000)
+    backtest = Backtester(data, SellOnOpenCloseOnCloseStrategy, money=50000)
     stats = backtest.run()
 
     assert stats["total_trades"] == 10

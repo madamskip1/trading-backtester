@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional
 
-from stock_backtesting.data import Data
+from trading_backtester.data import Data
 
 
 class MarketTime(Enum):

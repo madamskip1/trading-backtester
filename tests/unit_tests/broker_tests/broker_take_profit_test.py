@@ -1,10 +1,10 @@
 import pytest
 
-from stock_backtesting.broker import Broker
-from stock_backtesting.data import Data
-from stock_backtesting.market import Market, MarketTime
-from stock_backtesting.order import OpenOrder, OrderAction
-from stock_backtesting.position import PositionType
+from trading_backtester.broker import Broker
+from trading_backtester.data import Data
+from trading_backtester.market import Market, MarketTime
+from trading_backtester.order import OpenOrder, OrderAction
+from trading_backtester.position import PositionType
 
 
 @pytest.mark.parametrize(

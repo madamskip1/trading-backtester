@@ -1,4 +1,4 @@
-from stock_backtesting.order import Order
+from trading_backtester.order import Order
 
 
 class Trade:

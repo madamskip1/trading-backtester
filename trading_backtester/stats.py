@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Tuple
 
-from stock_backtesting.order import OrderAction
+from trading_backtester.order import OrderAction
 
 from .account import Account
 from .position import PositionType

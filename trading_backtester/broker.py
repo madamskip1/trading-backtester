@@ -1,9 +1,9 @@
 from typing import List, Tuple
 
-from stock_backtesting.account import Account
-from stock_backtesting.market import Market
-from stock_backtesting.order import CloseOrder, Order, OrderAction
-from stock_backtesting.trade import Trade
+from trading_backtester.account import Account
+from trading_backtester.market import Market
+from trading_backtester.order import CloseOrder, Order, OrderAction
+from trading_backtester.trade import Trade
 
 from .position import Position, PositionType
 

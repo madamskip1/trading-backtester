@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import List
 
-from stock_backtesting.data import Data
-from stock_backtesting.indicator import Indicator
-from stock_backtesting.market import Market, MarketTime
-from stock_backtesting.order import Order
-from stock_backtesting.position import Position
+from trading_backtester.data import Data
+from trading_backtester.indicator import Indicator
+from trading_backtester.market import Market, MarketTime
+from trading_backtester.order import Order
+from trading_backtester.position import Position
 
 
 class Strategy:

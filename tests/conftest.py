@@ -2,7 +2,7 @@ from typing import Any, List, Optional, Tuple
 
 import pytest
 
-from stock_backtesting.data import Data
+from trading_backtester.data import Data
 
 
 @pytest.fixture

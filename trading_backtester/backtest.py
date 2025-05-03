@@ -10,7 +10,7 @@ from .stats import Statistics
 from .strategy import Strategy
 
 
-class Backtest:
+class Backtester:
     def __init__(
         self,
         data: Data,

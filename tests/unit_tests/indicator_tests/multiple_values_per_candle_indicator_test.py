@@ -3,8 +3,8 @@ from typing import Any
 import numpy as np
 import pytest
 
-from stock_backtesting.data import Data
-from stock_backtesting.indicator import Indicator
+from trading_backtester.data import Data
+from trading_backtester.indicator import Indicator
 
 
 class MultipleValuesPerCandleIndicator(Indicator):

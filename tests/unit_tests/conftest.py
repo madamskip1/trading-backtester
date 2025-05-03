@@ -1,11 +1,11 @@
 import numpy as np
 import pytest
 
-from stock_backtesting.account import Account
-from stock_backtesting.broker import Broker
-from stock_backtesting.data import Data
-from stock_backtesting.market import Market
-from stock_backtesting.stats import Statistics
+from trading_backtester.account import Account
+from trading_backtester.broker import Broker
+from trading_backtester.data import Data
+from trading_backtester.market import Market
+from trading_backtester.stats import Statistics
 
 
 class AccountMock(Account):
