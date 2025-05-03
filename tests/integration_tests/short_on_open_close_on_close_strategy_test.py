@@ -1,0 +1,61 @@
+import os
+from datetime import datetime
+from typing import List
+
+import pytest
+
+from trading_backtester.backtest import Backtester
+from trading_backtester.data import Data
+from trading_backtester.market import MarketTime
+from trading_backtester.order import CloseOrder, OpenOrder, Order
+from trading_backtester.position import PositionType
+from trading_backtester.strategy import Strategy
+
+
+class SellOnOpenCloseOnCloseStrategy(Strategy):
+    def collect_orders(
+        self, market_time: MarketTime, price: float, date_time: datetime
+    ) -> List[Order]:
+        if market_time == MarketTime.OPEN:
+            # Sell on open
+            return [
+                OpenOrder(
+                    size=1,
+                    position_type=PositionType.SHORT,
+                )
+            ]
+
+        elif market_time == MarketTime.CLOSE:
+            # Close on close
+            return [
+                CloseOrder(
+                    size=1,
+                    position_to_close=self._positions[0],
+                )
+            ]
+
+        return []
+
+
+def test_single_day_profit_short():
+    data = Data.from_csv(
+        file_path=os.path.join(
+            os.path.dirname(__file__), "data", "^spx_01_03_2025-07_03_2025.csv"
+        )
+    )
+    backtest = Backtester(data, SellOnOpenCloseOnCloseStrategy, money=50000)
+    stats = backtest.run()
+
+    assert stats["total_trades"] == 10
+    assert stats["total_open_trades"] == 5
+    assert stats["total_close_trades"] == 5
+    assert stats["total_open_long_trades"] == 0
+    assert stats["total_close_long_trades"] == 0
+    assert stats["total_open_short_trades"] == 5
+    assert stats["total_close_short_trades"] == 5
+    assert stats["final_money"] == pytest.approx(50094.33, abs=0.01)
+    assert stats["final_assets_value"] == 0
+    assert stats["final_total_equity"] == pytest.approx(50094.33, abs=0.01)
+    assert stats["return"] == pytest.approx(94.33, abs=0.01)
+    assert stats["max_drawdown"] == pytest.approx(61.27, abs=0.01)
+    assert stats["max_drawdown_percentage"] == pytest.approx(0.12, abs=0.01)
