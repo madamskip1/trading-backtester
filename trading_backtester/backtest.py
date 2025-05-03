@@ -1,7 +1,5 @@
 from typing import Any, Dict, Type
 
-import numpy as np
-
 from .account import Account
 from .broker import Broker
 from .data import Data
