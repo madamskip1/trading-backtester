@@ -98,7 +98,6 @@ def test_alpha(
     trades: List[Trade] = []
     statistics = Statistics(trades, account_mock, benchmark=test_data)
     account_mock.set_equity(equity)
-    account_mock.set_initial_money(equity[0])
 
     stats = statistics.get_stats()
     assert stats["alpha"] == pytest.approx(expected_alpha, abs=0.01)

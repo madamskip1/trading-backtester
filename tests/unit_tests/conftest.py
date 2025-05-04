@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Any, List, Union
 
 import numpy as np
 import pytest
@@ -17,25 +17,21 @@ class AccountMock(Account):
     def set_current_money(self, amount: float):
         self._current_money = amount
 
-    def set_initial_money(self, amount: float):
-        self._initial_money = amount
+    def set_assets_value(
+        self, values: Union[np.ndarray[Any, np.dtype[Any]], List[float]]
+    ):
+        if isinstance(values, np.ndarray):
+            self._assets_value = values
+        else:
+            self._assets_value = np.array(values, dtype=float)
 
-    def set_assets_value(self, index: int, value: float):
-        self._assets_value[index] = value
-
-    def set_equity_on_index(self, index: int, value: float):
-        self._equity[index] = value
-
-    def set_equity(self, values: Union[np.ndarray, List[float]]):
+    def set_equity(self, values: Union[np.ndarray[Any, np.dtype[Any]], List[float]]):
         if isinstance(values, np.ndarray):
             self._equity = values
         else:
             self._equity = np.array(values, dtype=float)
 
-    def set_data_size(self, size: int):
-        assert size >= 1
-        self._assets_value = np.zeros(size, dtype=float)
-        self._equity = np.zeros(size, dtype=float)
+        self._initial_money = self._equity[0]
 
 
 @pytest.fixture
