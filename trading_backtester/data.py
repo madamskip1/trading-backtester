@@ -51,11 +51,11 @@ class Data:
 
     @property
     def low(self) -> np.ndarray[Any, np.dtype[Any]]:
-        return self.__data["min"]
+        return self.__data["low"]
 
     @property
     def high(self) -> np.ndarray[Any, np.dtype[Any]]:
-        return self.__data["max"]
+        return self.__data["high"]
 
     @property
     def close(self) -> np.ndarray[Any, np.dtype[Any]]:
