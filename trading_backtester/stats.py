@@ -1,5 +1,8 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
+import numpy as np
+
+from trading_backtester.data import Data
 from trading_backtester.order import OrderAction
 
 from .account import Account
@@ -9,9 +12,12 @@ from .trade import Trade
 
 class Statistics:
 
-    def __init__(self, trades: List[Trade], account: Account):
+    def __init__(
+        self, trades: List[Trade], account: Account, benchmark: Optional[Data] = None
+    ):
         self.__trades = trades
         self.__account = account
+        self.__benchmark = benchmark
 
     def get_stats(self) -> Dict[str, Any]:
         max_drowdown, max_drawdown_percentage = self.__calc_max_drown()
@@ -61,6 +67,7 @@ class Statistics:
             "return": self.__account.calc_return_value(),
             "max_drawdown": max_drowdown,
             "max_drawdown_percentage": max_drawdown_percentage,
+            "beta": self.__calc_beta(),
         }
 
     def __str__(self):
@@ -99,3 +106,27 @@ class Statistics:
                 max_drawdown_percentage = (drawdown / peak) * 100
 
         return max_drawdown, max_drawdown_percentage
+
+    def __calc_beta(self) -> Optional[float]:
+        if self.__benchmark is None:
+            return None
+
+        benchmark_data = np.insert(
+            self.__benchmark.close, 0, self.__benchmark.open[0], axis=0
+        )
+        benchmark_returns = np.diff(benchmark_data) / benchmark_data[:-1]
+
+        equity_returns = (
+            np.diff(self.__account.get_equity()) / self.__account.get_equity()[:-1]
+        )
+
+        if len(benchmark_returns) < 2 or len(equity_returns) < 2:
+            return None
+
+        covariance = np.cov(equity_returns, benchmark_returns)[0, 1]
+        market_variance = np.var(benchmark_returns, ddof=1)
+
+        if market_variance == 0:
+            return None
+
+        return covariance / market_variance

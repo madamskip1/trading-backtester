@@ -20,7 +20,7 @@ class Backtester:
         self.__market = Market(self.__data)
         self.__account = Account(data_size=len(data), initial_money=money)
         self.__broker = Broker(self.__market, self.__account, spread)
-        self.__statistics = Statistics(self.__broker.get_trades(), self.__account)
+        self.__statistics = Statistics(self.__broker.get_trades(), self.__account, data)
 
         self.__strategy = strategy(self.__market, self.__broker.get_positions())
         self.__strategy.prepare_indicators(self.__data)

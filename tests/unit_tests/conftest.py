@@ -1,3 +1,5 @@
+from typing import List, Union
+
 import numpy as np
 import pytest
 
@@ -21,8 +23,14 @@ class AccountMock(Account):
     def set_assets_value(self, index: int, value: float):
         self._assets_value[index] = value
 
-    def set_equity(self, index: int, value: float):
+    def set_equity_on_index(self, index: int, value: float):
         self._equity[index] = value
+
+    def set_equity(self, values: Union[np.ndarray, List[float]]):
+        if isinstance(values, np.ndarray):
+            self._equity = values
+        else:
+            self._equity = np.array(values, dtype=float)
 
     def set_data_size(self, size: int):
         assert size >= 1
