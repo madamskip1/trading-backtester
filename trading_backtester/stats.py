@@ -21,6 +21,8 @@ class Statistics:
 
     def get_stats(self) -> Dict[str, Any]:
         max_drowdown, max_drawdown_percentage = self.__calc_max_drown()
+        beta = self.__calc_beta()
+
         return {
             "total_trades": len(self.__trades),
             "total_open_trades": len(
@@ -67,7 +69,8 @@ class Statistics:
             "return": self.__account.calc_return_value(),
             "max_drawdown": max_drowdown,
             "max_drawdown_percentage": max_drawdown_percentage,
-            "beta": self.__calc_beta(),
+            "beta": beta,
+            "alpha": self.__calc_alpha(beta),
         }
 
     def __str__(self):
@@ -130,3 +133,20 @@ class Statistics:
             return None
 
         return covariance / market_variance
+
+    def __calc_alpha(
+        self, beta: Optional[float], risk_free_rate: float = 0.0
+    ) -> Optional[float]:
+        if beta is None or self.__benchmark is None:
+            return None
+
+        equity_return = (
+            self.__account.calc_return_value() / self.__account.get_initial_money()
+        )
+        benchmark_return = (
+            self.__benchmark.close[-1] - self.__benchmark.open[0]
+        ) / self.__benchmark.open[0]
+
+        return (
+            equity_return - risk_free_rate - beta * (benchmark_return - risk_free_rate)
+        )
