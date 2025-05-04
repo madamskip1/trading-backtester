@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="trading-backtester",
-    version="0.2.0a1",
+    version="0.2.0",
     description="A trading backtesting framework for Python",
     author="Adamski Maciej",
     author_email="madamskip1@gmail.com",
