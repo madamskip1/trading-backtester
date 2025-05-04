@@ -10,7 +10,8 @@ class Account:
         self._initial_money = initial_money
         # assets and equity are calculated at the end of the day
         self._assets_value = np.zeros(data_size, dtype=float)
-        self._equity = np.zeros(data_size, dtype=float)
+        self._equity = np.zeros(data_size + 1, dtype=float)
+        self._equity[0] = initial_money
 
     def get_current_money(self) -> float:
         return self._current_money
@@ -40,7 +41,7 @@ class Account:
         self._assets_value[index] = value
 
     def calculate_equity(self, index: int):
-        self._equity[index] = self._current_money + self._assets_value[index]
+        self._equity[index + 1] = self._current_money + self._assets_value[index]
 
     def has_enough_money(self, amount: float) -> bool:
         return self._current_money >= amount
