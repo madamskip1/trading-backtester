@@ -1,4 +1,4 @@
-from typing import Any, Dict, Type
+from typing import Any, Dict, Optional, Type
 
 from .account import Account
 from .broker import Broker
@@ -15,12 +15,15 @@ class Backtester:
         strategy: Type[Strategy],
         money: float = 1000.0,
         spread: float = 0.0,
+        benchmark: Optional[Data] = None,
     ):
         self.__data = data
         self.__market = Market(self.__data)
         self.__account = Account(data_size=len(data), initial_money=money)
         self.__broker = Broker(self.__market, self.__account, spread)
-        self.__statistics = Statistics(self.__broker.get_trades(), self.__account)
+        self.__statistics = Statistics(
+            self.__broker.get_trades(), self.__account, benchmark
+        )
 
         self.__strategy = strategy(self.__market, self.__broker.get_positions())
         self.__strategy.prepare_indicators(self.__data)
