@@ -81,7 +81,12 @@ class Backtester:
         return self.__statistics.get_stats()
 
     def show_plot(self) -> None:
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(
+            2, 1, sharex=True, gridspec_kw={"hspace": 0.2, "height_ratios": [3, 1]}
+        )
+        ax_price = ax[0]
+        ax_volume = ax[1]
+
         width = np.timedelta64(12, "h")
 
         for i in range(len(self.__data)):
@@ -92,14 +97,15 @@ class Backtester:
             high_val = i_data["high"]
             low_val = i_data["low"]
             close_val = i_data["close"]
+            volume_val = i_data["volume"]
 
             color = "green" if close_val >= open_val else "red"
             lower = min(open_val, close_val)
             height = abs(close_val - open_val)
             print(height)
 
-            ax.plot([date, date], [low_val, high_val], color="black", zorder=2)
-            ax.add_patch(
+            ax_price.plot([date, date], [low_val, high_val], color="black", zorder=2)
+            ax_price.add_patch(
                 plt.Rectangle(
                     (date - width / 2, lower),
                     width,
@@ -109,11 +115,18 @@ class Backtester:
                 )
             )
 
-        ax.set_xticks(self.__data.datetime)
-        ax.set_xticklabels([str(dt) for dt in self.__data.datetime])
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Price")
-        ax.grid(True, axis="y")
+            ax_volume.bar(date, volume_val, width=width, color=color, zorder=2)
+
+        ax_price.set_ylabel("Price")
+        ax_price.grid(True, axis="y")
+
+        ax_volume.set_ylabel("Volume")
+        ax_volume.grid(True, axis="y")
+
+        ax_volume.set_xticks(self.__data.datetime)
+        ax_volume.set_xticklabels([str(dt) for dt in self.__data.datetime])
+        ax_volume.set_xlabel("Time")
+
         fig.autofmt_xdate()
 
         plt.show()
