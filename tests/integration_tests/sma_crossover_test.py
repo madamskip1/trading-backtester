@@ -65,23 +65,25 @@ class SMACrossoverStrategy(Strategy):
     "market_data",
     [
         [
-            (None, 3.0, 3.0, 3.0, 3.0),
-            (None, 2.0, 2.0, 2.0, 2.0),  # SMA(2) == 2.5, SMA(3) = NaN
-            (None, 1.0, 1.0, 1.0, 1.0),  # SMA(2) == 1.5, SMA(3) = 2.0
+            (None, 3.0, 3.0, 3.0, 3.0, None),
+            (None, 2.0, 2.0, 2.0, 2.0, None),  # SMA(2) == 2.5, SMA(3) = NaN
+            (None, 1.0, 1.0, 1.0, 1.0, None),  # SMA(2) == 1.5, SMA(3) = 2.0
             (
                 None,
                 4.0,
                 4.0,
                 4.0,
                 4.0,
+                None,
             ),  # SMA(2) == 2.5, SMA(3) = 2.33 -> will cross and open long
-            (None, 1.0, 1.0, 1.0, 1.0),  # SMA(2) == 2.5, SMA(3) = 2.0 -
+            (None, 1.0, 1.0, 1.0, 1.0, None),  # SMA(2) == 2.5, SMA(3) = 2.0 -
             (
                 None,
                 1.0,
                 1.0,
                 1.0,
                 1.0,
+                None,
             ),  # SMA(2) == 1.0, SMA(3) = 2.0 -> will cross and close long
         ]
     ],

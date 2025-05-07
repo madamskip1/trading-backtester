@@ -10,6 +10,7 @@ DATA_TYPE = np.dtype(
         ("high", "f8"),
         ("low", "f8"),
         ("close", "f8"),
+        ("volume", "f8"),
     ]
 )
 
@@ -65,11 +66,20 @@ class Data:
     def close(self) -> np.ndarray[Any, np.dtype[Any]]:
         return self.__data["close"]
 
+    @property
+    def volume(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__data["volume"]
+
     @staticmethod
     def from_array(
         data: List[
             Tuple[
-                Any, Optional[float], Optional[float], Optional[float], Optional[float]
+                Any,
+                Optional[float],
+                Optional[float],
+                Optional[float],
+                Optional[float],
+                Optional[float],
             ]
         ],
     ) -> "Data":
@@ -89,6 +99,6 @@ class Data:
             delimiter=delimiter,
             skip_header=1,
             dtype=DATA_TYPE,
-            usecols=(0, 1, 2, 3, 4),
+            usecols=(0, 1, 2, 3, 4, 5),
         )
         return Data(data_np)

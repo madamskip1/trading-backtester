@@ -8,7 +8,7 @@ from trading_backtester.position import PositionType
 from trading_backtester.trade import TradeType
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, None, None)]])
 def test_open_long_single(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -39,7 +39,7 @@ def test_open_long_single(test_account: Account, test_broker: Broker):
     assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, None, None)]])
 def test_open_long_multiple_in_single_process(
     test_account: Account, test_broker: Broker
 ):
@@ -92,7 +92,7 @@ def test_open_long_multiple_in_single_process(
     assert test_account.get_current_money() == pytest.approx(25.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0, None)]])
 def test_open_long_multiple_in_multiple_processes(
     test_market: Market, test_account: Account, test_broker: Broker
 ):
@@ -148,7 +148,7 @@ def test_open_long_multiple_in_multiple_processes(
     assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, None, None)]])
 def test_open_short_single(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -180,7 +180,7 @@ def test_open_short_single(test_account: Account, test_broker: Broker):
     assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, None)]])
+@pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, None, None)]])
 def test_open_short_multiple_in_single_process(
     test_account: Account, test_broker: Broker
 ):
@@ -230,7 +230,7 @@ def test_open_short_multiple_in_single_process(
     assert test_account.get_current_money() == pytest.approx(25.0, abs=0.01)
 
 
-@pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0, None)]])
 def test_open_short_multiple_in_multiple_processes(
     test_market: Market, test_account: Account, test_broker: Broker
 ):
@@ -284,7 +284,7 @@ def test_open_short_multiple_in_multiple_processes(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, None, None, None)], 2.2)]
+    "market_data, spread", [([(None, 90.0, None, None, None, None)], 2.2)]
 )
 def test_open_long_with_spread(
     test_account: Account,
@@ -320,7 +320,7 @@ def test_open_long_with_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, None, None, None)], 2.2)]
+    "market_data, spread", [([(None, 90.0, None, None, None, None)], 2.2)]
 )
 def test_open_short_with_spread(
     test_account: Account,

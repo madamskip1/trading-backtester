@@ -17,9 +17,9 @@ class SingleValuePerCandleIndicator(Indicator):
     "market_data",
     [
         [
-            (None, 100.0, 100.0, 120.0, 110.0),
-            (None, 101.0, 101.0, 121.0, 111.0),
-            (None, 102.0, 102.0, 122.0, 112.0),
+            (None, 100.0, 100.0, 120.0, 110.0, None),
+            (None, 101.0, 101.0, 121.0, 111.0, None),
+            (None, 102.0, 102.0, 122.0, 112.0, None),
         ]
     ],
 )
@@ -37,10 +37,10 @@ def test_single_value_per_candle_indicator_values(test_data: Data):
     "market_data",
     [
         [
-            (None, 100.0, 100.0, 120.0, np.nan),
-            (None, 102.0, 102.0, 122.0, 112.0),
-            (None, np.nan, np.nan, np.nan, np.nan),
-            (None, 102.0, 102.0, 122.0, 112.0),
+            (None, 100.0, 100.0, 120.0, None, None),
+            (None, 102.0, 102.0, 122.0, 112.0, None),
+            (None, np.nan, np.nan, np.nan, None, None),
+            (None, 102.0, 102.0, 122.0, 112.0, None),
         ]
     ],
 )
@@ -56,8 +56,8 @@ def test_single_value_per_candle_indicator_with_skip(test_data: Data):
     "market_data",
     [
         [
-            (None, 100.0, 100.0, 120.0, 112.0),
-            (None, 102.0, 102.0, 122.0, 112.0),
+            (None, 100.0, 100.0, 120.0, 112.0, None),
+            (None, 102.0, 102.0, 122.0, 112.0, None),
         ]
     ],
 )
@@ -73,9 +73,9 @@ def test_single_value_per_candle_indicator_without_skip(test_data: Data):
     "market_data",
     [
         [
-            (None, 100.0, 100.0, 120.0, 110.0),
-            (None, 101.0, 101.0, 121.0, 111.0),
-            (None, 102.0, 102.0, 122.0, 112.0),
+            (None, 100.0, 100.0, 120.0, 110.0, None),
+            (None, 101.0, 101.0, 121.0, 111.0, None),
+            (None, 102.0, 102.0, 122.0, 112.0, None),
         ]
     ],
 )

@@ -9,7 +9,8 @@ from trading_backtester.trade import TradeType
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(None, None, None, None, 100.0), (None, 101.0, None, None, None)]]
+    "market_data",
+    [[(None, None, None, None, 100.0, None), (None, 101.0, None, None, None, None)]],
 )
 def test_long_equal_on_open_time(
     test_data: Data, test_market: Market, test_broker: Broker
@@ -41,7 +42,8 @@ def test_long_equal_on_open_time(
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(None, None, None, None, 100.0), (None, 102.0, None, None, None)]]
+    "market_data",
+    [[(None, None, None, None, 100.0, None), (None, 102.0, None, None, None, None)]],
 )
 def test_long_greater_on_open_time(
     test_data: Data, test_market: Market, test_broker: Broker
@@ -73,7 +75,8 @@ def test_long_greater_on_open_time(
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(None, None, None, None, 100.0), (None, 100.5, None, None, None)]]
+    "market_data",
+    [[(None, None, None, None, 100.0, None), (None, 100.5, None, None, None, None)]],
 )
 def test_long_less_on_open_time(
     test_data: Data, test_market: Market, test_broker: Broker
@@ -96,7 +99,7 @@ def test_long_less_on_open_time(
     assert len(test_broker.get_trades()) == 1
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 100.0, 101.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 100.0, 101.0, None)]])
 def test_long_on_close_time(test_market: Market, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -122,7 +125,7 @@ def test_long_on_close_time(test_market: Market, test_broker: Broker):
     assert test_broker.get_trades()[1].market_order is True
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 102.0, 100.0, 100.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 102.0, 100.0, 100.0, None)]])
 def test_long_during_day(test_market: Market, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -148,7 +151,7 @@ def test_long_during_day(test_market: Market, test_broker: Broker):
     assert test_broker.get_trades()[1].market_order is True
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.9, 100.0, 100.5)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.9, 100.0, 100.5, None)]])
 def test_long_less_not_happend_during_day(test_market: Market, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -167,7 +170,8 @@ def test_long_less_not_happend_during_day(test_market: Market, test_broker: Brok
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(None, None, None, None, 100.0), (None, 99.0, None, None, None)]]
+    "market_data",
+    [[(None, None, None, None, 100.0, None), (None, 99.0, None, None, None, None)]],
 )
 def test_short_equal_on_open_time(
     test_data: Data, test_market: Market, test_broker: Broker
@@ -199,7 +203,8 @@ def test_short_equal_on_open_time(
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(None, None, None, None, 100.0), (None, 98.0, None, None, None)]]
+    "market_data",
+    [[(None, None, None, None, 100.0, None), (None, 98.0, None, None, None, None)]],
 )
 def test_short_less_on_open_time(
     test_data: Data, test_market: Market, test_broker: Broker
@@ -231,7 +236,8 @@ def test_short_less_on_open_time(
 
 
 @pytest.mark.parametrize(
-    "market_data", [[(None, None, None, None, 100.0), (None, 99.5, None, None, None)]]
+    "market_data",
+    [[(None, None, None, None, 100.0, None), (None, 99.5, None, None, None, None)]],
 )
 def test_short_greater_on_open_time(
     test_data: Data, test_market: Market, test_broker: Broker
@@ -254,7 +260,7 @@ def test_short_greater_on_open_time(
     assert len(test_broker.get_trades()) == 1
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 99.0, 99.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 99.0, 99.0, None)]])
 def test_short_less_on_close_time(test_market: Market, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -280,7 +286,7 @@ def test_short_less_on_close_time(test_market: Market, test_broker: Broker):
     assert test_broker.get_trades()[1].market_order is True
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 98.0, 98.5)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 98.0, 98.5, None)]])
 def test_short_less_during_day(test_market: Market, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -306,7 +312,7 @@ def test_short_less_during_day(test_market: Market, test_broker: Broker):
     assert test_broker.get_trades()[1].market_order is True
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 99.1, 99.5)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 99.1, 99.5, None)]])
 def test_short_not_happend_during_day(test_market: Market, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -324,7 +330,7 @@ def test_short_not_happend_during_day(test_market: Market, test_broker: Broker):
     assert len(test_broker.get_trades()) == 1
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 100.0, 101.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 101.0, 100.0, 101.0, None)]])
 def test_take_profit_not_set_long(test_market: Market, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -341,7 +347,7 @@ def test_take_profit_not_set_long(test_market: Market, test_broker: Broker):
     assert len(test_broker.get_trades()) == 1
 
 
-@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 99.0, 99.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 99.0, 99.0, None)]])
 def test_take_profit_not_set_short(test_market: Market, test_broker: Broker):
     open_order = OpenOrder(
         size=1,
@@ -358,7 +364,7 @@ def test_take_profit_not_set_short(test_market: Market, test_broker: Broker):
     assert len(test_broker.get_trades()) == 1
 
 
-@pytest.mark.parametrize("market_data", [[(None, 50.0, 51.0, 50.0, 51.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 50.0, 51.0, 50.0, 51.0, None)]])
 def test_multiple_long_positions(test_market: Market, test_broker: Broker):
     open_order1 = OpenOrder(
         size=1,
@@ -390,7 +396,7 @@ def test_multiple_long_positions(test_market: Market, test_broker: Broker):
     assert test_broker.get_trades()[2].market_order is True
 
 
-@pytest.mark.parametrize("market_data", [[(None, 50.0, 50.0, 49.0, 49.0)]])
+@pytest.mark.parametrize("market_data", [[(None, 50.0, 50.0, 49.0, 49.0, None)]])
 def test_multiple_short_positions(test_market: Market, test_broker: Broker):
     open_order1 = OpenOrder(
         size=1,
@@ -423,7 +429,7 @@ def test_multiple_short_positions(test_market: Market, test_broker: Broker):
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, 95.0, 90.0, 95.0)], 2.2)]
+    "market_data, spread", [([(None, 90.0, 95.0, 90.0, 95.0, None)], 2.2)]
 )
 def test_long_with_spread_exact_price(
     test_market: Market,
@@ -444,7 +450,7 @@ def test_long_with_spread_exact_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, 97.2, 90.0, 97.2)], 2.2)]
+    "market_data, spread", [([(None, 90.0, 97.2, 90.0, 97.2, None)], 2.2)]
 )
 def test_long_with_spread_enough_price(
     test_market: Market,
@@ -473,7 +479,7 @@ def test_long_with_spread_enough_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, 90.0, 85.0, 85.0)], 2.2)]
+    "market_data, spread", [([(None, 90.0, 90.0, 85.0, 85.0, None)], 2.2)]
 )
 def test_short_with_spread_exact_price(
     test_market: Market,
@@ -494,7 +500,7 @@ def test_short_with_spread_exact_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, 90.0, 82.8, 82.8)], 2.2)]
+    "market_data, spread", [([(None, 90.0, 90.0, 82.8, 82.8, None)], 2.2)]
 )
 def test_short_with_spread_enough_price(
     test_market: Market,
