@@ -27,6 +27,9 @@ class Data:
     def __len__(self) -> int:
         return len(self.__data)
 
+    def __iter__(self):
+        return iter(self.__data)
+
     def increment_data_index(self) -> None:
         self.__current_data_index += 1
 

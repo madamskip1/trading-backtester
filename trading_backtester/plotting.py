@@ -23,17 +23,15 @@ class Plotting:
         ax_price = ax[0]
         ax_volume = ax[1]
 
-        for i in range(len(self.__data)):
-            i_data = self.__data[i]
-            open_val = i_data["open"]
-            high_val = i_data["high"]
-            low_val = i_data["low"]
-            close_val = i_data["close"]
-            volume_val = i_data["volume"]
-
-            self.__draw_candlestick(ax_price, i, open_val, high_val, low_val, close_val)
+        for i, data in enumerate(self.__data):
+            self.__draw_candlestick(
+                ax_price, i, data["open"], data["high"], data["low"], data["close"]
+            )
             self.__draw_volume_bar(
-                ax_volume, i, volume_val, self.__get_bar_color(open_val, close_val)
+                ax_volume,
+                i,
+                data["volume"],
+                self.__get_bar_color(data["open"], data["close"]),
             )
 
         ax_price.set_ylabel("Price")
