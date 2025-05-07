@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional, Type
 
-import matplotlib.pyplot as plt
-import numpy as np
+from trading_backtester.plotting import Plotting
 
 from .account import Account
 from .broker import Broker
@@ -80,71 +79,5 @@ class Backtester:
 
         return self.__statistics.get_stats()
 
-    def show_plot(self) -> None:
-        fig, ax = plt.subplots(
-            2, 1, sharex=True, gridspec_kw={"hspace": 0.2, "height_ratios": [3, 1]}
-        )
-        ax_price = ax[0]
-        ax_volume = ax[1]
-
-        bar_width = 0.75
-
-        for i in range(len(self.__data)):
-            i_data = self.__data[i]
-            open_val = i_data["open"]
-            high_val = i_data["high"]
-            low_val = i_data["low"]
-            close_val = i_data["close"]
-            volume_val = i_data["volume"]
-
-            color = "green" if close_val >= open_val else "red"
-            lower = min(open_val, close_val)
-            height = abs(close_val - open_val)
-            print(height)
-
-            ax_price.plot([i, i], [low_val, high_val], color="black", zorder=2)
-            ax_price.add_patch(
-                plt.Rectangle(
-                    (i - bar_width / 2, lower),
-                    bar_width,
-                    height,
-                    facecolor=color,
-                    zorder=3,
-                )
-            )
-
-            ax_volume.bar(i, volume_val, width=0.95, color=color, zorder=2)
-
-        ax_price.set_ylabel("Price")
-        ax_price.grid(True, axis="y")
-
-        ax_volume.set_ylabel("Volume")
-        ax_volume.grid(True, axis="y")
-
-        ax_volume.set_xticks(list(range(len(self.__data))))
-
-        diffs = np.diff(self.__data.datetime)
-        min_diff = np.min(diffs)
-
-        if min_diff < np.timedelta64(1, "h"):
-            fmt = "%H:%M"
-        elif min_diff < np.timedelta64(12, "h"):
-            fmt = "%m-%d %H:%M"
-        elif min_diff < np.timedelta64(28, "D"):
-            fmt = "%Y-%m-%d"
-        elif min_diff < np.timedelta64(365, "D"):
-            fmt = "%Y-%m"
-        else:
-            fmt = "%Y"
-
-        xticklabels = [
-            np.datetime64(dt).astype("datetime64[s]").astype(object).strftime(fmt)
-            for dt in self.__data.datetime
-        ]
-
-        ax_volume.set_xticklabels(xticklabels)
-        ax_volume.set_xlabel("Time")
-
-        fig.autofmt_xdate()
-
-        plt.show()
+    def get_plotting(self) -> Plotting:
+        return Plotting(self.__data)
