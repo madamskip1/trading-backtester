@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional, Type
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 from .account import Account
 from .broker import Broker
@@ -87,12 +86,10 @@ class Backtester:
         ax_price = ax[0]
         ax_volume = ax[1]
 
-        width = np.timedelta64(12, "h")
+        bar_width = 0.75
 
         for i in range(len(self.__data)):
             i_data = self.__data[i]
-            date = i_data["datetime"]
-            print(date)
             open_val = i_data["open"]
             high_val = i_data["high"]
             low_val = i_data["low"]
@@ -104,18 +101,18 @@ class Backtester:
             height = abs(close_val - open_val)
             print(height)
 
-            ax_price.plot([date, date], [low_val, high_val], color="black", zorder=2)
+            ax_price.plot([i, i], [low_val, high_val], color="black", zorder=2)
             ax_price.add_patch(
                 plt.Rectangle(
-                    (date - width / 2, lower),
-                    width,
+                    (i - bar_width / 2, lower),
+                    bar_width,
                     height,
                     facecolor=color,
                     zorder=3,
                 )
             )
 
-            ax_volume.bar(date, volume_val, width=width, color=color, zorder=2)
+            ax_volume.bar(i, volume_val, width=0.95, color=color, zorder=2)
 
         ax_price.set_ylabel("Price")
         ax_price.grid(True, axis="y")
@@ -123,9 +120,9 @@ class Backtester:
         ax_volume.set_ylabel("Volume")
         ax_volume.grid(True, axis="y")
 
-        ax_volume.set_xticks(self.__data.datetime)
-        ax_volume.set_xticklabels([str(dt) for dt in self.__data.datetime])
-        ax_volume.set_xlabel("Time")
+        ax_volume.set_xticks(list(range(len(self.__data))))
+        ax_price.set_xticklabels([str(dt) for dt in self.__data.datetime])
+        ax_price.set_xlabel("Time")
 
         fig.autofmt_xdate()
 
