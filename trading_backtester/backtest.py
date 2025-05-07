@@ -1,5 +1,8 @@
 from typing import Any, Dict, Optional, Type
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 from .account import Account
 from .broker import Broker
 from .data import Data
@@ -76,3 +79,41 @@ class Backtester:
         print(self.__statistics)
 
         return self.__statistics.get_stats()
+
+    def show_plot(self) -> None:
+        fig, ax = plt.subplots()
+        width = np.timedelta64(12, "h")
+
+        for i in range(len(self.__data)):
+            i_data = self.__data[i]
+            date = i_data["datetime"]
+            print(date)
+            open_val = i_data["open"]
+            high_val = i_data["high"]
+            low_val = i_data["low"]
+            close_val = i_data["close"]
+
+            color = "green" if close_val >= open_val else "red"
+            lower = min(open_val, close_val)
+            height = abs(close_val - open_val)
+            print(height)
+
+            ax.plot([date, date], [low_val, high_val], color="black", zorder=2)
+            ax.add_patch(
+                plt.Rectangle(
+                    (date - width / 2, lower),
+                    width,
+                    height,
+                    facecolor=color,
+                    zorder=3,
+                )
+            )
+
+        ax.set_xticks(self.__data.datetime)
+        ax.set_xticklabels([str(dt) for dt in self.__data.datetime])
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Price")
+        ax.grid(True, axis="y")
+        fig.autofmt_xdate()
+
+        plt.show()

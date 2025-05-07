@@ -46,6 +46,10 @@ class Data:
         )
 
     @property
+    def datetime(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__data["datetime"]
+
+    @property
     def open(self) -> np.ndarray[Any, np.dtype[Any]]:
         return self.__data["open"]
 
