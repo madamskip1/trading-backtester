@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional, Type
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from .account import Account
 from .broker import Broker
@@ -121,8 +122,28 @@ class Backtester:
         ax_volume.grid(True, axis="y")
 
         ax_volume.set_xticks(list(range(len(self.__data))))
-        ax_price.set_xticklabels([str(dt) for dt in self.__data.datetime])
-        ax_price.set_xlabel("Time")
+
+        diffs = np.diff(self.__data.datetime)
+        min_diff = np.min(diffs)
+
+        if min_diff < np.timedelta64(1, "h"):
+            fmt = "%H:%M"
+        elif min_diff < np.timedelta64(12, "h"):
+            fmt = "%m-%d %H:%M"
+        elif min_diff < np.timedelta64(28, "D"):
+            fmt = "%Y-%m-%d"
+        elif min_diff < np.timedelta64(365, "D"):
+            fmt = "%Y-%m"
+        else:
+            fmt = "%Y"
+
+        xticklabels = [
+            np.datetime64(dt).astype("datetime64[s]").astype(object).strftime(fmt)
+            for dt in self.__data.datetime
+        ]
+
+        ax_volume.set_xticklabels(xticklabels)
+        ax_volume.set_xlabel("Time")
 
         fig.autofmt_xdate()
 
