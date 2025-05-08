@@ -3,7 +3,7 @@ from typing import List, Tuple
 from trading_backtester.account import Account
 from trading_backtester.market import Market
 from trading_backtester.order import CloseOrder, Order, OrderAction
-from trading_backtester.trade import Trade
+from trading_backtester.trade import CloseTrade, OpenTrade, Trade
 
 from .position import Position, PositionType
 
@@ -166,9 +166,10 @@ class Broker:
         self.__account.update_money(-money)
 
         self.__trades.append(
-            Trade(
-                order,
+            OpenTrade(
+                order.position_type,
                 price,
+                order.size,
                 market_order=(order.limit_price is None),
             )
         )
@@ -190,9 +191,11 @@ class Broker:
                 order.position_to_close.size -= order.size
 
             self.__trades.append(
-                Trade(
-                    order,
+                CloseTrade(
+                    order.position_type,
+                    order.position_to_close.avg_bought_price,
                     price,
+                    order.size,
                     market_order=(order.limit_price is None),
                 )
             )
@@ -217,16 +220,18 @@ class Broker:
                     positions_to_close.append(position)
 
                 size_to_reduce_left -= reduce_size
+
+                self.__trades.append(
+                    CloseTrade(
+                        order.position_type,
+                        position.avg_bought_price,
+                        price,
+                        reduce_size,
+                        market_order=(order.limit_price is None),
+                    )
+                )
                 if size_to_reduce_left == 0:
                     break
-
-            self.__trades.append(
-                Trade(
-                    order,
-                    price,
-                    market_order=(order.limit_price is None),
-                )
-            )
 
             for position in positions_to_close:
                 self.__positions.remove(position)

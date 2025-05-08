@@ -6,6 +6,7 @@ from trading_backtester.data import Data
 from trading_backtester.market import Market, MarketTime
 from trading_backtester.order import CloseOrder, OpenOrder
 from trading_backtester.position import PositionType
+from trading_backtester.trade import TradeType
 
 
 @pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, 150.0)]])
@@ -27,9 +28,13 @@ def test_close_long_single_full(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.LONG
+    assert test_broker.get_trades()[1].open_price == pytest.approx(100.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(150.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 0
@@ -56,9 +61,13 @@ def test_close_long_single_reduce(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.LONG
+    assert test_broker.get_trades()[1].open_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(75.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 1
@@ -93,9 +102,13 @@ def test_close_long_single_full_position_specified(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.LONG
+    assert test_broker.get_trades()[1].open_price == pytest.approx(100.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(150.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 0
@@ -122,9 +135,13 @@ def test_close_long_single_reduce_position_specified(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.LONG
+    assert test_broker.get_trades()[1].open_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(75.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 1
@@ -164,13 +181,23 @@ def test_close_long_multiple_positions_in_single_order(
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
-    assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order1
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == open_order2
-    assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order
+    assert len(test_broker.get_trades()) == 4
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.LONG
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 1
     assert test_broker.get_trades()[2].market_order is True
+
+    assert test_broker.get_trades()[3].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[3].position_type == PositionType.LONG
+    assert test_broker.get_trades()[3].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[3].open_size is None
+    assert test_broker.get_trades()[3].close_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[3].close_size == 3
+    assert test_broker.get_trades()[3].market_order is True
 
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
@@ -201,13 +228,23 @@ def test_close_long_multiple_positions_in_single_order_reduce(
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
-    assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order1
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == open_order2
-    assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order
+    assert len(test_broker.get_trades()) == 4
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.LONG
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 1
     assert test_broker.get_trades()[2].market_order is True
+
+    assert test_broker.get_trades()[3].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[3].position_type == PositionType.LONG
+    assert test_broker.get_trades()[3].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[3].open_size is None
+    assert test_broker.get_trades()[3].close_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[3].close_size == 2
+    assert test_broker.get_trades()[3].market_order is True
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -247,11 +284,13 @@ def test_close_long_multiple_positions_specified_position_close(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order1
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == open_order2
-    assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.LONG
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 3
     assert test_broker.get_trades()[2].market_order is True
 
     assert len(test_broker.get_positions()) == 1
@@ -292,11 +331,13 @@ def test_close_long_multiple_positions_specified_position_reduce(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order1
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == open_order2
-    assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.LONG
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 2
     assert test_broker.get_trades()[2].market_order is True
 
     assert len(test_broker.get_positions()) == 2
@@ -353,11 +394,21 @@ def test_close_long_reduce_in_multiple_candlesticks(
     test_broker.process_orders([close_order2])
 
     assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order1
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.LONG
+    assert test_broker.get_trades()[1].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order2
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.LONG
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 3
     assert test_broker.get_trades()[2].market_order is True
 
     assert len(test_broker.get_positions()) == 0
@@ -385,9 +436,13 @@ def test_close_short_single_full(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[1].open_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 2
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 0
@@ -415,9 +470,13 @@ def test_close_short_single_reduce(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[1].open_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 1
@@ -453,9 +512,13 @@ def test_close_short_single_full_specified_position(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[1].open_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 2
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 0
@@ -483,9 +546,13 @@ def test_close_short_single_reduce_specified_position(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[1].open_price == pytest.approx(50.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 1
@@ -525,13 +592,23 @@ def test_open_short_multiple_positions_in_single_order(
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
-    assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order1
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == open_order2
-    assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order
+    assert len(test_broker.get_trades()) == 4
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(20.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 1
     assert test_broker.get_trades()[2].market_order is True
+
+    assert test_broker.get_trades()[3].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[3].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[3].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[3].open_size is None
+    assert test_broker.get_trades()[3].close_price == pytest.approx(20.0, abs=0.01)
+    assert test_broker.get_trades()[3].close_size == 3
+    assert test_broker.get_trades()[3].market_order is True
 
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
@@ -562,13 +639,23 @@ def test_open_short_multiple_positions_in_single_order_reduce(
     test_market.set_current_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
-    assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order1
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == open_order2
-    assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order
+    assert len(test_broker.get_trades()) == 4
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(20.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 1
     assert test_broker.get_trades()[2].market_order is True
+
+    assert test_broker.get_trades()[3].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[3].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[3].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[3].open_size is None
+    assert test_broker.get_trades()[3].close_price == pytest.approx(20.0, abs=0.01)
+    assert test_broker.get_trades()[3].close_size == 2
+    assert test_broker.get_trades()[3].market_order is True
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -605,11 +692,13 @@ def test_open_short_multiple_positions_specified_position_close(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order1
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == open_order2
-    assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(20.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 3
     assert test_broker.get_trades()[2].market_order is True
 
     assert len(test_broker.get_positions()) == 1
@@ -647,11 +736,13 @@ def test_open_short_multiple_positions_specified_position_reduec(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order1
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == open_order2
-    assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(20.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 2
     assert test_broker.get_trades()[2].market_order is True
 
     assert len(test_broker.get_positions()) == 2
@@ -709,11 +800,21 @@ def test_open_short_reduce_in_multiple_candlesticks(
     test_broker.process_orders([close_order2])
 
     assert len(test_broker.get_trades()) == 3
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order1
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[1].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(20.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 2
     assert test_broker.get_trades()[1].market_order is True
-    assert test_broker.get_trades()[2].order == close_order2
+
+    assert test_broker.get_trades()[2].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[2].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[2].open_price == pytest.approx(25.0, abs=0.01)
+    assert test_broker.get_trades()[2].open_size is None
+    assert test_broker.get_trades()[2].close_price == pytest.approx(15.0, abs=0.01)
+    assert test_broker.get_trades()[2].close_size == 2
     assert test_broker.get_trades()[2].market_order is True
 
     assert len(test_broker.get_positions()) == 0
@@ -745,9 +846,13 @@ def test_close_long_with_spread(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.LONG
+    assert test_broker.get_trades()[1].open_price == pytest.approx(92.2, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(92.8, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 0
@@ -779,9 +884,13 @@ def test_close_short_with_spread(
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
-    assert test_broker.get_trades()[0].order == open_order
-    assert test_broker.get_trades()[0].market_order is True
-    assert test_broker.get_trades()[1].order == close_order
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[1].open_price == pytest.approx(87.8, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(87.2, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
 
     assert len(test_broker.get_positions()) == 0

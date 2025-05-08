@@ -3,11 +3,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 
 from trading_backtester.data import Data
-from trading_backtester.order import OrderAction
 
 from .account import Account
 from .position import PositionType
-from .trade import Trade
+from .trade import Trade, TradeType
 
 
 class Statistics:
@@ -26,41 +25,41 @@ class Statistics:
         return {
             "total_trades": len(self.__trades),
             "total_open_trades": len(
-                [t for t in self.__trades if t.order.action == OrderAction.OPEN]
+                [t for t in self.__trades if t.trade_type == TradeType.OPEN]
             ),
             "total_close_trades": len(
-                [t for t in self.__trades if t.order.action == OrderAction.CLOSE]
+                [t for t in self.__trades if t.trade_type == TradeType.CLOSE]
             ),
             "total_open_long_trades": len(
                 [
                     t
                     for t in self.__trades
-                    if t.order.position_type == PositionType.LONG
-                    and t.order.action == OrderAction.OPEN
+                    if t.position_type == PositionType.LONG
+                    and t.trade_type == TradeType.OPEN
                 ]
             ),
             "total_close_long_trades": len(
                 [
                     t
                     for t in self.__trades
-                    if t.order.position_type == PositionType.LONG
-                    and t.order.action == OrderAction.CLOSE
+                    if t.position_type == PositionType.LONG
+                    and t.trade_type == TradeType.CLOSE
                 ]
             ),
             "total_open_short_trades": len(
                 [
                     t
                     for t in self.__trades
-                    if t.order.position_type == PositionType.SHORT
-                    and t.order.action == OrderAction.OPEN
+                    if t.position_type == PositionType.SHORT
+                    and t.trade_type == TradeType.OPEN
                 ]
             ),
             "total_close_short_trades": len(
                 [
                     t
                     for t in self.__trades
-                    if t.order.position_type == PositionType.SHORT
-                    and t.order.action == OrderAction.CLOSE
+                    if t.position_type == PositionType.SHORT
+                    and t.trade_type == TradeType.CLOSE
                 ]
             ),
             "final_money": self.__account.get_current_money(),

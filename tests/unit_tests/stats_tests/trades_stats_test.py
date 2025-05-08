@@ -1,9 +1,8 @@
 from typing import List
 
-from trading_backtester.order import CloseOrder, OpenOrder
-from trading_backtester.position import Position, PositionType
+from trading_backtester.position import PositionType
 from trading_backtester.stats import Statistics
-from trading_backtester.trade import Trade
+from trading_backtester.trade import CloseTrade, OpenTrade, Trade
 
 from ..conftest import AccountMock
 
@@ -13,12 +12,10 @@ def test_open_long_position(account_mock: AccountMock):
     statistics = Statistics(trades, account_mock)
 
     trades.append(
-        Trade(
-            order=OpenOrder(
-                size=1,
-                position_type=PositionType.LONG,
-            ),
+        OpenTrade(
+            position_type=PositionType.LONG,
             price=100,
+            size=1,
             market_order=True,
         )
     )
@@ -41,12 +38,10 @@ def test_open_short_position(account_mock: AccountMock):
     statistics = Statistics(trades, account_mock)
 
     trades.append(
-        Trade(
-            order=OpenOrder(
-                size=1,
-                position_type=PositionType.SHORT,
-            ),
+        OpenTrade(
+            position_type=PositionType.SHORT,
             price=100,
+            size=1,
             market_order=True,
         )
     )
@@ -67,12 +62,11 @@ def test_close_long_position(account_mock: AccountMock):
     statistics = Statistics(trades, account_mock)
 
     trades.append(
-        Trade(
-            order=CloseOrder(
-                size=1,
-                position_to_close=Position(PositionType.LONG, size=1, price=50),
-            ),
-            price=100,
+        CloseTrade(
+            position_type=PositionType.LONG,
+            open_price=50,
+            close_price=100,
+            close_size=1,
             market_order=True,
         )
     )
@@ -93,12 +87,11 @@ def test_close_short_position(account_mock: AccountMock):
     statistics = Statistics(trades, account_mock)
 
     trades.append(
-        Trade(
-            order=CloseOrder(
-                size=1,
-                position_to_close=Position(PositionType.SHORT, size=1, price=50),
-            ),
-            price=100,
+        CloseTrade(
+            position_type=PositionType.SHORT,
+            open_price=50,
+            close_price=100,
+            close_size=1,
             market_order=True,
         )
     )
@@ -119,23 +112,20 @@ def test_open_and_close_long_position(account_mock: AccountMock):
     statistics = Statistics(trades, account_mock)
 
     trades.append(
-        Trade(
-            order=OpenOrder(
-                size=1,
-                position_type=PositionType.LONG,
-            ),
+        OpenTrade(
+            position_type=PositionType.LONG,
             price=100,
+            size=1,
             market_order=True,
         )
     )
 
     trades.append(
-        Trade(
-            order=CloseOrder(
-                size=1,
-                position_to_close=Position(PositionType.LONG, size=1, price=50),
-            ),
-            price=100,
+        CloseTrade(
+            position_type=PositionType.LONG,
+            open_price=50,
+            close_price=100,
+            close_size=1,
             market_order=True,
         )
     )
@@ -156,23 +146,20 @@ def test_open_and_close_short_position(account_mock: AccountMock):
     statistics = Statistics(trades, account_mock)
 
     trades.append(
-        Trade(
-            order=OpenOrder(
-                size=1,
-                position_type=PositionType.SHORT,
-            ),
+        OpenTrade(
+            position_type=PositionType.SHORT,
             price=100,
+            size=1,
             market_order=True,
         )
     )
 
     trades.append(
-        Trade(
-            order=CloseOrder(
-                size=1,
-                position_to_close=Position(PositionType.SHORT, size=1, price=50),
-            ),
-            price=100,
+        CloseTrade(
+            position_type=PositionType.SHORT,
+            open_price=50,
+            close_price=100,
+            close_size=1,
             market_order=True,
         )
     )
