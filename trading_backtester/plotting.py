@@ -1,9 +1,13 @@
+from typing import Dict, List
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
 
 from trading_backtester.data import Data
+from trading_backtester.position import PositionType
+from trading_backtester.trade import CloseTrade, Trade, TradeType
 
 
 class Plotting:
@@ -13,8 +17,9 @@ class Plotting:
 
     CANDLESTICK_WIDTH = 0.75
 
-    def __init__(self, data: Data):
+    def __init__(self, data: Data, trades: List[Trade]):
         self.__data = data
+        self.__trades = trades
 
     def draw_plot(self):
         fig, ax = plt.subplots(
@@ -22,6 +27,10 @@ class Plotting:
         )
         ax_price = ax[0]
         ax_volume = ax[1]
+
+        datetime_to_index: Dict[np.datetime64, int] = {
+            dt: i for i, dt in enumerate(self.__data.datetime)
+        }
 
         for i, data in enumerate(self.__data):
             self.__draw_candlestick(
@@ -33,6 +42,11 @@ class Plotting:
                 data["volume"],
                 self.__get_bar_color(data["open"], data["close"]),
             )
+
+        for trade in reversed(self.__trades):
+            if trade.trade_type == TradeType.CLOSE:
+                assert isinstance(trade, CloseTrade)
+                self.__draw_closed_trade(ax_price, trade, datetime_to_index)
 
         ax_price.set_ylabel("Price")
         ax_price.grid(True, axis="y")
@@ -106,3 +120,38 @@ class Plotting:
 
     def __draw_volume_bar(self, ax: Axes, i: int, volume_val: float, color: str):
         ax.bar(i, volume_val, width=0.95, color=color, zorder=2)
+
+    def __draw_closed_trade(
+        self,
+        ax: Axes,
+        close_trade: CloseTrade,
+        datetime_to_index: Dict[np.datetime64, int],
+    ):
+        assert close_trade.close_datetime is not None
+        assert close_trade.close_price is not None
+
+        x_start = datetime_to_index[close_trade.open_datetime]
+        y_start = close_trade.open_price
+        x_end = datetime_to_index[close_trade.close_datetime]
+        y_end = close_trade.close_price
+
+        marker = "^" if close_trade.position_type == PositionType.LONG else "v"
+        color = self.__get_bar_color(close_trade.open_price, close_trade.close_price)
+
+        ax.plot(
+            [x_start, x_end],
+            [y_start, y_end],
+            color="black",
+            linewidth=2,
+            linestyle="--",
+            zorder=4,
+        )
+        ax.plot(
+            x_end,
+            y_end,
+            marker=marker,
+            color=color,
+            zorder=5,
+            markeredgecolor="black",
+            markersize=10,
+        )
