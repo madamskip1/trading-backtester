@@ -20,11 +20,11 @@ def test_long_equal_on_open_time(
         position_type=PositionType.LONG,
         stop_loss=99.0,
     )
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -54,11 +54,11 @@ def test_long_greater_on_open_time(
         stop_loss=99.0,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -90,7 +90,7 @@ def test_long_less_on_open_time(
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 1
@@ -108,7 +108,7 @@ def test_long_on_close_time(test_market: Market, test_broker: Broker):
 
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -134,7 +134,7 @@ def test_long_during_day(test_market: Market, test_broker: Broker):
 
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -161,7 +161,7 @@ def test_long_not_happend_during_day(test_market: Market, test_broker: Broker):
 
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 1
@@ -182,11 +182,11 @@ def test_short_equal_on_open_time(
         stop_loss=101.0,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -216,11 +216,11 @@ def test_short_less_on_open_time(
         stop_loss=101.0,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -249,11 +249,11 @@ def test_short_greater_on_open_time(
         stop_loss=101.0,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 1
@@ -271,7 +271,7 @@ def test_short_equal_on_close_time(test_market: Market, test_broker: Broker):
 
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -298,7 +298,7 @@ def test_short_equal_during_day(test_market: Market, test_broker: Broker):
 
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -325,7 +325,7 @@ def test_short_equal_not_happend_during_day(test_market: Market, test_broker: Br
 
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 1
@@ -342,7 +342,7 @@ def test_stop_loss_not_set_long(test_market: Market, test_broker: Broker):
 
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 1
@@ -359,7 +359,7 @@ def test_stop_loss_not_set_short(test_market: Market, test_broker: Broker):
 
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 1
@@ -383,7 +383,7 @@ def test_multiple_long_positions(test_market: Market, test_broker: Broker):
 
     test_broker.process_orders([open_order1, open_order2])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 1
@@ -414,7 +414,7 @@ def test_multiple_short_positions(test_market: Market, test_broker: Broker):
 
     test_broker.process_orders([open_order1, open_order2])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 1
@@ -439,7 +439,7 @@ def test_long_with_spread_exact_price(
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, stop_loss=80.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -463,7 +463,7 @@ def test_long_with_spread_enough_price(
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, stop_loss=80.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -487,7 +487,7 @@ def test_short_with_spread_exact_price(
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, stop_loss=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0
@@ -511,7 +511,7 @@ def test_short_with_spread_enough_price(
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, stop_loss=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_stop_losses()
 
     assert len(test_broker.get_positions()) == 0

@@ -16,7 +16,7 @@ def test_open_long_on_close(
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -48,7 +48,7 @@ def test_open_long_during_day(
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -85,11 +85,11 @@ def test_open_long_on_open_equal(
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -126,11 +126,11 @@ def test_open_long_on_open_less(
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -167,11 +167,11 @@ def test_open_long_on_open_greater_not_opened(
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 0
@@ -187,7 +187,7 @@ def test_open_short_on_close(
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -219,7 +219,7 @@ def test_open_short_during_day(
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -256,11 +256,11 @@ def test_open_short_on_open_equal(
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -297,11 +297,11 @@ def test_open_short_on_open_less(
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -338,11 +338,11 @@ def test_open_short_on_open_greater_not_opened(
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 0
@@ -362,7 +362,7 @@ def test_open_long_with_spread_exact_price(
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 0
@@ -382,7 +382,7 @@ def test_open_long_with_spread_enough_price(
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -418,7 +418,7 @@ def test_open_short_with_spread_exact_price(
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 0
@@ -438,7 +438,7 @@ def test_open_short_with_spread_enough_price(
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1

@@ -1,5 +1,7 @@
 from typing import List
 
+import numpy as np
+
 from trading_backtester.position import PositionType
 from trading_backtester.stats import Statistics
 from trading_backtester.trade import CloseTrade, OpenTrade, Trade
@@ -14,6 +16,7 @@ def test_open_long_position(account_mock: AccountMock):
     trades.append(
         OpenTrade(
             position_type=PositionType.LONG,
+            open_datetime=np.datetime64(),
             price=100,
             size=1,
             market_order=True,
@@ -40,6 +43,7 @@ def test_open_short_position(account_mock: AccountMock):
     trades.append(
         OpenTrade(
             position_type=PositionType.SHORT,
+            open_datetime=np.datetime64(),
             price=100,
             size=1,
             market_order=True,
@@ -64,7 +68,9 @@ def test_close_long_position(account_mock: AccountMock):
     trades.append(
         CloseTrade(
             position_type=PositionType.LONG,
+            open_datetime=np.datetime64(),
             open_price=50,
+            close_datetime=np.datetime64(),
             close_price=100,
             close_size=1,
             market_order=True,
@@ -89,7 +95,9 @@ def test_close_short_position(account_mock: AccountMock):
     trades.append(
         CloseTrade(
             position_type=PositionType.SHORT,
+            open_datetime=np.datetime64(),
             open_price=50,
+            close_datetime=np.datetime64(),
             close_price=100,
             close_size=1,
             market_order=True,
@@ -114,6 +122,7 @@ def test_open_and_close_long_position(account_mock: AccountMock):
     trades.append(
         OpenTrade(
             position_type=PositionType.LONG,
+            open_datetime=np.datetime64(),
             price=100,
             size=1,
             market_order=True,
@@ -123,7 +132,9 @@ def test_open_and_close_long_position(account_mock: AccountMock):
     trades.append(
         CloseTrade(
             position_type=PositionType.LONG,
+            open_datetime=np.datetime64(),
             open_price=50,
+            close_datetime=np.datetime64(),
             close_price=100,
             close_size=1,
             market_order=True,
@@ -148,6 +159,7 @@ def test_open_and_close_short_position(account_mock: AccountMock):
     trades.append(
         OpenTrade(
             position_type=PositionType.SHORT,
+            open_datetime=np.datetime64(),
             price=100,
             size=1,
             market_order=True,
@@ -157,7 +169,9 @@ def test_open_and_close_short_position(account_mock: AccountMock):
     trades.append(
         CloseTrade(
             position_type=PositionType.SHORT,
+            open_datetime=np.datetime64(),
             open_price=50,
+            close_datetime=np.datetime64(),
             close_price=100,
             close_size=1,
             market_order=True,

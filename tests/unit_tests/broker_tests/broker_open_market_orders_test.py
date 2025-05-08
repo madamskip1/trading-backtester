@@ -108,7 +108,7 @@ def test_open_long_multiple_in_multiple_processes(
         position_type=PositionType.LONG,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order2])
 
     assert len(test_broker.get_trades()) == 2
@@ -246,7 +246,7 @@ def test_open_short_multiple_in_multiple_processes(
         position_type=PositionType.SHORT,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([open_order2])
 
     assert len(test_broker.get_trades()) == 2

@@ -55,8 +55,12 @@ def spread() -> float:  # if not provided assume no spread
 
 
 @pytest.fixture
-def test_broker(test_market: Market, test_account: Account, spread: float) -> Broker:
-    return Broker(market=test_market, accout=test_account, spread=spread)
+def test_broker(
+    test_market: Market, test_data: Data, test_account: Account, spread: float
+) -> Broker:
+    return Broker(
+        market=test_market, data=test_data, accout=test_account, spread=spread
+    )
 
 
 @pytest.fixture

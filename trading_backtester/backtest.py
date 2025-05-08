@@ -22,7 +22,7 @@ class Backtester:
         self.__data = data
         self.__market = Market(self.__data)
         self.__account = Account(data_size=len(data), initial_money=money)
-        self.__broker = Broker(self.__market, self.__account, spread)
+        self.__broker = Broker(self.__market, self.__data, self.__account, spread)
         self.__statistics = Statistics(
             self.__broker.get_trades(), self.__account, benchmark
         )
@@ -43,25 +43,25 @@ class Backtester:
             self.__data.increment_data_index()
 
         for _ in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
-            self.__market.set_current_time(MarketTime.OPEN)
+            self.__market.set_current_market_time(MarketTime.OPEN)
 
             self.__broker.process_stop_losses()
             self.__broker.process_take_profits()
 
             new_orders = self.__strategy.collect_orders(
-                self.__market.get_current_time(),
+                self.__market.get_current_market_time(),
                 self.__market.get_current_open_price(),
                 self.__data.get_current_datatime(),
             )
             self.__broker.process_orders(new_orders=new_orders)
 
-            self.__market.set_current_time(MarketTime.CLOSE)
+            self.__market.set_current_market_time(MarketTime.CLOSE)
 
             self.__broker.process_stop_losses()
             self.__broker.process_take_profits()
 
             new_orders = self.__strategy.collect_orders(
-                self.__market.get_current_time(),
+                self.__market.get_current_market_time(),
                 self.__market.get_current_close_price(),
                 self.__data.get_current_datatime(),
             )
@@ -80,4 +80,4 @@ class Backtester:
         return self.__statistics.get_stats()
 
     def get_plotting(self) -> Plotting:
-        return Plotting(self.__data)
+        return Plotting(self.__data, self.__broker.get_trades())

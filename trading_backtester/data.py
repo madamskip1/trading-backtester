@@ -42,6 +42,9 @@ class Data:
     def get_current_data(self, key: str) -> float:
         return self.__data[self.__current_data_index][key]
 
+    def get_current_numpy_datetime(self) -> np.datetime64:
+        return self.__data[self.__current_data_index]["datetime"]
+
     def get_current_datatime(self) -> datetime:
         return (
             self.__data[self.__current_data_index]["datetime"]

@@ -24,7 +24,7 @@ def test_close_long_single_full(
         position_type=PositionType.LONG,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
@@ -57,7 +57,7 @@ def test_close_long_single_reduce(
         position_type=PositionType.LONG,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
@@ -98,7 +98,7 @@ def test_close_long_single_full_position_specified(
         position_to_close=test_broker.get_positions()[0],
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
@@ -131,7 +131,7 @@ def test_close_long_single_reduce_position_specified(
         position_to_close=test_broker.get_positions()[0],
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
@@ -178,7 +178,7 @@ def test_close_long_multiple_positions_in_single_order(
         position_type=PositionType.LONG,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 4
@@ -225,7 +225,7 @@ def test_close_long_multiple_positions_in_single_order_reduce(
         position_type=PositionType.LONG,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 4
@@ -280,7 +280,7 @@ def test_close_long_multiple_positions_specified_position_close(
         position_to_close=test_broker.get_positions()[1],
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
@@ -327,7 +327,7 @@ def test_close_long_multiple_positions_specified_position_reduce(
         position_to_close=test_broker.get_positions()[1],
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
@@ -382,7 +382,7 @@ def test_close_long_reduce_in_multiple_candlesticks(
         position_type=PositionType.LONG,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order1])
 
     close_order2 = CloseOrder(
@@ -391,7 +391,7 @@ def test_close_long_reduce_in_multiple_candlesticks(
     )
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_orders([close_order2])
 
     assert len(test_broker.get_trades()) == 3
@@ -433,7 +433,7 @@ def test_close_short_single_full(
         position_type=PositionType.SHORT,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
@@ -467,7 +467,7 @@ def test_close_short_single_reduce(
         position_type=PositionType.SHORT,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
@@ -509,7 +509,7 @@ def test_close_short_single_full_specified_position(
         position_to_close=test_broker.get_positions()[0],
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
@@ -543,7 +543,7 @@ def test_close_short_single_reduce_specified_position(
         position_to_close=test_broker.get_positions()[0],
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
@@ -590,7 +590,7 @@ def test_open_short_multiple_positions_in_single_order(
         position_type=PositionType.SHORT,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 4
@@ -637,7 +637,7 @@ def test_open_short_multiple_positions_in_single_order_reduce(
         position_type=PositionType.SHORT,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 4
@@ -689,7 +689,7 @@ def test_open_short_multiple_positions_specified_position_close(
 
     close_order = CloseOrder(size=3, position_to_close=test_broker.get_positions()[1])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
@@ -733,7 +733,7 @@ def test_open_short_multiple_positions_specified_position_reduec(
 
     close_order = CloseOrder(size=2, position_to_close=test_broker.get_positions()[1])
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
@@ -789,7 +789,7 @@ def test_open_short_reduce_in_multiple_candlesticks(
         position_type=PositionType.SHORT,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order1])
 
     close_order2 = CloseOrder(
@@ -798,7 +798,7 @@ def test_open_short_reduce_in_multiple_candlesticks(
     )
 
     test_data.increment_data_index()
-    test_market.set_current_time(MarketTime.OPEN)
+    test_market.set_current_market_time(MarketTime.OPEN)
     test_broker.process_orders([close_order2])
 
     assert len(test_broker.get_trades()) == 3
@@ -844,7 +844,7 @@ def test_close_long_with_spread(
         position_type=PositionType.LONG,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
@@ -882,7 +882,7 @@ def test_close_short_with_spread(
         position_type=PositionType.SHORT,
     )
 
-    test_market.set_current_time(MarketTime.CLOSE)
+    test_market.set_current_market_time(MarketTime.CLOSE)
     test_broker.process_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
