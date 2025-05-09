@@ -114,6 +114,15 @@ class Plotting:
                 in_drawdown = True
                 max_drawdown = max(max_drawdown, drawdown)
 
+        if in_drawdown and max_drawdown >= drawdown_threshold:
+            ax.axvspan(
+                last_peak,
+                len(drawdowns_percentages) - 1,
+                color="red",
+                alpha=0.2,
+                zorder=1,
+            )
+
     def __draw_candlesticks(self, ax: Axes):
         for x, data in enumerate(self.__data):
             candlestick_color = self.__get_bar_color(data["open"], data["close"])
