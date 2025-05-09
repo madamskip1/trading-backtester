@@ -1,10 +1,12 @@
 from typing import Dict, List
 
+import mplcursors
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import FuncFormatter
+from mplcursors import Selection
 
 from trading_backtester.account import Account
 from trading_backtester.data import Data
@@ -83,11 +85,12 @@ class Plotting:
         ax_right.set_ylabel("Equity %")
         ax.grid(True, axis="y")
 
-        ax.plot(self.__account.get_equity(), zorder=11, color="blue")
+        equity = self.__account.get_equity()
 
-        percent_equity = (
-            self.__account.get_equity() / self.__account.get_equity()[0] * 100
-        )
+        ax.plot(equity, zorder=11, color="blue")
+        scatter = ax.scatter(np.arange(len(equity)), equity, s=10, alpha=0)
+
+        percent_equity = equity / equity[0] * 100
         ax_right.set_ylim(
             percent_equity.min() - percent_equity.min() * 0.05,
             percent_equity.max() + percent_equity.max() * 0.05,
@@ -95,8 +98,9 @@ class Plotting:
         formatter = FuncFormatter(lambda y, _: f"{y:.1f}%")
         ax_right.yaxis.set_major_formatter(formatter)
 
-        peaks = np.maximum.accumulate(self.__account.get_equity())
-        drawdowns_percentages = np.abs((self.__account.get_equity() - peaks) / peaks)
+        peaks = np.maximum.accumulate(equity)
+        drawdowns = equity - peaks
+        drawdowns_percentages = np.abs(drawdowns / peaks)
         drawdown_threshold = 0.02
         in_drawdown = False
         last_peak = 0
@@ -122,6 +126,20 @@ class Plotting:
                 alpha=0.2,
                 zorder=1,
             )
+
+        equity_cursor = mplcursors.cursor(scatter, hover=mplcursors.HoverMode.Transient)
+
+        @equity_cursor.connect("add")
+        def on_equity_cursor_hover(selection: Selection):
+            idx = int(selection.index)
+            value = equity[idx]
+            drawdown = drawdowns[idx]
+            drawdown_percentage = drawdowns_percentages[idx] * 100
+            selection.annotation.set_text(
+                f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
+            )
+            selection.annotation.set_horizontalalignment("left")
+            selection.annotation.get_bbox_patch().set_alpha(0.9)
 
     def __draw_candlesticks(self, ax: Axes):
         for x, data in enumerate(self.__data):
