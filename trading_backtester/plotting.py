@@ -12,7 +12,7 @@ from mplcursors import Selection
 from trading_backtester.account import Account
 from trading_backtester.data import Data
 from trading_backtester.position import PositionType
-from trading_backtester.trade import CloseTrade, Trade, TradeType
+from trading_backtester.trade import Trade, TradeType
 
 
 class Plotting:
@@ -171,12 +171,50 @@ class Plotting:
         datetime_to_x_axis: Dict[np.datetime64, int] = {
             dt: x for x, dt in enumerate(self.__data.datetime)
         }
+        closed_trades: List[Trade] = [
+            trade
+            for trade in reversed(self.__trades)
+            if trade.trade_type == TradeType.CLOSE
+        ]
+
         close_markers: List[Line2D] = []
-        for trade in reversed(self.__trades):
-            if trade.trade_type == TradeType.CLOSE:
-                assert isinstance(trade, CloseTrade)
-                close_marker = self.__draw_closed_trade(ax, trade, datetime_to_x_axis)
-                close_markers.append(close_marker)
+        trade_lines_x_start: List[int] = []
+        trade_lines_x_end: List[int] = []
+        trade_lines_y_start: List[float] = []
+        trade_lines_y_end: List[float] = []
+
+        for trade in closed_trades:
+            assert trade.close_datetime is not None
+            assert trade.close_price is not None
+
+            x_start = datetime_to_x_axis[trade.open_datetime]
+            y_start = trade.open_price
+            x_end = datetime_to_x_axis[trade.close_datetime]
+            y_end = trade.close_price
+
+            trade_lines_x_start.append(x_start)
+            trade_lines_x_end.append(x_end)
+            trade_lines_y_start.append(y_start)
+            trade_lines_y_end.append(y_end)
+
+            close_marker = self.__draw_closed_trade_marker(
+                ax,
+                x_end,
+                y_end,
+                trade.position_type,
+                trade.open_price,
+                trade.close_price,
+            )
+            close_markers.append(close_marker)
+
+        ax.plot(
+            [trade_lines_x_start, trade_lines_x_end],
+            [trade_lines_y_start, trade_lines_y_end],
+            color="black",
+            linewidth=2,
+            linestyle="--",
+            zorder=4,
+        )
 
         close_markers_cursor = mplcursors.cursor(
             close_markers, hover=mplcursors.HoverMode.Transient
@@ -184,44 +222,31 @@ class Plotting:
 
         @close_markers_cursor.connect("add")
         def on_close_markers_hover(selection: Selection):
-            trade: CloseTrade = selection.artist._trade
+            idx = int(selection.index)
+            close_trade = closed_trades[idx]
             selection.annotation.set_text(
-                f"{"Long" if trade.position_type == PositionType.LONG else "Short"} Trade\n"
-                f"Open: {trade.open_price:.2f}\n"
-                f"Close: {trade.close_price:.2f}\n"
-                f"Size: {trade.close_size:.2f}\n"
-                f"Proffit/Loss: {trade.calc_profit_loss():.2f}"
+                f"{"Long" if close_trade.position_type == PositionType.LONG else "Short"} Trade\n"
+                f"Open: {close_trade.open_price:.2f}\n"
+                f"Close: {close_trade.close_price:.2f}\n"
+                f"Size: {close_trade.close_size:.2f}\n"
+                f"Proffit/Loss: {close_trade.calc_profit_loss():.2f}"
             )
             selection.annotation.set_horizontalalignment("left")
             selection.annotation.get_bbox_patch().set_alpha(0.9)
 
-    def __draw_closed_trade(
+    def __draw_closed_trade_marker(
         self,
         ax: Axes,
-        close_trade: CloseTrade,
-        datetime_to_x_axis: Dict[np.datetime64, int],
+        x_end: int,
+        y_end: float,
+        position_type: PositionType,
+        open_price: float,
+        close_price: float,
     ) -> Line2D:
-        assert close_trade.close_datetime is not None
-        assert close_trade.close_price is not None
+        # def __draw_closed_trade_marker(self, ax: Axes, close_trade: Trade, datetime_to_x_axis: Dict[np.datetime64, int],) -> Line2D:
+        marker = "^" if position_type == PositionType.LONG else "v"
+        color = self.__get_bar_color(open_price, close_price)
 
-        x_start = datetime_to_x_axis[close_trade.open_datetime]
-        y_start = close_trade.open_price
-        x_end = datetime_to_x_axis[close_trade.close_datetime]
-        y_end = close_trade.close_price
-
-        marker = "^" if close_trade.position_type == PositionType.LONG else "v"
-        color = self.__get_bar_color(close_trade.open_price, close_trade.close_price)
-
-        # Draw the line from the open to the close
-        ax.plot(
-            [x_start, x_end],
-            [y_start, y_end],
-            color="black",
-            linewidth=2,
-            linestyle="--",
-            zorder=4,
-        )
-        # Draw the marker at the close
         close_marker = ax.plot(
             x_end,
             y_end,
@@ -231,8 +256,6 @@ class Plotting:
             markeredgecolor="black",
             markersize=10,
         )[0]
-
-        close_marker._trade = close_trade
 
         return close_marker
 
