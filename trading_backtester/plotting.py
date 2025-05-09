@@ -4,6 +4,7 @@ import mplcursors
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import FuncFormatter
 from mplcursors import Selection
@@ -170,17 +171,36 @@ class Plotting:
         datetime_to_x_axis: Dict[np.datetime64, int] = {
             dt: x for x, dt in enumerate(self.__data.datetime)
         }
+        close_markers: List[Line2D] = []
         for trade in reversed(self.__trades):
             if trade.trade_type == TradeType.CLOSE:
                 assert isinstance(trade, CloseTrade)
-                self.__draw_closed_trade(ax, trade, datetime_to_x_axis)
+                close_marker = self.__draw_closed_trade(ax, trade, datetime_to_x_axis)
+                close_markers.append(close_marker)
+
+        close_markers_cursor = mplcursors.cursor(
+            close_markers, hover=mplcursors.HoverMode.Transient
+        )
+
+        @close_markers_cursor.connect("add")
+        def on_close_markers_hover(selection: Selection):
+            trade: CloseTrade = selection.artist._trade
+            selection.annotation.set_text(
+                f"{"Long" if trade.position_type == PositionType.LONG else "Short"} Trade\n"
+                f"Open: {trade.open_price:.2f}\n"
+                f"Close: {trade.close_price:.2f}\n"
+                f"Size: {trade.close_size:.2f}\n"
+                f"Proffit/Loss: {trade.calc_profit_loss():.2f}"
+            )
+            selection.annotation.set_horizontalalignment("left")
+            selection.annotation.get_bbox_patch().set_alpha(0.9)
 
     def __draw_closed_trade(
         self,
         ax: Axes,
         close_trade: CloseTrade,
         datetime_to_x_axis: Dict[np.datetime64, int],
-    ):
+    ) -> Line2D:
         assert close_trade.close_datetime is not None
         assert close_trade.close_price is not None
 
@@ -202,7 +222,7 @@ class Plotting:
             zorder=4,
         )
         # Draw the marker at the close
-        ax.plot(
+        close_marker = ax.plot(
             x_end,
             y_end,
             marker=marker,
@@ -210,7 +230,11 @@ class Plotting:
             zorder=5,
             markeredgecolor="black",
             markersize=10,
-        )
+        )[0]
+
+        close_marker._trade = close_trade
+
+        return close_marker
 
     def __get_bar_color(self, open_val: float, close_val: float) -> str:
         return (

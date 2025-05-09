@@ -43,6 +43,20 @@ class Trade:
         self.close_size = close_size
         self.market_order = market_order
 
+    def calc_profit_loss(self) -> float:
+        assert (
+            self.trade_type == TradeType.CLOSE
+        ), "Profit/loss can only be calculated for closed trades."
+
+        profit_loss_per_unit = (
+            (self.close_price - self.open_price)
+            if self.position_type == PositionType.LONG
+            else (self.open_price - self.close_price)
+        )
+        profit_loss = profit_loss_per_unit * self.close_size
+
+        return profit_loss
+
 
 class OpenTrade(Trade):
     def __init__(
