@@ -171,7 +171,29 @@ class Plotting:
             self.__account.get_equity() / self.__account.get_equity()[0] * 100
         )
         ax2 = ax.twinx()
-        ax2.set_ylim(percent_equity.min(), percent_equity.max())
+        ax2.set_ylim(
+            percent_equity.min() - percent_equity.min() * 0.05,
+            percent_equity.max() + percent_equity.max() * 0.05,
+        )
         formatter = FuncFormatter(lambda y, _: f"{y:.1f} %")
         ax2.yaxis.set_major_formatter(formatter)
         ax2.grid(True, axis="y")
+
+        peaks = np.maximum.accumulate(self.__account.get_equity())
+        drawdowns_percentages = np.abs((self.__account.get_equity() - peaks) / peaks)
+        drawdown_threshold = 0.02
+        in_drawdown = False
+        last_peak = 0
+        max_drawdown = 0.0
+        for i, drawdown in enumerate(drawdowns_percentages):
+            if drawdown == 0.0:
+                if in_drawdown:
+                    if max_drawdown >= drawdown_threshold:
+                        ax.axvspan(last_peak, i - 1, color="red", alpha=0.2, zorder=1)
+                    in_drawdown = False
+                    max_drawdown = 0.0
+
+                last_peak = i
+            else:
+                in_drawdown = True
+                max_drawdown = max(max_drawdown, drawdown)
