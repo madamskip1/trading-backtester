@@ -27,21 +27,72 @@ class Plotting:
         self.__trades = trades
         self.__account = account
 
+        self.__should_draw_candlesticks: bool
+        self.__should_draw_volume: bool
+        self.__should_draw_equity: bool
+        self.__should_draw_trades: bool
+        self.__should_draw_annotations: bool
+        self.config_drawing()
+
+    def config_drawing(
+        self,
+        draw_candlesticks: bool = True,
+        draw_volume: bool = True,
+        draw_equity: bool = True,
+        draw_trades: bool = True,
+        annotations: bool = True,
+    ):
+        self.__should_draw_candlesticks = draw_candlesticks
+        self.__should_draw_volume = draw_volume
+        self.__should_draw_equity = draw_equity
+        self.__should_draw_trades = draw_trades
+        self.__should_draw_annotations = annotations
+
     def draw_plot(self):
+        num_of_plots = 0
+        height_ratios: List[int] = []
+        ax_equity_index = -1
+        ax_price_index = -1
+        ax_volume_index = -1
+
+        if self.__should_draw_equity:
+            ax_equity_index = num_of_plots
+            num_of_plots += 1
+            height_ratios.append(1)
+
+        if self.__should_draw_candlesticks or self.__should_draw_trades:
+            ax_price_index = num_of_plots
+            num_of_plots += 1
+            height_ratios.append(3)
+
+        if self.__should_draw_volume:
+            ax_volume_index = num_of_plots
+            num_of_plots += 1
+            height_ratios.append(1)
+
+        if num_of_plots == 0:
+            raise ValueError("No plots to draw. Please enable at least one plot.")
+        if num_of_plots == 1:
+            height_ratios = [1]
+
         fig, ax = plt.subplots(
-            3, 1, sharex=True, gridspec_kw={"hspace": 0.2, "height_ratios": [1, 3, 1]}
+            num_of_plots,
+            1,
+            sharex=True,
+            gridspec_kw={"hspace": 0.2, "height_ratios": height_ratios},
         )
-        ax_equity = ax[0]
-        ax_price = ax[1]
-        ax_volume = ax[2]
 
-        x_axis_values = np.arange(len(self.__data))
+        if num_of_plots == 1:
+            ax = [ax]
 
-        self.__draw_price_plot(ax_price)
-        self.__draw_volume_plot(ax_volume)
-        self.__draw_equity_plot(ax_equity)
+        if self.__should_draw_candlesticks or self.__should_draw_trades:
+            self.__draw_price_plot(ax[ax_price_index])
 
-        ax_volume.set_xticks(x_axis_values)
+        if self.__should_draw_volume:
+            self.__draw_volume_plot(ax[ax_volume_index])
+
+        if self.__should_draw_equity:
+            self.__draw_equity_plot(ax[ax_equity_index])
 
         dateformat = self.__get_date_format()
         xticklabels = [
@@ -51,9 +102,12 @@ class Plotting:
             .strftime(dateformat)
             for dt in self.__data.datetime
         ]
+        x_axis_values = np.arange(len(self.__data))
 
-        ax_volume.set_xticklabels(xticklabels)
-        ax_volume.set_xlabel("Time")
+        last_axis = ax[-1]
+        last_axis.set_xticks(x_axis_values)
+        last_axis.set_xticklabels(xticklabels)
+        last_axis.set_xlabel("Time")
 
         fig.autofmt_xdate()
 
@@ -63,8 +117,11 @@ class Plotting:
         ax.set_ylabel("Price")
         ax.grid(True, axis="y"),
 
-        self.__draw_candlesticks(ax)
-        self.__draw_closed_trades(ax)
+        if self.__should_draw_candlesticks:
+            self.__draw_candlesticks(ax)
+
+        if self.__should_draw_trades:
+            self.__draw_closed_trades(ax)
 
     def __draw_volume_plot(self, ax: Axes):
         ax.set_ylabel("Volume")
@@ -128,19 +185,22 @@ class Plotting:
                 zorder=1,
             )
 
-        equity_cursor = mplcursors.cursor(scatter, hover=mplcursors.HoverMode.Transient)
-
-        @equity_cursor.connect("add")
-        def on_equity_cursor_hover(selection: Selection):
-            idx = int(selection.index)
-            value = equity[idx]
-            drawdown = drawdowns[idx]
-            drawdown_percentage = drawdowns_percentages[idx] * 100
-            selection.annotation.set_text(
-                f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
+        if self.__should_draw_annotations:
+            equity_cursor = mplcursors.cursor(
+                scatter, hover=mplcursors.HoverMode.Transient
             )
-            selection.annotation.set_horizontalalignment("left")
-            selection.annotation.get_bbox_patch().set_alpha(0.9)
+
+            @equity_cursor.connect("add")
+            def on_equity_cursor_hover(selection: Selection):
+                idx = int(selection.index)
+                value = equity[idx]
+                drawdown = drawdowns[idx]
+                drawdown_percentage = drawdowns_percentages[idx] * 100
+                selection.annotation.set_text(
+                    f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
+                )
+                selection.annotation.set_horizontalalignment("left")
+                selection.annotation.get_bbox_patch().set_alpha(0.9)
 
     def __draw_candlesticks(self, ax: Axes):
         for x, data in enumerate(self.__data):
@@ -216,23 +276,24 @@ class Plotting:
             zorder=4,
         )
 
-        close_markers_cursor = mplcursors.cursor(
-            close_markers, hover=mplcursors.HoverMode.Transient
-        )
-
-        @close_markers_cursor.connect("add")
-        def on_close_markers_hover(selection: Selection):
-            idx = int(selection.index)
-            close_trade = closed_trades[idx]
-            selection.annotation.set_text(
-                f"{"Long" if close_trade.position_type == PositionType.LONG else "Short"} Trade\n"
-                f"Open: {close_trade.open_price:.2f}\n"
-                f"Close: {close_trade.close_price:.2f}\n"
-                f"Size: {close_trade.close_size:.2f}\n"
-                f"Proffit/Loss: {close_trade.calc_profit_loss():.2f}"
+        if self.__should_draw_annotations:
+            close_markers_cursor = mplcursors.cursor(
+                close_markers, hover=mplcursors.HoverMode.Transient
             )
-            selection.annotation.set_horizontalalignment("left")
-            selection.annotation.get_bbox_patch().set_alpha(0.9)
+
+            @close_markers_cursor.connect("add")
+            def on_close_markers_hover(selection: Selection):
+                idx = int(selection.index)
+                close_trade = closed_trades[idx]
+                selection.annotation.set_text(
+                    f"{"Long" if close_trade.position_type == PositionType.LONG else "Short"} Trade\n"
+                    f"Open: {close_trade.open_price:.2f}\n"
+                    f"Close: {close_trade.close_price:.2f}\n"
+                    f"Size: {close_trade.close_size:.2f}\n"
+                    f"Profit/Loss: {close_trade.calc_profit_loss():.2f}"
+                )
+                selection.annotation.set_horizontalalignment("left")
+                selection.annotation.get_bbox_patch().set_alpha(0.9)
 
     def __draw_closed_trade_marker(
         self,
