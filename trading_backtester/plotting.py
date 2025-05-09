@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
-from matplotlib.ticker import FuncFormatter
+from matplotlib.ticker import FuncFormatter, MaxNLocator
 from mplcursors import Selection
 
 from trading_backtester.account import Account
@@ -108,7 +108,9 @@ class Plotting:
         last_axis.set_xticks(x_axis_values)
         last_axis.set_xticklabels(xticklabels)
         last_axis.set_xlabel("Time")
-
+        last_axis.xaxis.set_major_locator(
+            MaxNLocator(integer=True, prune="both", nbins=10)
+        )
         fig.autofmt_xdate()
 
         plt.show()
