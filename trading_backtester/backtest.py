@@ -80,4 +80,4 @@ class Backtester:
         return self.__statistics.get_stats()
 
     def get_plotting(self) -> Plotting:
-        return Plotting(self.__data, self.__broker.get_trades())
+        return Plotting(self.__data, self.__broker.get_trades(), self.__account)

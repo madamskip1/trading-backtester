@@ -4,7 +4,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
+from matplotlib.ticker import FuncFormatter
 
+from trading_backtester.account import Account
 from trading_backtester.data import Data
 from trading_backtester.position import PositionType
 from trading_backtester.trade import CloseTrade, Trade, TradeType
@@ -17,16 +19,18 @@ class Plotting:
 
     CANDLESTICK_WIDTH = 0.75
 
-    def __init__(self, data: Data, trades: List[Trade]):
+    def __init__(self, data: Data, trades: List[Trade], account: Account):
         self.__data = data
         self.__trades = trades
+        self.__account = account
 
     def draw_plot(self):
         fig, ax = plt.subplots(
-            2, 1, sharex=True, gridspec_kw={"hspace": 0.2, "height_ratios": [3, 1]}
+            3, 1, sharex=True, gridspec_kw={"hspace": 0.2, "height_ratios": [1, 3, 1]}
         )
-        ax_price = ax[0]
-        ax_volume = ax[1]
+        ax_equity = ax[0]
+        ax_price = ax[1]
+        ax_volume = ax[2]
 
         datetime_to_index: Dict[np.datetime64, int] = {
             dt: i for i, dt in enumerate(self.__data.datetime)
@@ -48,6 +52,7 @@ class Plotting:
                 assert isinstance(trade, CloseTrade)
                 self.__draw_closed_trade(ax_price, trade, datetime_to_index)
 
+        self.__draw_equity_plot(ax_equity)
         ax_price.set_ylabel("Price")
         ax_price.grid(True, axis="y")
 
@@ -155,3 +160,18 @@ class Plotting:
             markeredgecolor="black",
             markersize=10,
         )
+
+    def __draw_equity_plot(
+        self,
+        ax: Axes,
+    ):
+        ax.plot(self.__account.get_equity(), zorder=11, color="blue")
+
+        percent_equity = (
+            self.__account.get_equity() / self.__account.get_equity()[0] * 100
+        )
+        ax2 = ax.twinx()
+        ax2.set_ylim(percent_equity.min(), percent_equity.max())
+        formatter = FuncFormatter(lambda y, _: f"{y:.1f} %")
+        ax2.yaxis.set_major_formatter(formatter)
+        ax2.grid(True, axis="y")
