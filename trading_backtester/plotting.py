@@ -136,6 +136,18 @@ class Plotting:
         )
         fig.autofmt_xdate()
 
+        fig.text(
+            0.5,
+            0.5,
+            "Trading-Backtester\n@madamskip1",
+            fontsize=50,
+            color="black",
+            ha="center",
+            va="center",
+            alpha=0.1,
+            rotation=30,
+        )
+
         self.__figure = fig
 
     def __draw_price_plot(self, ax: Axes):
