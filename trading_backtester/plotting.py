@@ -219,21 +219,40 @@ class Plotting:
         self.__draw_equity_drawdown(ax, drawdowns_percentages)
 
         if self.__should_draw_annotations:
-            equity_cursor = mplcursors.cursor(
-                scatter, hover=mplcursors.HoverMode.Transient
+            equity_annotation = ax.annotate(
+                "",
+                xy=(0, 0),
+                xytext=(20, 20),
+                textcoords="offset points",
+                bbox=dict(
+                    boxstyle="round,pad=0.5",
+                    alpha=0.95,
+                ),
+                zorder=20,
+                arrowprops=dict(arrowstyle="->"),
             )
 
-            @equity_cursor.connect("add")
-            def on_equity_cursor_hover(selection: Selection):
-                idx = int(selection.index)
-                value = equity[idx]
-                drawdown = drawdowns[idx]
-                drawdown_percentage = drawdowns_percentages[idx] * 100
-                selection.annotation.set_text(
-                    f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
-                )
-                selection.annotation.set_horizontalalignment("left")
-                selection.annotation.get_bbox_patch().set_alpha(0.9)
+            equity_annotation.set_visible(False)
+
+            def on_mouse_move(event):
+                cond, ind = scatter.contains(event)
+                if cond:
+                    idx = int(ind["ind"][0])
+                    pos = scatter.get_offsets()[idx]
+                    equity_annotation.xy = pos
+                    value = equity[idx]
+                    drawdown = drawdowns[idx]
+                    drawdown_percentage = drawdowns_percentages[idx] * 100
+                    equity_annotation.set_text(
+                        f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
+                    )
+                    equity_annotation.set_visible(True)
+                else:
+                    equity_annotation.set_visible(False)
+
+                event.canvas.draw_idle()
+
+            ax.figure.canvas.mpl_connect("motion_notify_event", on_mouse_move)
 
     def __draw_equity_drawdown(self, ax: Axes, drawdowns_percentages: np.ndarray):
         in_drawdown = False
