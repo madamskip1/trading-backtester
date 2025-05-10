@@ -1,9 +1,10 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import mplcursors
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import FuncFormatter, MaxNLocator
@@ -23,6 +24,8 @@ class Plotting:
     CANDLESTICK_WIDTH = 0.75
 
     def __init__(self, data: Data, trades: List[Trade], account: Account):
+        self.__figure: Optional[Figure] = None
+
         self.__data = data
         self.__trades = trades
         self.__account = account
@@ -48,7 +51,27 @@ class Plotting:
         self.__should_draw_trades = draw_trades
         self.__should_draw_annotations = annotations
 
-    def draw_plot(self):
+        self.__figure = None
+
+    def get_figure(self) -> Figure:
+        self.__prepare_figure()
+        assert self.__figure is not None
+        return self.__figure
+
+    def show_plot(self):
+        self.__prepare_figure()
+        assert self.__figure is not None
+        plt.show()
+
+    def save_plot(self, file_path: str, **kwargs):
+        self.__prepare_figure()
+        assert self.__figure is not None
+        self.__figure.savefig(file_path, **kwargs)
+
+    def __prepare_figure(self):
+        if self.__figure is not None:
+            return
+
         num_of_plots = 0
         height_ratios: List[int] = []
         ax_equity_index = -1
@@ -113,7 +136,7 @@ class Plotting:
         )
         fig.autofmt_xdate()
 
-        plt.show()
+        self.__figure = fig
 
     def __draw_price_plot(self, ax: Axes):
         ax.set_ylabel("Price")
