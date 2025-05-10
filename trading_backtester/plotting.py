@@ -212,6 +212,27 @@ class Plotting:
         formatter = FuncFormatter(lambda y, _: f"{y:.1f}%")
         ax_right.yaxis.set_major_formatter(formatter)
 
+        self.__draw_equity_drawdown(ax)
+
+        if self.__should_draw_annotations:
+            equity_cursor = mplcursors.cursor(
+                scatter, hover=mplcursors.HoverMode.Transient
+            )
+
+            @equity_cursor.connect("add")
+            def on_equity_cursor_hover(selection: Selection):
+                idx = int(selection.index)
+                value = equity[idx]
+                drawdown = drawdowns[idx]
+                drawdown_percentage = drawdowns_percentages[idx] * 100
+                selection.annotation.set_text(
+                    f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
+                )
+                selection.annotation.set_horizontalalignment("left")
+                selection.annotation.get_bbox_patch().set_alpha(0.9)
+
+    def __draw_equity_drawdown(self, ax: Axes):
+        equity = self.__account.get_equity()
         peaks = np.maximum.accumulate(equity)
         drawdowns = equity - peaks
         drawdowns_percentages = np.abs(drawdowns / peaks)
@@ -240,23 +261,6 @@ class Plotting:
                 alpha=0.2,
                 zorder=1,
             )
-
-        if self.__should_draw_annotations:
-            equity_cursor = mplcursors.cursor(
-                scatter, hover=mplcursors.HoverMode.Transient
-            )
-
-            @equity_cursor.connect("add")
-            def on_equity_cursor_hover(selection: Selection):
-                idx = int(selection.index)
-                value = equity[idx]
-                drawdown = drawdowns[idx]
-                drawdown_percentage = drawdowns_percentages[idx] * 100
-                selection.annotation.set_text(
-                    f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
-                )
-                selection.annotation.set_horizontalalignment("left")
-                selection.annotation.get_bbox_patch().set_alpha(0.9)
 
     def __draw_candlesticks(self, ax: Axes):
         for x, data in enumerate(self.__data):
