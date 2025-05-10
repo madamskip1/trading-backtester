@@ -301,6 +301,8 @@ class Plotting:
             zorder=4,
         )
 
+        ax.legend(handles=self.__prepare_closed_trade_legend(closed_trades), loc="best")
+
         if self.__should_draw_annotations:
             close_markers_cursor = mplcursors.cursor(
                 close_markers, hover=mplcursors.HoverMode.Transient
@@ -344,6 +346,72 @@ class Plotting:
         )[0]
 
         return close_marker
+
+    def __prepare_closed_trade_legend(self, closed_trades: List[Trade]) -> List[Line2D]:
+        had_profitable_long_trade = False
+        had_profitable_short_trade = False
+        had_losing_long_trade = False
+        had_losing_short_trade = False
+
+        for trade in closed_trades:
+            assert trade.close_datetime is not None
+            assert trade.close_price is not None
+
+            if trade.position_type == PositionType.LONG:
+                if trade.calc_profit_loss() > 0:
+                    had_profitable_long_trade = True
+                else:
+                    had_losing_long_trade = True
+            else:
+                if trade.calc_profit_loss() > 0:
+                    had_profitable_short_trade = True
+                else:
+                    had_losing_short_trade = True
+
+        legend_elements: List[Line2D] = []
+        if had_profitable_long_trade:
+            legend_elements.append(
+                self.__prepare_dummy_closed_trade_legend_marker(
+                    "^", "Profitable Long Trade", self.POSITIVE_BAR_COLOR
+                )
+            )
+        if had_losing_long_trade:
+            legend_elements.append(
+                self.__prepare_dummy_closed_trade_legend_marker(
+                    "^", "Losing Long Trade", self.NEGATIVE_BAR_COLOR
+                )
+            )
+        if had_profitable_short_trade:
+            legend_elements.append(
+                self.__prepare_dummy_closed_trade_legend_marker(
+                    "v", "Profitable Short Trade", self.POSITIVE_BAR_COLOR
+                )
+            )
+        if had_losing_short_trade:
+            legend_elements.append(
+                self.__prepare_dummy_closed_trade_legend_marker(
+                    "v", "Losing Short Trade", self.NEGATIVE_BAR_COLOR
+                )
+            )
+
+        return legend_elements
+
+    def __prepare_dummy_closed_trade_legend_marker(
+        self,
+        marker: str,
+        label: str,
+        markerfacecolor: str,
+    ) -> Line2D:
+        return Line2D(
+            [0],
+            [0],
+            marker=marker,
+            linestyle="None",
+            color="black",
+            label=label,
+            markerfacecolor=markerfacecolor,
+            markersize=10,
+        )
 
     def __get_bar_color(self, open_val: float, close_val: float) -> str:
         return (
