@@ -74,7 +74,7 @@ class SellOnOpenStrategyTakeProfit(Strategy):
 
 def test_take_profit_on_close_less_short():
     data_array = [
-        (None, 18.0, 18.0, 15.0, 16.5),
+        (None, 18.0, 18.0, 15.0, 16.5, None),
     ]
 
     data = Data.from_array(data_array)
@@ -98,7 +98,7 @@ def test_take_profit_on_close_less_short():
 
 def test_take_profit_on_close_equal_short():
     data_array = [
-        (None, 18.0, 18.0, 15.0, 17.0),
+        (None, 18.0, 18.0, 15.0, 17.0, None),
     ]
 
     data = Data.from_array(data_array)
@@ -122,8 +122,8 @@ def test_take_profit_on_close_equal_short():
 
 def test_take_profit_on_open_less_short():
     data_array = [
-        (None, 18.0, 18.0, 17.1, 17.5),
-        (None, 16.5, 18.5, 16.0, 18.5),
+        (None, 18.0, 18.0, 17.1, 17.5, None),
+        (None, 16.5, 18.5, 16.0, 18.5, None),
     ]
 
     data = Data.from_array(data_array)
@@ -147,8 +147,8 @@ def test_take_profit_on_open_less_short():
 
 def test_take_profit_on_open_equal_short():
     data_array = [
-        (None, 18.0, 18.0, 17.1, 17.5),
-        (None, 17.0, 18.0, 16.1, 18.0),
+        (None, 18.0, 18.0, 17.1, 17.5, None),
+        (None, 17.0, 18.0, 16.1, 18.0, None),
     ]
 
     data = Data.from_array(data_array)
@@ -191,7 +191,7 @@ class SellOnOpenStrategyStopLoss(Strategy):
 
 def test_stop_loss_on_close_less_short():
     data_array = [
-        (None, 18.0, 19.5, 15.0, 19.5),
+        (None, 18.0, 19.5, 15.0, 19.5, None),
     ]
 
     data = Data.from_array(data_array)
@@ -219,7 +219,7 @@ def test_stop_loss_on_close_less_short():
 
 def test_stop_loss_on_close_equal_short():
     data_array = [
-        (None, 18.0, 19.0, 15.0, 19.0),
+        (None, 18.0, 19.0, 15.0, 19.0, None),
     ]
 
     data = Data.from_array(data_array)
@@ -247,8 +247,8 @@ def test_stop_loss_on_close_equal_short():
 
 def test_stop_loss_on_open_less_short():
     data_array = [
-        (None, 18.0, 18.0, 15.0, 17.5),
-        (None, 19.5, 19.5, 15.0, 18.5),
+        (None, 18.0, 18.0, 15.0, 17.5, None),
+        (None, 19.5, 19.5, 15.0, 18.5, None),
     ]
 
     data = Data.from_array(data_array)
@@ -276,8 +276,8 @@ def test_stop_loss_on_open_less_short():
 
 def test_stop_loss_on_open_equal_short():
     data_array = [
-        (None, 18.0, 18.0, 15.0, 17.5),
-        (None, 19.0, 19.0, 15.0, 18.0),
+        (None, 18.0, 18.0, 15.0, 17.5, None),
+        (None, 19.0, 19.0, 15.0, 18.0, None),
     ]
 
     data = Data.from_array(data_array)

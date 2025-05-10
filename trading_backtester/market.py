@@ -16,10 +16,10 @@ class Market:
         self.__data = data
         self.__current_time = MarketTime.OPEN
 
-    def set_current_time(self, time: MarketTime) -> None:
+    def set_current_market_time(self, time: MarketTime) -> None:
         self.__current_time = time
 
-    def get_current_time(self) -> MarketTime:
+    def get_current_market_time(self) -> MarketTime:
         return self.__current_time
 
     def get_current_price(self) -> float:

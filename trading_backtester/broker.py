@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
 from trading_backtester.account import Account
+from trading_backtester.data import Data
 from trading_backtester.market import Market
 from trading_backtester.order import CloseOrder, Order, OrderAction
 from trading_backtester.trade import CloseTrade, OpenTrade, Trade
@@ -12,10 +13,12 @@ class Broker:
     def __init__(
         self,
         market: Market,
+        data: Data,
         accout: Account,
         spread: float,
     ):
         self.__market = market
+        self.__data = data
         self.__account = accout
         self.__spread = spread
         self.__positions: List[Position] = []
@@ -159,6 +162,7 @@ class Broker:
                 order.position_type,
                 price,
                 order.size,
+                self.__data.get_current_numpy_datetime(),
                 order.stop_loss,
                 order.take_profit,
             )
@@ -168,6 +172,7 @@ class Broker:
         self.__trades.append(
             OpenTrade(
                 order.position_type,
+                self.__data.get_current_numpy_datetime(),
                 price,
                 order.size,
                 market_order=(order.limit_price is None),
@@ -193,7 +198,9 @@ class Broker:
             self.__trades.append(
                 CloseTrade(
                     order.position_type,
+                    order.position_to_close.open_datetime,
                     order.position_to_close.avg_bought_price,
+                    self.__data.get_current_numpy_datetime(),
                     price,
                     order.size,
                     market_order=(order.limit_price is None),
@@ -224,7 +231,9 @@ class Broker:
                 self.__trades.append(
                     CloseTrade(
                         order.position_type,
+                        position.open_datetime,
                         position.avg_bought_price,
+                        self.__data.get_current_numpy_datetime(),
                         price,
                         reduce_size,
                         market_order=(order.limit_price is None),

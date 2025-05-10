@@ -10,6 +10,7 @@ DATA_TYPE = np.dtype(
         ("high", "f8"),
         ("low", "f8"),
         ("close", "f8"),
+        ("volume", "f8"),
     ]
 )
 
@@ -26,6 +27,9 @@ class Data:
     def __len__(self) -> int:
         return len(self.__data)
 
+    def __iter__(self):
+        return iter(self.__data)
+
     def increment_data_index(self) -> None:
         self.__current_data_index += 1
 
@@ -38,12 +42,19 @@ class Data:
     def get_current_data(self, key: str) -> float:
         return self.__data[self.__current_data_index][key]
 
+    def get_current_numpy_datetime(self) -> np.datetime64:
+        return self.__data[self.__current_data_index]["datetime"]
+
     def get_current_datatime(self) -> datetime:
         return (
             self.__data[self.__current_data_index]["datetime"]
             .astype("M8[ms]")
             .astype(datetime)
         )
+
+    @property
+    def datetime(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__data["datetime"]
 
     @property
     def open(self) -> np.ndarray[Any, np.dtype[Any]]:
@@ -61,11 +72,20 @@ class Data:
     def close(self) -> np.ndarray[Any, np.dtype[Any]]:
         return self.__data["close"]
 
+    @property
+    def volume(self) -> np.ndarray[Any, np.dtype[Any]]:
+        return self.__data["volume"]
+
     @staticmethod
     def from_array(
         data: List[
             Tuple[
-                Any, Optional[float], Optional[float], Optional[float], Optional[float]
+                Any,
+                Optional[float],
+                Optional[float],
+                Optional[float],
+                Optional[float],
+                Optional[float],
             ]
         ],
     ) -> "Data":
@@ -85,6 +105,6 @@ class Data:
             delimiter=delimiter,
             skip_header=1,
             dtype=DATA_TYPE,
-            usecols=(0, 1, 2, 3, 4),
+            usecols=(0, 1, 2, 3, 4, 5),
         )
         return Data(data_np)
