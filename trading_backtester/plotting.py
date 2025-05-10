@@ -212,7 +212,11 @@ class Plotting:
         formatter = FuncFormatter(lambda y, _: f"{y:.1f}%")
         ax_right.yaxis.set_major_formatter(formatter)
 
-        self.__draw_equity_drawdown(ax)
+        peaks = np.maximum.accumulate(equity)
+        drawdowns = equity - peaks
+        drawdowns_percentages = np.abs(drawdowns / peaks)
+
+        self.__draw_equity_drawdown(ax, drawdowns_percentages)
 
         if self.__should_draw_annotations:
             equity_cursor = mplcursors.cursor(
@@ -231,12 +235,7 @@ class Plotting:
                 selection.annotation.set_horizontalalignment("left")
                 selection.annotation.get_bbox_patch().set_alpha(0.9)
 
-    def __draw_equity_drawdown(self, ax: Axes):
-        equity = self.__account.get_equity()
-        peaks = np.maximum.accumulate(equity)
-        drawdowns = equity - peaks
-        drawdowns_percentages = np.abs(drawdowns / peaks)
-
+    def __draw_equity_drawdown(self, ax: Axes, drawdowns_percentages: np.ndarray):
         in_drawdown = False
         last_peak = 0
         max_drawdown = 0.0
