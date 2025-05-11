@@ -4,7 +4,7 @@ from typing import List
 
 import pytest
 
-from trading_backtester.backtest import Backtester
+from trading_backtester.backtester import Backtester
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import CloseOrder, OpenOrder, Order
 from trading_backtester.position import PositionType
@@ -44,8 +44,9 @@ def test_single_day_profit_long():
         )
     )
     backtest = Backtester(data, BuyOnOpenCloseOnCloseStrategy, money=50000)
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 10
     assert stats["total_open_trades"] == 5
     assert stats["total_close_trades"] == 5

@@ -61,6 +61,15 @@ class Position:
         self.__validate_take_profit(take_profit)
         self.__take_profit = take_profit
 
+    def calc_value(self, current_price: float) -> float:
+        value = 0.0
+        if self.__position_type == PositionType.LONG:
+            value = current_price * self.__size
+        elif self.__position_type == PositionType.SHORT:
+            value = (2 * self.__open_price - current_price) * self.__size
+
+        return value
+
     def replace(self, **kwargs) -> "Position":
         return Position(
             position_type=kwargs.get("position_type", self.__position_type),

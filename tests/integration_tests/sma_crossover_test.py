@@ -4,7 +4,7 @@ from typing import Any, List
 import numpy as np
 import pytest
 
-from trading_backtester.backtest import Backtester
+from trading_backtester.backtester import Backtester
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.indicator import Indicator
 from trading_backtester.market import Market
@@ -18,7 +18,7 @@ class SMAIndicator(Indicator):
         super().__init__()
         self.period = period
 
-    def calc_indicator_values(self, data: Data) -> np.ndarray[Any, np.dtype[Any]]:
+    def _calc_indicator_values(self, data: Data) -> np.ndarray[Any, np.dtype[Any]]:
         sma = np.convolve(data.close, np.ones(self.period) / self.period, mode="valid")
         return np.concatenate([np.full(self.period - 1, np.nan), sma])
 
@@ -94,8 +94,9 @@ def test_sma_crossover_strategy(test_data: Data):
         strategy=SMACrossoverStrategy,
         money=10.0,
     )
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 2
     assert stats["total_open_trades"] == 1
     assert stats["total_close_trades"] == 1

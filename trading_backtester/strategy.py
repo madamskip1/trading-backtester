@@ -24,7 +24,7 @@ class Strategy:
     ) -> List[Order]:
         raise NotImplementedError("This method should be implemented in subclasses.")
 
-    def prepare_indicators(self, data: Data):
+    def prepare_indicators(self, data: Data) -> None:
         for member_name in dir(self):
             member = getattr(self, member_name)
             if isinstance(member, Indicator):
@@ -34,5 +34,4 @@ class Strategy:
                 )
 
     def candletsticks_to_skip(self) -> int:
-        print(f"candlesticks_to_skip: {self.__candlesticks_to_skip}")
         return self.__candlesticks_to_skip

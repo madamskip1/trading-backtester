@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Type
+from typing import Optional, Type
 
 from trading_backtester.plotting import Plotting
 
@@ -29,12 +29,8 @@ class Backtester:
         self.__strategy = strategy(Market(self.__data), self.__broker.get_positions())
         self.__strategy.prepare_indicators(self.__data)
 
-    def run(self) -> Dict[str, Any]:
-        print("Starting backtest...")
-        print(f"Initial money: {self.__account.get_current_money()}")
-
-        candlesticks_to_skip = self.__strategy.candletsticks_to_skip()
-        for _ in range(candlesticks_to_skip):
+    def run(self) -> None:
+        for _ in range(self.__strategy.candletsticks_to_skip()):
             self.__account.update_assets_value(
                 self.__data.get_current_data_index(), 0.0
             )
@@ -42,29 +38,8 @@ class Backtester:
             self.__data.increment_data_index()
 
         for _ in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
-            self.__data.set_candlestick_phase(CandlestickPhase.OPEN)
-
-            self.__broker.process_stop_losses()
-            self.__broker.process_take_profits()
-
-            new_orders = self.__strategy.collect_orders(
-                self.__data.get_candlestick_phase(),
-                self.__data.get_current_data("open"),
-                self.__data.get_current_datatime(),
-            )
-            self.__broker.process_orders(new_orders=new_orders)
-
-            self.__data.set_candlestick_phase(CandlestickPhase.CLOSE)
-
-            self.__broker.process_stop_losses()
-            self.__broker.process_take_profits()
-
-            new_orders = self.__strategy.collect_orders(
-                self.__data.get_candlestick_phase(),
-                self.__data.get_current_data("close"),
-                self.__data.get_current_datatime(),
-            )
-            self.__broker.process_orders(new_orders=new_orders)
+            self.__process_candlestick_phase(CandlestickPhase.OPEN)
+            self.__process_candlestick_phase(CandlestickPhase.CLOSE)
 
             self.__account.update_assets_value(
                 self.__data.get_current_data_index(), self.__broker.get_assets_value()
@@ -73,10 +48,22 @@ class Backtester:
 
             self.__data.increment_data_index()
 
-        print("Backtest finished.")
-        print(self.__statistics)
-
-        return self.__statistics.get_stats()
+    def get_statistics(self) -> Statistics:
+        return self.__statistics
 
     def get_plotting(self) -> Plotting:
         return Plotting(self.__data, self.__broker.get_trades(), self.__account)
+
+    def __process_candlestick_phase(self, phase: CandlestickPhase) -> None:
+        self.__data.set_candlestick_phase(phase)
+
+        self.__broker.process_stop_losses()
+        self.__broker.process_take_profits()
+
+        new_orders = self.__strategy.collect_orders(
+            phase,
+            self.__data.get_current_price(),
+            self.__data.get_current_datatime(),
+        )
+        self.__broker.process_new_orders(new_orders=new_orders)
+        self.__broker.process_limit_orders()

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -11,6 +12,15 @@ from .trade import Trade, TradeType
 
 class Statistics:
 
+    @dataclass
+    class __TradesCounters:
+        total_open_trades: int = 0
+        total_close_trades: int = 0
+        total_open_long_trades: int = 0
+        total_close_long_trades: int = 0
+        total_open_short_trades: int = 0
+        total_close_short_trades: int = 0
+
     def __init__(
         self, trades: List[Trade], account: Account, benchmark: Optional[Data] = None
     ):
@@ -22,46 +32,16 @@ class Statistics:
         max_drowdown, max_drawdown_percentage = self.__calc_max_drown()
         beta = self.__calc_beta()
 
+        trades_counters = self.__get_trades_counters()
+
         return {
             "total_trades": len(self.__trades),
-            "total_open_trades": len(
-                [t for t in self.__trades if t.trade_type == TradeType.OPEN]
-            ),
-            "total_close_trades": len(
-                [t for t in self.__trades if t.trade_type == TradeType.CLOSE]
-            ),
-            "total_open_long_trades": len(
-                [
-                    t
-                    for t in self.__trades
-                    if t.position_type == PositionType.LONG
-                    and t.trade_type == TradeType.OPEN
-                ]
-            ),
-            "total_close_long_trades": len(
-                [
-                    t
-                    for t in self.__trades
-                    if t.position_type == PositionType.LONG
-                    and t.trade_type == TradeType.CLOSE
-                ]
-            ),
-            "total_open_short_trades": len(
-                [
-                    t
-                    for t in self.__trades
-                    if t.position_type == PositionType.SHORT
-                    and t.trade_type == TradeType.OPEN
-                ]
-            ),
-            "total_close_short_trades": len(
-                [
-                    t
-                    for t in self.__trades
-                    if t.position_type == PositionType.SHORT
-                    and t.trade_type == TradeType.CLOSE
-                ]
-            ),
+            "total_open_trades": trades_counters.total_open_trades,
+            "total_close_trades": trades_counters.total_close_trades,
+            "total_open_long_trades": trades_counters.total_open_long_trades,
+            "total_close_long_trades": trades_counters.total_close_long_trades,
+            "total_open_short_trades": trades_counters.total_open_short_trades,
+            "total_close_short_trades": trades_counters.total_close_short_trades,
             "final_money": self.__account.get_current_money(),
             "final_assets_value": self.__account.get_final_assets_value(),
             "final_total_equity": self.__account.get_final_equity(),
@@ -72,7 +52,7 @@ class Statistics:
             "alpha": self.__calc_alpha(beta),
         }
 
-    def __str__(self):
+    def __str__(self) -> str:
         stats = self.get_stats()
         return "\n".join(
             [
@@ -149,3 +129,21 @@ class Statistics:
         return (
             equity_return - risk_free_rate - beta * (benchmark_return - risk_free_rate)
         )
+
+    def __get_trades_counters(self) -> __TradesCounters:
+        counters = self.__TradesCounters()
+        for trade in self.__trades:
+            if trade.trade_type == TradeType.OPEN:
+                counters.total_open_trades += 1
+                if trade.position_type == PositionType.LONG:
+                    counters.total_open_long_trades += 1
+                else:
+                    counters.total_open_short_trades += 1
+            else:
+                counters.total_close_trades += 1
+                if trade.position_type == PositionType.LONG:
+                    counters.total_close_long_trades += 1
+                else:
+                    counters.total_close_short_trades += 1
+
+        return counters

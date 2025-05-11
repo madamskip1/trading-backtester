@@ -55,7 +55,7 @@ class Plotting:
         draw_equity: bool = True,
         draw_trades: bool = True,
         annotations: bool = True,
-    ):
+    ) -> None:
         self.__should_draw_candlesticks = draw_candlesticks
         self.__should_draw_volume = draw_volume
         self.__should_draw_equity = draw_equity
@@ -69,17 +69,17 @@ class Plotting:
         assert self.__figure is not None
         return self.__figure
 
-    def show_plot(self):
+    def show_plot(self) -> None:
         self.__prepare_figure()
         assert self.__figure is not None
         plt.show()
 
-    def save_plot(self, file_path: str, **kwargs):
+    def save_plot(self, file_path: str, **kwargs) -> None:
         self.__prepare_figure()
         assert self.__figure is not None
         self.__figure.savefig(file_path, **kwargs)
 
-    def __prepare_figure(self):
+    def __prepare_figure(self) -> None:
         if self.__figure is not None:
             return
 
@@ -164,7 +164,7 @@ class Plotting:
 
         self.__figure = fig
 
-    def __draw_price_plot(self, ax: Axes):
+    def __draw_price_plot(self, ax: Axes) -> None:
         ax.set_ylabel("Price")
         ax.grid(True, axis="y"),
 
@@ -174,7 +174,7 @@ class Plotting:
         if self.__should_draw_trades:
             self.__draw_closed_trades(ax)
 
-    def __draw_volume_plot(self, ax: Axes):
+    def __draw_volume_plot(self, ax: Axes) -> None:
         ax.set_ylabel("Volume")
         ax.grid(True, axis="y")
 
@@ -189,7 +189,7 @@ class Plotting:
                 zorder=2,
             )
 
-    def __draw_equity_plot(self, ax: Axes):
+    def __draw_equity_plot(self, ax: Axes) -> None:
         ax.set_ylabel("Equity")
 
         ax_right = ax.twinx()
@@ -265,7 +265,9 @@ class Plotting:
 
             ax.figure.canvas.mpl_connect("motion_notify_event", on_mouse_move)
 
-    def __draw_equity_drawdown(self, ax: Axes, drawdowns_percentages: np.ndarray):
+    def __draw_equity_drawdown(
+        self, ax: Axes, drawdowns_percentages: np.ndarray
+    ) -> None:
         in_drawdown = False
         last_peak = 0
         max_drawdown = 0.0
@@ -291,7 +293,7 @@ class Plotting:
                 zorder=1,
             )
 
-    def __draw_candlesticks(self, ax: Axes):
+    def __draw_candlesticks(self, ax: Axes) -> None:
         for x, data in enumerate(self.__data):
             candlestick_color = self.__get_bar_color(data["open"], data["close"])
 
@@ -316,7 +318,7 @@ class Plotting:
                 )
             )
 
-    def __draw_closed_trades(self, ax: Axes):
+    def __draw_closed_trades(self, ax: Axes) -> None:
         datetime_to_x_axis: Dict[np.datetime64, int] = {
             dt: x for x, dt in enumerate(self.__data.datetime)
         }
@@ -547,7 +549,7 @@ class Plotting:
         self,
         annotation: Annotation,
         event: MouseEvent,
-    ):
+    ) -> None:
         if annotation.get_visible():
             annotation.set_visible(False)
             event.canvas.draw_idle()

@@ -9,7 +9,7 @@ from trading_backtester.indicator import Indicator
 
 class MultipleValuesPerCandleIndicator(Indicator):
 
-    def calc_indicator_values(self, data: Data) -> np.ndarray[Any, np.dtype[Any]]:
+    def _calc_indicator_values(self, data: Data) -> np.ndarray[Any, np.dtype[Any]]:
         return np.column_stack((data.open, data.close))
 
 

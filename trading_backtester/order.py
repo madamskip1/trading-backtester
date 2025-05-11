@@ -22,13 +22,41 @@ class Order(ABC):
         take_profit: Optional[float] = None,
         limit_price: Optional[float] = None,
     ):
-        self.size = size
-        self.position_type = position_type
-        self.action = action
-        self.position_to_close = position_to_close
-        self.stop_loss = stop_loss
-        self.take_profit = take_profit
-        self.limit_price = limit_price
+        self.__size = size
+        self.__position_type = position_type
+        self.__action = action
+        self.__position_to_close = position_to_close
+        self.__stop_loss = stop_loss
+        self.__take_profit = take_profit
+        self.__limit_price = limit_price
+
+    @property
+    def size(self) -> int:
+        return self.__size
+
+    @property
+    def position_type(self) -> PositionType:
+        return self.__position_type
+
+    @property
+    def action(self) -> OrderAction:
+        return self.__action
+
+    @property
+    def position_to_close(self) -> Optional[Position]:
+        return self.__position_to_close
+
+    @property
+    def stop_loss(self) -> Optional[float]:
+        return self.__stop_loss
+
+    @property
+    def take_profit(self) -> Optional[float]:
+        return self.__take_profit
+
+    @property
+    def limit_price(self) -> Optional[float]:
+        return self.__limit_price
 
 
 class OpenOrder(Order):

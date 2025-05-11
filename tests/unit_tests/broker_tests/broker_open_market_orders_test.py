@@ -14,7 +14,7 @@ def test_open_long_single(test_account: Account, test_broker: Broker):
         size=1,
         position_type=PositionType.LONG,
     )
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     assert len(test_broker.get_trades()) == 1
     assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
@@ -51,7 +51,7 @@ def test_open_long_multiple_in_single_process(
         position_type=PositionType.LONG,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     assert len(test_broker.get_trades()) == 2
     assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
@@ -95,7 +95,7 @@ def test_open_long_multiple_in_multiple_processes(
         position_type=PositionType.LONG,
     )
 
-    test_broker.process_orders([open_order1])
+    test_broker.process_new_orders([open_order1])
 
     open_order2 = OpenOrder(
         size=2,
@@ -103,7 +103,7 @@ def test_open_long_multiple_in_multiple_processes(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([open_order2])
+    test_broker.process_new_orders([open_order2])
 
     assert len(test_broker.get_trades()) == 2
     assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
@@ -145,7 +145,7 @@ def test_open_short_single(test_account: Account, test_broker: Broker):
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     assert len(test_broker.get_trades()) == 1
     assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
@@ -182,7 +182,7 @@ def test_open_short_multiple_in_single_process(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     assert len(test_broker.get_trades()) == 2
     assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
@@ -223,7 +223,7 @@ def test_open_short_multiple_in_multiple_processes(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order1])
+    test_broker.process_new_orders([open_order1])
 
     open_order2 = OpenOrder(
         size=2,
@@ -231,7 +231,7 @@ def test_open_short_multiple_in_multiple_processes(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([open_order2])
+    test_broker.process_new_orders([open_order2])
 
     assert len(test_broker.get_trades()) == 2
     assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
@@ -275,7 +275,7 @@ def test_open_long_with_spread(
         size=1,
         position_type=PositionType.LONG,
     )
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     assert len(test_broker.get_trades()) == 1
     assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
@@ -308,7 +308,7 @@ def test_open_short_with_spread(
         size=1,
         position_type=PositionType.SHORT,
     )
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     assert len(test_broker.get_trades()) == 1
     assert test_broker.get_trades()[0].trade_type == TradeType.OPEN

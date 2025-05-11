@@ -47,6 +47,10 @@ class Trade:
         assert (
             self.trade_type == TradeType.CLOSE
         ), "Profit/loss can only be calculated for closed trades."
+        assert (
+            self.close_price is not None
+        ), "Close price must be set for closed trades."
+        assert self.close_size is not None, "Close size must be set for closed trades."
 
         profit_loss_per_unit = (
             (self.close_price - self.open_price)

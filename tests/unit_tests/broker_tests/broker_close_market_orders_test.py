@@ -16,7 +16,7 @@ def test_close_long_single_full(
         size=1,
         position_type=PositionType.LONG,
     )
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=1,
@@ -24,7 +24,7 @@ def test_close_long_single_full(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 
@@ -49,7 +49,7 @@ def test_close_long_single_reduce(
         size=2,
         position_type=PositionType.LONG,
     )
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=1,
@@ -57,7 +57,7 @@ def test_close_long_single_reduce(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 
@@ -88,7 +88,7 @@ def test_close_long_single_full_position_specified(
         size=1,
         position_type=PositionType.LONG,
     )
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=1,
@@ -96,7 +96,7 @@ def test_close_long_single_full_position_specified(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 
@@ -121,7 +121,7 @@ def test_close_long_single_reduce_position_specified(
         size=2,
         position_type=PositionType.LONG,
     )
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=1,
@@ -129,7 +129,7 @@ def test_close_long_single_reduce_position_specified(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 
@@ -166,7 +166,7 @@ def test_close_long_multiple_positions_in_single_order(
         position_type=PositionType.LONG,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     close_order = CloseOrder(
         size=4,
@@ -174,7 +174,7 @@ def test_close_long_multiple_positions_in_single_order(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 4
 
@@ -213,7 +213,7 @@ def test_close_long_multiple_positions_in_single_order_reduce(
         position_type=PositionType.LONG,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     close_order = CloseOrder(
         size=3,
@@ -221,7 +221,7 @@ def test_close_long_multiple_positions_in_single_order_reduce(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 4
 
@@ -266,7 +266,7 @@ def test_close_long_multiple_positions_specified_position_close(
         position_type=PositionType.LONG,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     close_order = CloseOrder(
         size=3,
@@ -274,7 +274,7 @@ def test_close_long_multiple_positions_specified_position_close(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
 
@@ -311,7 +311,7 @@ def test_close_long_multiple_positions_specified_position_reduce(
         position_type=PositionType.LONG,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     close_order = CloseOrder(
         size=2,
@@ -319,7 +319,7 @@ def test_close_long_multiple_positions_specified_position_reduce(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
 
@@ -361,7 +361,7 @@ def test_close_long_reduce_in_multiple_candlesticks(
         position_type=PositionType.LONG,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order1 = CloseOrder(
         size=1,
@@ -369,7 +369,7 @@ def test_close_long_reduce_in_multiple_candlesticks(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order1])
+    test_broker.process_new_orders([close_order1])
 
     close_order2 = CloseOrder(
         size=3,
@@ -378,7 +378,7 @@ def test_close_long_reduce_in_multiple_candlesticks(
 
     test_data.increment_data_index()
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
-    test_broker.process_orders([close_order2])
+    test_broker.process_new_orders([close_order2])
 
     assert len(test_broker.get_trades()) == 3
 
@@ -412,7 +412,7 @@ def test_close_short_single_full(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=2,
@@ -420,7 +420,7 @@ def test_close_short_single_full(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 
@@ -446,7 +446,7 @@ def test_close_short_single_reduce(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=1,
@@ -454,7 +454,7 @@ def test_close_short_single_reduce(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 
@@ -486,7 +486,7 @@ def test_close_short_single_full_specified_position(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=2,
@@ -494,7 +494,7 @@ def test_close_short_single_full_specified_position(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 
@@ -520,7 +520,7 @@ def test_close_short_single_reduce_specified_position(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=1,
@@ -528,7 +528,7 @@ def test_close_short_single_reduce_specified_position(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 
@@ -565,7 +565,7 @@ def test_open_short_multiple_positions_in_single_order(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     close_order = CloseOrder(
         size=4,
@@ -573,7 +573,7 @@ def test_open_short_multiple_positions_in_single_order(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 4
 
@@ -612,7 +612,7 @@ def test_open_short_multiple_positions_in_single_order_reduce(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     close_order = CloseOrder(
         size=3,
@@ -620,7 +620,7 @@ def test_open_short_multiple_positions_in_single_order_reduce(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 4
 
@@ -665,12 +665,12 @@ def test_open_short_multiple_positions_specified_position_close(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     close_order = CloseOrder(size=3, position_to_close=test_broker.get_positions()[1])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
 
@@ -707,12 +707,12 @@ def test_open_short_multiple_positions_specified_position_reduec(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     close_order = CloseOrder(size=2, position_to_close=test_broker.get_positions()[1])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 3
 
@@ -755,7 +755,7 @@ def test_open_short_reduce_in_multiple_candlesticks(
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order1 = CloseOrder(
         size=2,
@@ -763,7 +763,7 @@ def test_open_short_reduce_in_multiple_candlesticks(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order1])
+    test_broker.process_new_orders([close_order1])
 
     close_order2 = CloseOrder(
         size=2,
@@ -772,7 +772,7 @@ def test_open_short_reduce_in_multiple_candlesticks(
 
     test_data.increment_data_index()
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
-    test_broker.process_orders([close_order2])
+    test_broker.process_new_orders([close_order2])
 
     assert len(test_broker.get_trades()) == 3
 
@@ -810,7 +810,7 @@ def test_close_long_with_spread(
         size=1,
         position_type=PositionType.LONG,
     )
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=1,
@@ -818,7 +818,7 @@ def test_close_long_with_spread(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 
@@ -848,7 +848,7 @@ def test_close_short_with_spread(
         size=1,
         position_type=PositionType.SHORT,
     )
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     close_order = CloseOrder(
         size=1,
@@ -856,7 +856,7 @@ def test_close_short_with_spread(
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([close_order])
+    test_broker.process_new_orders([close_order])
 
     assert len(test_broker.get_trades()) == 2
 

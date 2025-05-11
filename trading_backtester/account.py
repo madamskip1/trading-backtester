@@ -34,13 +34,13 @@ class Account:
     def get_equity(self) -> np.ndarray[Any, np.dtype[Any]]:
         return self._equity
 
-    def update_money(self, amount: float):
+    def update_money(self, amount: float) -> None:
         self._current_money += amount
 
-    def update_assets_value(self, index: int, value: float):
+    def update_assets_value(self, index: int, value: float) -> None:
         self._assets_value[index] = value
 
-    def calculate_equity(self, index: int):
+    def calculate_equity(self, index: int) -> None:
         self._equity[index + 1] = self._current_money + self._assets_value[index]
 
     def has_enough_money(self, amount: float) -> bool:
