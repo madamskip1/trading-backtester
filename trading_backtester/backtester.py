@@ -65,4 +65,5 @@ class Backtester:
             self.__data.get_current_price(),
             self.__data.get_current_datatime(),
         )
-        self.__broker.process_orders(new_orders=new_orders)
+        self.__broker.process_new_orders(new_orders=new_orders)
+        self.__broker.process_limit_orders()

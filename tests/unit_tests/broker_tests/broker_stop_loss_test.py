@@ -18,7 +18,7 @@ def test_long_equal_on_open_time(test_data: Data, test_broker: Broker):
         stop_loss=99.0,
     )
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.increment_data_index()
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
@@ -50,7 +50,7 @@ def test_long_greater_on_open_time(test_data: Data, test_broker: Broker):
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.increment_data_index()
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
@@ -80,7 +80,7 @@ def test_long_less_on_open_time(test_data: Data, test_broker: Broker):
         stop_loss=99.0,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.increment_data_index()
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
@@ -99,7 +99,7 @@ def test_long_on_close_time(test_data: Data, test_broker: Broker):
         stop_loss=99.0,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -125,7 +125,7 @@ def test_long_during_day(test_data: Data, test_broker: Broker):
         stop_loss=99.0,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -152,7 +152,7 @@ def test_long_not_happend_during_day(test_data: Data, test_broker: Broker):
         stop_loss=99.0,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -174,7 +174,7 @@ def test_short_equal_on_open_time(test_data: Data, test_broker: Broker):
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.increment_data_index()
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
@@ -206,7 +206,7 @@ def test_short_less_on_open_time(test_data: Data, test_broker: Broker):
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.increment_data_index()
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
@@ -237,7 +237,7 @@ def test_short_greater_on_open_time(test_data: Data, test_broker: Broker):
     )
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.increment_data_index()
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
@@ -256,7 +256,7 @@ def test_short_equal_on_close_time(test_data: Data, test_broker: Broker):
         stop_loss=101.0,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -283,7 +283,7 @@ def test_short_equal_during_day(test_data: Data, test_broker: Broker):
         stop_loss=101.0,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -310,7 +310,7 @@ def test_short_equal_not_happend_during_day(test_data: Data, test_broker: Broker
         stop_loss=101.0,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -327,7 +327,7 @@ def test_stop_loss_not_set_long(test_data: Data, test_broker: Broker):
         position_type=PositionType.LONG,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -344,7 +344,7 @@ def test_stop_loss_not_set_short(test_data: Data, test_broker: Broker):
         position_type=PositionType.SHORT,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -368,7 +368,7 @@ def test_multiple_long_positions(test_data: Data, test_broker: Broker):
         stop_loss=48.0,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -399,7 +399,7 @@ def test_multiple_short_positions(test_data: Data, test_broker: Broker):
         stop_loss=52.0,
     )
 
-    test_broker.process_orders([open_order1, open_order2])
+    test_broker.process_new_orders([open_order1, open_order2])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -422,7 +422,7 @@ def test_multiple_short_positions(test_data: Data, test_broker: Broker):
 )
 def test_long_with_spread_exact_price(test_data: Data, test_broker: Broker):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, stop_loss=80.0)
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -444,7 +444,7 @@ def test_long_with_spread_exact_price(test_data: Data, test_broker: Broker):
 )
 def test_long_with_spread_enough_price(test_data: Data, test_broker: Broker):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, stop_loss=80.0)
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -466,7 +466,7 @@ def test_long_with_spread_enough_price(test_data: Data, test_broker: Broker):
 )
 def test_short_with_spread_exact_price(test_data: Data, test_broker: Broker):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, stop_loss=90.0)
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -488,7 +488,7 @@ def test_short_with_spread_exact_price(test_data: Data, test_broker: Broker):
 )
 def test_short_with_spread_enough_price(test_data: Data, test_broker: Broker):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, stop_loss=90.0)
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -516,7 +516,7 @@ def test_long_stop_loss_update(test_data: Data, test_broker: Broker):
         stop_loss=98.0,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()
@@ -556,7 +556,7 @@ def test_short_stop_loss_update(test_data: Data, test_broker: Broker):
         stop_loss=102.0,
     )
 
-    test_broker.process_orders([open_order])
+    test_broker.process_new_orders([open_order])
 
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_stop_losses()

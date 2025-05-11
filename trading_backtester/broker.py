@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 from trading_backtester.account import Account
 from trading_backtester.data import Data
@@ -34,6 +34,34 @@ class Broker:
             assets_value += position.calc_value(self.__data.get_current_price())
 
         return assets_value
+
+    def process_new_orders(self, new_orders: List[Order]) -> None:
+        if new_orders == []:
+            return
+
+        price = self.__data.get_current_price()
+
+        for order in new_orders:
+            if order.action == OrderAction.CLOSE:
+                if order.limit_price is not None:
+                    self.__limit_orders.append(order)
+                    continue
+
+                adjusted_price = self.__adjust_close_price_by_spread(
+                    price, order.position_type
+                )
+                self.__process_close_order(order, adjusted_price)
+
+        for order in new_orders:
+            if order.action == OrderAction.OPEN:
+                if order.limit_price is not None:
+                    self.__limit_orders.append(order)
+                    continue
+
+                adjusted_price = self.__adjust_open_price_by_spread(
+                    price, order.position_type
+                )
+                self.__process_open_order(order, adjusted_price)
 
     def process_stop_losses(self) -> None:
         low_price = self.__data.get_current_low_price()
@@ -92,37 +120,7 @@ class Broker:
         for order, price in close_orders:
             self.__process_close_order(order, price)
 
-    def process_orders(self, new_orders: Optional[List[Order]] = None) -> None:
-        if new_orders is None:
-            new_orders = []
-
-        price = self.__data.get_current_price()
-
-        for order in new_orders:
-            if order.action == OrderAction.CLOSE:
-                if order.limit_price is not None:
-                    self.__limit_orders.append(order)
-                    continue
-
-                adjusted_price = self.__adjust_close_price_by_spread(
-                    price, order.position_type
-                )
-                self.__process_close_order(order, adjusted_price)
-
-        for order in new_orders:
-            if order.action == OrderAction.OPEN:
-                if order.limit_price is not None:
-                    self.__limit_orders.append(order)
-                    continue
-
-                adjusted_price = self.__adjust_open_price_by_spread(
-                    price, order.position_type
-                )
-                self.__process_open_order(order, adjusted_price)
-
-        self.__process_limit_orders()
-
-    def __process_limit_orders(self) -> None:
+    def process_limit_orders(self) -> None:
         price = self.__data.get_current_price()
         low_price = self.__data.get_current_low_price()
         high_price = self.__data.get_current_high_price()
