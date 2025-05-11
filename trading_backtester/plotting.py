@@ -1,6 +1,5 @@
 from typing import Dict, List, Optional
 
-import mplcursors
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
@@ -8,7 +7,6 @@ from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import FuncFormatter, MaxNLocator
-from mplcursors import Selection
 
 from trading_backtester.account import Account
 from trading_backtester.data import Data
@@ -323,7 +321,7 @@ class Plotting:
             if trade.trade_type == TradeType.CLOSE
         ]
 
-        close_markers: List[Line2D] = []
+        closed_trades_markers: List[Line2D] = []
         trade_lines_x_start: List[int] = []
         trade_lines_x_end: List[int] = []
         trade_lines_y_start: List[float] = []
@@ -343,7 +341,7 @@ class Plotting:
             trade_lines_y_start.append(y_start)
             trade_lines_y_end.append(y_end)
 
-            close_marker = self.__draw_closed_trade_marker(
+            closed_trade_marker = self.__draw_closed_trade_marker(
                 ax,
                 x_end,
                 y_end,
@@ -351,7 +349,7 @@ class Plotting:
                 trade.open_price,
                 trade.close_price,
             )
-            close_markers.append(close_marker)
+            closed_trades_markers.append(closed_trade_marker)
 
         ax.plot(
             [trade_lines_x_start, trade_lines_x_end],
@@ -365,23 +363,54 @@ class Plotting:
         ax.legend(handles=self.__prepare_closed_trade_legend(closed_trades), loc="best")
 
         if self.__should_draw_annotations:
-            close_markers_cursor = mplcursors.cursor(
-                close_markers, hover=mplcursors.HoverMode.Transient
+            closed_trade_annotation = ax.annotate(
+                "",
+                xy=(0, 0),
+                xytext=(20, 20),
+                textcoords="offset points",
+                bbox=dict(
+                    boxstyle="round,pad=0.5",
+                    alpha=0.95,
+                ),
+                zorder=20,
+                arrowprops=dict(arrowstyle="->"),
             )
+            closed_trade_annotation.set_visible(False)
 
-            @close_markers_cursor.connect("add")
-            def on_close_markers_hover(selection: Selection):
-                idx = int(selection.index)
-                close_trade = closed_trades[idx]
-                selection.annotation.set_text(
-                    f"{"Long" if close_trade.position_type == PositionType.LONG else "Short"} Trade\n"
-                    f"Open: {close_trade.open_price:.2f}\n"
-                    f"Close: {close_trade.close_price:.2f}\n"
-                    f"Size: {close_trade.close_size:.2f}\n"
-                    f"Profit/Loss: {close_trade.calc_profit_loss():.2f}"
-                )
-                selection.annotation.set_horizontalalignment("left")
-                selection.annotation.get_bbox_patch().set_alpha(0.9)
+            def on_mouse_move(event):
+                if event.inaxes is not ax:
+                    if closed_trade_annotation.get_visible():
+                        event.canvas.draw_idle()
+                        closed_trade_annotation.set_visible(False)
+                    return
+
+                for i, marker in enumerate(closed_trades_markers):
+                    contains, _ = marker.contains(event)
+                    if not contains:
+                        continue
+
+                    pos = (marker.get_xdata(), marker.get_ydata())
+                    if np.array_equal(closed_trade_annotation.xy, pos):
+                        return
+
+                    closed_trade_annotation.xy = pos
+                    close_trade = closed_trades[i]
+                    closed_trade_annotation.set_text(
+                        f"{"Long" if close_trade.position_type == PositionType.LONG else "Short"} Trade\n"
+                        f"Open: {close_trade.open_price:.2f}\n"
+                        f"Close: {close_trade.close_price:.2f}\n"
+                        f"Size: {close_trade.close_size:.2f}\n"
+                        f"Profit/Loss: {close_trade.calc_profit_loss():.2f}"
+                    )
+                    closed_trade_annotation.set_visible(True)
+                    event.canvas.draw_idle()
+                    return
+
+                if closed_trade_annotation.get_visible():
+                    closed_trade_annotation.set_visible(False)
+                    event.canvas.draw_idle()
+
+            ax.figure.canvas.mpl_connect("motion_notify_event", on_mouse_move)
 
     def __draw_closed_trade_marker(
         self,
