@@ -245,7 +245,10 @@ class Plotting:
 
                 idx = int(ind["ind"][0])
                 pos = scatter.get_offsets()[idx]
-                if np.array_equal(equity_annotation.xy, pos):
+                if (
+                    np.array_equal(equity_annotation.xy, pos)
+                    and equity_annotation.get_visible()
+                ):
                     return
 
                 equity_annotation.xy = pos
@@ -390,7 +393,10 @@ class Plotting:
                         continue
 
                     pos = (marker.get_xdata(), marker.get_ydata())
-                    if np.array_equal(closed_trade_annotation.xy, pos):
+                    if (
+                        np.array_equal(closed_trade_annotation.xy, pos)
+                        and closed_trade_annotation.get_visible()
+                    ):
                         return
 
                     closed_trade_annotation.xy = pos
