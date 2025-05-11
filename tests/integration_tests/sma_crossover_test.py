@@ -18,7 +18,7 @@ class SMAIndicator(Indicator):
         super().__init__()
         self.period = period
 
-    def calc_indicator_values(self, data: Data) -> np.ndarray[Any, np.dtype[Any]]:
+    def _calc_indicator_values(self, data: Data) -> np.ndarray[Any, np.dtype[Any]]:
         sma = np.convolve(data.close, np.ones(self.period) / self.period, mode="valid")
         return np.concatenate([np.full(self.period - 1, np.nan), sma])
 

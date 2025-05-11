@@ -25,7 +25,7 @@ class Indicator(ABC):
 
     def prepare_indicator(self, data: Data) -> None:
         self.__data = data
-        self.__indicator_values = self.calc_indicator_values(self.__data)
+        self.__indicator_values = self._calc_indicator_values(self.__data)
 
     def get_indicator_values(self) -> np.ndarray[Any, np.dtype[Any]]:
         return self.__indicator_values
@@ -40,5 +40,5 @@ class Indicator(ABC):
         return 0
 
     @abstractmethod
-    def calc_indicator_values(self, data: Data) -> np.ndarray[Any, np.dtype[Any]]:
+    def _calc_indicator_values(self, data: Data) -> np.ndarray[Any, np.dtype[Any]]:
         pass
