@@ -14,7 +14,11 @@ class Strategy:
         self.__positions = positions
         self.__candlesticks_to_skip = 0
         self.__account = account
-        self._market = market
+        self.__market = market
+
+    @property
+    def _market(self) -> Market:
+        return self.__market
 
     @property
     def _positions(self) -> Sequence[Position]:
