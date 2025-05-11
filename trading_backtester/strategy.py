@@ -34,5 +34,4 @@ class Strategy:
                 )
 
     def candletsticks_to_skip(self) -> int:
-        print(f"candlesticks_to_skip: {self.__candlesticks_to_skip}")
         return self.__candlesticks_to_skip

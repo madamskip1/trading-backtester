@@ -30,9 +30,6 @@ class Backtester:
         self.__strategy.prepare_indicators(self.__data)
 
     def run(self) -> Dict[str, Any]:
-        print("Starting backtest...")
-        print(f"Initial money: {self.__account.get_current_money()}")
-
         candlesticks_to_skip = self.__strategy.candletsticks_to_skip()
         for _ in range(candlesticks_to_skip):
             self.__account.update_assets_value(
@@ -72,9 +69,6 @@ class Backtester:
             self.__account.calculate_equity(self.__data.get_current_data_index())
 
             self.__data.increment_data_index()
-
-        print("Backtest finished.")
-        print(self.__statistics)
 
         return self.__statistics.get_stats()
 
