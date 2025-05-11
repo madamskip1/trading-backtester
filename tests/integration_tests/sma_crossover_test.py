@@ -94,8 +94,9 @@ def test_sma_crossover_strategy(test_data: Data):
         strategy=SMACrossoverStrategy,
         money=10.0,
     )
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 2
     assert stats["total_open_trades"] == 1
     assert stats["total_close_trades"] == 1

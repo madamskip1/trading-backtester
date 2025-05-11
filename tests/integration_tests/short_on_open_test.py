@@ -35,8 +35,9 @@ def test_few_days():
         )
     )
     backtest = Backtester(data, ShortOnOpenStrategy, money=50000)
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 5
     assert stats["total_open_trades"] == 5
     assert stats["total_close_trades"] == 0
@@ -78,8 +79,9 @@ def test_take_profit_on_close_less_short():
 
     data = Data.from_array(data_array)
     backtest = Backtester(data, SellOnOpenStrategyTakeProfit, money=100.0)
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 2
     assert stats["total_open_trades"] == 1
     assert stats["total_close_trades"] == 1
@@ -102,8 +104,9 @@ def test_take_profit_on_close_equal_short():
 
     data = Data.from_array(data_array)
     backtest = Backtester(data, SellOnOpenStrategyTakeProfit, money=100.0)
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 2
     assert stats["total_open_trades"] == 1
     assert stats["total_close_trades"] == 1
@@ -127,8 +130,9 @@ def test_take_profit_on_open_less_short():
 
     data = Data.from_array(data_array)
     backtest = Backtester(data, SellOnOpenStrategyTakeProfit, money=100.0)
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 3
     assert stats["total_open_trades"] == 2
     assert stats["total_close_trades"] == 1
@@ -152,8 +156,9 @@ def test_take_profit_on_open_equal_short():
 
     data = Data.from_array(data_array)
     backtest = Backtester(data, SellOnOpenStrategyTakeProfit, money=100.0)
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 3
     assert stats["total_open_trades"] == 2
     assert stats["total_close_trades"] == 1
@@ -199,8 +204,9 @@ def test_stop_loss_on_close_less_short():
         SellOnOpenStrategyStopLoss,
         money=100.0,
     )
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 2
     assert stats["total_open_trades"] == 1
     assert stats["total_close_trades"] == 1
@@ -227,8 +233,9 @@ def test_stop_loss_on_close_equal_short():
         SellOnOpenStrategyStopLoss,
         money=100.0,
     )
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 2
     assert stats["total_open_trades"] == 1
     assert stats["total_close_trades"] == 1
@@ -256,8 +263,9 @@ def test_stop_loss_on_open_less_short():
         SellOnOpenStrategyStopLoss,
         money=100.0,
     )
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 3
     assert stats["total_open_trades"] == 2
     assert stats["total_close_trades"] == 1
@@ -285,8 +293,9 @@ def test_stop_loss_on_open_equal_short():
         SellOnOpenStrategyStopLoss,
         money=100.0,
     )
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 3
     assert stats["total_open_trades"] == 2
     assert stats["total_close_trades"] == 1

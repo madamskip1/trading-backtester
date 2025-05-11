@@ -43,8 +43,9 @@ def test_single_day_profit_short():
         )
     )
     backtest = Backtester(data, SellOnOpenCloseOnCloseStrategy, money=50000)
-    stats = backtest.run()
+    backtest.run()
 
+    stats = backtest.get_statistics().get_stats()
     assert stats["total_trades"] == 10
     assert stats["total_open_trades"] == 5
     assert stats["total_close_trades"] == 5

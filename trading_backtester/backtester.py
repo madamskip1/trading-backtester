@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Type
+from typing import Optional, Type
 
 from trading_backtester.plotting import Plotting
 
@@ -29,7 +29,7 @@ class Backtester:
         self.__strategy = strategy(Market(self.__data), self.__broker.get_positions())
         self.__strategy.prepare_indicators(self.__data)
 
-    def run(self) -> Dict[str, Any]:
+    def run(self) -> None:
         for _ in range(self.__strategy.candletsticks_to_skip()):
             self.__account.update_assets_value(
                 self.__data.get_current_data_index(), 0.0
@@ -48,7 +48,8 @@ class Backtester:
 
             self.__data.increment_data_index()
 
-        return self.__statistics.get_stats()
+    def get_statistics(self) -> Statistics:
+        return self.__statistics
 
     def get_plotting(self) -> Plotting:
         return Plotting(self.__data, self.__broker.get_trades(), self.__account)
