@@ -168,74 +168,84 @@ class Broker:
 
     def __process_close_order(self, order: Order, price: float) -> None:
         if order.position_to_close is not None:
-            if order.size > order.position_to_close.size:
-                raise ValueError(
-                    "if order.position_to_close is specified, order.size must be less than or equal to order.position_to_close.size"
+            self.__process_close_order_specified_position(order, price)
+        else:
+            self.__process_close_order_fifo_positions(order, price)
+
+    def __process_close_order_fifo_positions(self, order: Order, price: float) -> None:
+        size_to_reduce_left = order.size
+        positions_to_close: List[Position] = []
+
+        for i, position in enumerate(self.__positions):
+            if position.position_type != order.position_type:
+                continue
+
+            reduce_size = min(size_to_reduce_left, position.size)
+
+            if reduce_size < position.size:
+                self.__account.update_money(
+                    self.__calc_money_from_close(position, price, reduce_size)
                 )
-
-            self.__account.update_money(
-                self.__calc_money_from_close(order.position_to_close, price, order.size)
-            )
-
-            if order.size == order.position_to_close.size:
-                self.__positions.remove(order.position_to_close)
+                self.__positions[i] = position.replace(size=position.size - reduce_size)
             else:
-                position_index = self.__positions.index(order.position_to_close)
-                self.__positions[position_index] = order.position_to_close.replace(
-                    size=order.position_to_close.size - order.size
+                self.__account.update_money(
+                    self.__calc_money_from_close(position, price, reduce_size)
                 )
+                positions_to_close.append(position)
+
+            size_to_reduce_left -= reduce_size
 
             self.__trades.append(
                 CloseTrade(
                     order.position_type,
-                    order.position_to_close.open_datetime,
-                    order.position_to_close.open_price,
+                    position.open_datetime,
+                    position.open_price,
                     self.__data.get_current_numpy_datetime(),
                     price,
-                    order.size,
+                    reduce_size,
                     market_order=(order.limit_price is None),
                 )
             )
+
+            if size_to_reduce_left == 0:
+                break
+
+        for position in positions_to_close:
+            self.__positions.remove(position)
+
+    def __process_close_order_specified_position(
+        self, order: Order, price: float
+    ) -> None:
+        assert order.position_to_close is not None
+
+        if order.size > order.position_to_close.size:
+            raise ValueError(
+                "if order.position_to_close is specified, order.size must be less than or equal to order.position_to_close.size"
+            )
+
+        self.__account.update_money(
+            self.__calc_money_from_close(order.position_to_close, price, order.size)
+        )
+
+        if order.size == order.position_to_close.size:
+            self.__positions.remove(order.position_to_close)
         else:
-            size_to_reduce_left = order.size
-            positions_to_close: List[Position] = []
-            for i, position in enumerate(self.__positions):
-                if position.position_type != order.position_type:
-                    continue
+            position_index = self.__positions.index(order.position_to_close)
+            self.__positions[position_index] = order.position_to_close.replace(
+                size=order.position_to_close.size - order.size
+            )
 
-                reduce_size = min(size_to_reduce_left, position.size)
-
-                if reduce_size < position.size:
-                    self.__account.update_money(
-                        self.__calc_money_from_close(position, price, reduce_size)
-                    )
-                    self.__positions[i] = position.replace(
-                        size=position.size - reduce_size
-                    )
-                else:
-                    self.__account.update_money(
-                        self.__calc_money_from_close(position, price, reduce_size)
-                    )
-                    positions_to_close.append(position)
-
-                size_to_reduce_left -= reduce_size
-
-                self.__trades.append(
-                    CloseTrade(
-                        order.position_type,
-                        position.open_datetime,
-                        position.open_price,
-                        self.__data.get_current_numpy_datetime(),
-                        price,
-                        reduce_size,
-                        market_order=(order.limit_price is None),
-                    )
-                )
-                if size_to_reduce_left == 0:
-                    break
-
-            for position in positions_to_close:
-                self.__positions.remove(position)
+        self.__trades.append(
+            CloseTrade(
+                order.position_type,
+                order.position_to_close.open_datetime,
+                order.position_to_close.open_price,
+                self.__data.get_current_numpy_datetime(),
+                price,
+                order.size,
+                market_order=(order.limit_price is None),
+            )
+        )
 
     def __adjust_open_price_by_spread(
         self, price: float, position_type: PositionType
