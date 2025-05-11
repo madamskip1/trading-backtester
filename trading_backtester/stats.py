@@ -52,7 +52,7 @@ class Statistics:
             "alpha": self.__calc_alpha(beta),
         }
 
-    def __str__(self):
+    def __str__(self) -> str:
         stats = self.get_stats()
         return "\n".join(
             [
