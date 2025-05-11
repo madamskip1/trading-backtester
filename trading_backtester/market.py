@@ -1,39 +1,21 @@
-from enum import Enum
 from typing import Optional
 
-from trading_backtester.data import Data
-
-
-class MarketTime(Enum):
-    OPEN = 1
-    MID_DAY = 2
-    CLOSE = 3
+from trading_backtester.data import CandlestickPhase, Data
 
 
 class Market:
 
     def __init__(self, data: Data):
         self.__data = data
-        self.__current_time = MarketTime.OPEN
-
-    def set_current_market_time(self, time: MarketTime) -> None:
-        self.__current_time = time
-
-    def get_current_market_time(self) -> MarketTime:
-        return self.__current_time
 
     def get_current_price(self) -> float:
-        return (
-            self.__data.get_current_data("open")
-            if self.__current_time == MarketTime.OPEN
-            else self.__data.get_current_data("close")
-        )
+        return self.__data.get_current_phase_price()
 
     def get_current_open_price(self) -> float:
         return self.__data.get_current_data("open")
 
     def get_current_close_price(self) -> float:
-        if self.__current_time != MarketTime.CLOSE:
+        if self.__data.get_candlestick_phase() != CandlestickPhase.CLOSE:
             raise ValueError(
                 "Candlestick is not closed yet. Can't look into the future."
             )
@@ -43,14 +25,14 @@ class Market:
     def get_current_low_price(self) -> float:
         return (
             self.__data.get_current_data("low")
-            if self.__current_time == MarketTime.CLOSE
+            if self.__data.get_candlestick_phase() == CandlestickPhase.CLOSE
             else self.__data.get_current_data("open")
         )
 
     def get_current_high_price(self) -> float:
         return (
             self.__data.get_current_data("high")
-            if self.__current_time == MarketTime.CLOSE
+            if self.__data.get_candlestick_phase() == CandlestickPhase.CLOSE
             else self.__data.get_current_data("open")
         )
 

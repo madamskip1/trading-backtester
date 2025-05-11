@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import List
 
-from trading_backtester.data import Data
+from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.indicator import Indicator
-from trading_backtester.market import Market, MarketTime
+from trading_backtester.market import Market
 from trading_backtester.order import Order
 from trading_backtester.position import Position
 
@@ -15,7 +15,7 @@ class Strategy:
         self.__candlesticks_to_skip = 0
 
     def collect_orders(
-        self, market_time: MarketTime, price: float, date_time: datetime
+        self, candlestick_phase: CandlestickPhase, price: float, date_time: datetime
     ) -> List[Order]:
         raise NotImplementedError("This method should be implemented in subclasses.")
 

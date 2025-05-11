@@ -5,8 +5,7 @@ from typing import List
 import pytest
 
 from trading_backtester.backtest import Backtester
-from trading_backtester.data import Data
-from trading_backtester.market import MarketTime
+from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import CloseOrder, OpenOrder, Order
 from trading_backtester.position import PositionType
 from trading_backtester.strategy import Strategy
@@ -14,9 +13,9 @@ from trading_backtester.strategy import Strategy
 
 class SellOnOpenCloseOnCloseStrategy(Strategy):
     def collect_orders(
-        self, market_time: MarketTime, price: float, date_time: datetime
+        self, candlestick_phase: CandlestickPhase, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.OPEN:
+        if candlestick_phase == CandlestickPhase.OPEN:
             # Sell on open
             return [
                 OpenOrder(
@@ -25,7 +24,7 @@ class SellOnOpenCloseOnCloseStrategy(Strategy):
                 )
             ]
 
-        elif market_time == MarketTime.CLOSE:
+        elif candlestick_phase == CandlestickPhase.CLOSE:
             # Close on close
             return [
                 CloseOrder(

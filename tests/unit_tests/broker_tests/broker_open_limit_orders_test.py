@@ -2,8 +2,7 @@ import pytest
 
 from trading_backtester.account import Account
 from trading_backtester.broker import Broker
-from trading_backtester.data import Data
-from trading_backtester.market import Market, MarketTime
+from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder
 from trading_backtester.position import PositionType
 from trading_backtester.trade import TradeType
@@ -11,12 +10,12 @@ from trading_backtester.trade import TradeType
 
 @pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 90.0, 90.0, None)]])
 def test_open_long_on_close(
-    test_market: Market, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -43,12 +42,12 @@ def test_open_long_on_close(
 
 @pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 85.0, 90.0, None)]])
 def test_open_long_during_day(
-    test_market: Market, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -79,17 +78,16 @@ def test_open_long_during_day(
 )
 def test_open_long_on_open_equal(
     test_data: Data,
-    test_market: Market,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_market_time(MarketTime.OPEN)
+    test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -120,17 +118,16 @@ def test_open_long_on_open_equal(
 )
 def test_open_long_on_open_less(
     test_data: Data,
-    test_market: Market,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_market_time(MarketTime.OPEN)
+    test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -161,17 +158,16 @@ def test_open_long_on_open_less(
 )
 def test_open_long_on_open_greater_not_opened(
     test_data: Data,
-    test_market: Market,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_market_time(MarketTime.OPEN)
+    test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 0
@@ -182,12 +178,12 @@ def test_open_long_on_open_greater_not_opened(
 
 @pytest.mark.parametrize("market_data", [[(None, 90.0, 100.0, 90.0, 100.0, None)]])
 def test_open_short_on_close(
-    test_market: Market, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -214,12 +210,12 @@ def test_open_short_on_close(
 
 @pytest.mark.parametrize("market_data", [[(None, 90.0, 105.0, 90.0, 100.0, None)]])
 def test_open_short_during_day(
-    test_market: Market, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -250,17 +246,16 @@ def test_open_short_during_day(
 )
 def test_open_short_on_open_equal(
     test_data: Data,
-    test_market: Market,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_market_time(MarketTime.OPEN)
+    test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -291,17 +286,16 @@ def test_open_short_on_open_equal(
 )
 def test_open_short_on_open_less(
     test_data: Data,
-    test_market: Market,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_market_time(MarketTime.OPEN)
+    test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -332,17 +326,16 @@ def test_open_short_on_open_less(
 )
 def test_open_short_on_open_greater_not_opened(
     test_data: Data,
-    test_market: Market,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order])
 
     test_data.increment_data_index()
-    test_market.set_current_market_time(MarketTime.OPEN)
+    test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 0
@@ -355,14 +348,14 @@ def test_open_short_on_open_greater_not_opened(
     "market_data, spread", [([(None, 100.0, 100.0, 90.0, 90.0, None)], 2.2)]
 )
 def test_open_long_with_spread_exact_price(
-    test_market: Market,
+    test_data: Data,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 0
@@ -375,14 +368,14 @@ def test_open_long_with_spread_exact_price(
     "market_data, spread", [([(None, 100.0, 100.0, 87.8, 87.8, None)], 2.2)]
 )
 def test_open_long_with_spread_enough_price(
-    test_market: Market,
+    test_data: Data,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1
@@ -411,14 +404,14 @@ def test_open_long_with_spread_enough_price(
     "market_data, spread", [([(None, 85.0, 95.0, 85.0, 95.0, None)], 2.2)]
 )
 def test_open_short_with_spread_exact_price(
-    test_market: Market,
+    test_data: Data,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 0
@@ -431,14 +424,14 @@ def test_open_short_with_spread_exact_price(
     "market_data, spread", [([(None, 85.0, 97.2, 85.0, 97.2, None)], 2.2)]
 )
 def test_open_short_with_spread_enough_price(
-    test_market: Market,
+    test_data: Data,
     test_account: Account,
     test_broker: Broker,
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
     test_broker.process_orders([open_order])
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders()
 
     assert len(test_broker.get_trades()) == 1

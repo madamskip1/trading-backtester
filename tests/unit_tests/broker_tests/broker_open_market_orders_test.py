@@ -2,7 +2,7 @@ import pytest
 
 from trading_backtester.account import Account
 from trading_backtester.broker import Broker
-from trading_backtester.market import Market, MarketTime
+from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder
 from trading_backtester.position import PositionType
 from trading_backtester.trade import TradeType
@@ -94,7 +94,7 @@ def test_open_long_multiple_in_single_process(
 
 @pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0, None)]])
 def test_open_long_multiple_in_multiple_processes(
-    test_market: Market, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker
 ):
     open_order1 = OpenOrder(
         size=1,
@@ -108,7 +108,7 @@ def test_open_long_multiple_in_multiple_processes(
         position_type=PositionType.LONG,
     )
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order2])
 
     assert len(test_broker.get_trades()) == 2
@@ -232,7 +232,7 @@ def test_open_short_multiple_in_single_process(
 
 @pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0, None)]])
 def test_open_short_multiple_in_multiple_processes(
-    test_market: Market, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker
 ):
     open_order1 = OpenOrder(
         size=1,
@@ -246,7 +246,7 @@ def test_open_short_multiple_in_multiple_processes(
         position_type=PositionType.SHORT,
     )
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order2])
 
     assert len(test_broker.get_trades()) == 2
