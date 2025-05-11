@@ -42,22 +42,16 @@ class Broker:
         price = self.__data.get_current_price()
 
         for order in new_orders:
-            if order.action == OrderAction.CLOSE:
-                if order.limit_price is not None:
-                    self.__limit_orders.append(order)
-                    continue
+            if order.limit_price is not None:
+                self.__limit_orders.append(order)
+                continue
 
+            if order.action == OrderAction.CLOSE:
                 adjusted_price = self.__adjust_close_price_by_spread(
                     price, order.position_type
                 )
                 self.__process_close_order(order, adjusted_price)
-
-        for order in new_orders:
-            if order.action == OrderAction.OPEN:
-                if order.limit_price is not None:
-                    self.__limit_orders.append(order)
-                    continue
-
+            elif order.action == OrderAction.OPEN:
                 adjusted_price = self.__adjust_open_price_by_spread(
                     price, order.position_type
                 )
