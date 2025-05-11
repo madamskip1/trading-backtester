@@ -233,23 +233,31 @@ class Plotting:
 
             def on_mouse_move(event):
                 if event.inaxes not in (ax, ax_right):
-                    equity_annotation.set_visible(False)
-                else:
-                    cond, ind = scatter.contains(event)
-                    if cond:
-                        idx = int(ind["ind"][0])
-                        pos = scatter.get_offsets()[idx]
-                        equity_annotation.xy = pos
-                        value = equity[idx]
-                        drawdown = drawdowns[idx]
-                        drawdown_percentage = drawdowns_percentages[idx] * 100
-                        equity_annotation.set_text(
-                            f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
-                        )
-                        equity_annotation.set_visible(True)
-                    else:
+                    if equity_annotation.get_visible():
+                        event.canvas.draw_idle()
                         equity_annotation.set_visible(False)
+                    return
 
+                cond, ind = scatter.contains(event)
+                if not cond:
+                    if equity_annotation.get_visible():
+                        equity_annotation.set_visible(False)
+                        event.canvas.draw_idle()
+                    return
+
+                idx = int(ind["ind"][0])
+                pos = scatter.get_offsets()[idx]
+                if np.array_equal(equity_annotation.xy, pos):
+                    return
+
+                equity_annotation.xy = pos
+                value = equity[idx]
+                drawdown = drawdowns[idx]
+                drawdown_percentage = drawdowns_percentages[idx] * 100
+                equity_annotation.set_text(
+                    f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
+                )
+                equity_annotation.set_visible(True)
                 event.canvas.draw_idle()
 
             ax.figure.canvas.mpl_connect("motion_notify_event", on_mouse_move)
