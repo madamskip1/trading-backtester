@@ -31,12 +31,7 @@ class Broker:
     def get_assets_value(self) -> float:
         assets_value = 0.0
         for position in self.__positions:
-            if position.position_type == PositionType.LONG:
-                assets_value += position.size * self.__data.get_current_price()
-            elif position.position_type == PositionType.SHORT:
-                assets_value += position.size * (
-                    2 * position.open_price - self.__data.get_current_price()
-                )
+            assets_value += position.calc_value(self.__data.get_current_price())
 
         return assets_value
 
