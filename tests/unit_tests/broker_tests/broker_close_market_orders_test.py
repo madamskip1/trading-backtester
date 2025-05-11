@@ -72,9 +72,7 @@ def test_close_long_single_reduce(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        50.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(50.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -146,9 +144,7 @@ def test_close_long_single_reduce_position_specified(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        50.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(50.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -248,9 +244,7 @@ def test_close_long_multiple_positions_in_single_order_reduce(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -295,9 +289,7 @@ def test_close_long_multiple_positions_specified_position_close(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -342,16 +334,12 @@ def test_close_long_multiple_positions_specified_position_reduce(
     assert len(test_broker.get_positions()) == 2
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
     assert test_broker.get_positions()[1].position_type == PositionType.LONG
     assert test_broker.get_positions()[1].size == 1
-    assert test_broker.get_positions()[1].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[1].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[1].stop_loss is None
     assert test_broker.get_positions()[1].take_profit is None
 
@@ -481,9 +469,7 @@ def test_close_short_single_reduce(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        50.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(50.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -557,9 +543,7 @@ def test_close_short_single_reduce_specified_position(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        50.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(50.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -659,9 +643,7 @@ def test_open_short_multiple_positions_in_single_order_reduce(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -703,9 +685,7 @@ def test_open_short_multiple_positions_specified_position_close(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -747,17 +727,13 @@ def test_open_short_multiple_positions_specified_position_reduec(
     assert len(test_broker.get_positions()) == 2
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_positions()[1].position_type == PositionType.SHORT
     assert test_broker.get_positions()[1].size == 1
-    assert test_broker.get_positions()[1].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[1].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[1].stop_loss is None
     assert test_broker.get_positions()[1].take_profit is None
 

@@ -35,7 +35,7 @@ class Broker:
                 assets_value += position.size * self.__data.get_current_price()
             elif position.position_type == PositionType.SHORT:
                 assets_value += position.size * (
-                    2 * position.avg_bought_price - self.__data.get_current_price()
+                    2 * position.open_price - self.__data.get_current_price()
                 )
 
         return assets_value
@@ -158,8 +158,8 @@ class Broker:
             Position(
                 order.position_type,
                 price,
-                order.size,
                 self.__data.get_current_numpy_datetime(),
+                order.size,
                 order.stop_loss,
                 order.take_profit,
             )
@@ -196,7 +196,7 @@ class Broker:
                 CloseTrade(
                     order.position_type,
                     order.position_to_close.open_datetime,
-                    order.position_to_close.avg_bought_price,
+                    order.position_to_close.open_price,
                     self.__data.get_current_numpy_datetime(),
                     price,
                     order.size,
@@ -229,7 +229,7 @@ class Broker:
                     CloseTrade(
                         order.position_type,
                         position.open_datetime,
-                        position.avg_bought_price,
+                        position.open_price,
                         self.__data.get_current_numpy_datetime(),
                         price,
                         reduce_size,
@@ -266,7 +266,7 @@ class Broker:
         return (
             size * current_price
             if position.position_type == PositionType.LONG
-            else size * (2 * position.avg_bought_price - current_price)
+            else size * (2 * position.open_price - current_price)
         )
 
     def __check_limit_price(
