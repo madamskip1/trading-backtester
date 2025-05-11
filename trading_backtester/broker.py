@@ -190,7 +190,10 @@ class Broker:
             if order.size == order.position_to_close.size:
                 self.__positions.remove(order.position_to_close)
             else:
-                order.position_to_close.size -= order.size
+                position_index = self.__positions.index(order.position_to_close)
+                self.__positions[position_index] = order.position_to_close.replace(
+                    size=order.position_to_close.size - order.size
+                )
 
             self.__trades.append(
                 CloseTrade(
@@ -206,7 +209,7 @@ class Broker:
         else:
             size_to_reduce_left = order.size
             positions_to_close: List[Position] = []
-            for position in self.__positions:
+            for i, position in enumerate(self.__positions):
                 if position.position_type != order.position_type:
                     continue
 
@@ -216,7 +219,9 @@ class Broker:
                     self.__account.update_money(
                         self.__calc_money_from_close(position, price, reduce_size)
                     )
-                    position.size -= reduce_size
+                    self.__positions[i] = position.replace(
+                        size=position.size - reduce_size
+                    )
                 else:
                     self.__account.update_money(
                         self.__calc_money_from_close(position, price, reduce_size)

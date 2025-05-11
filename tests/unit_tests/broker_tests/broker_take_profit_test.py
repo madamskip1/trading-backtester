@@ -513,3 +513,86 @@ def test_short_with_spread_enough_price(
     assert test_broker.get_trades()[1].close_price == pytest.approx(85.0, abs=0.01)
     assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
+
+
+@pytest.mark.parametrize(
+    "market_data",
+    [
+        [
+            (None, 100.0, 101.0, 100.0, 101.0, None),
+            (None, 101.0, 101.0, 101.0, 101.0, None),
+        ]
+    ],
+)
+def test_long_update_take_profit(
+    test_data: Data,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.LONG,
+        take_profit=102.0,
+    )
+
+    test_broker.process_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 1
+    assert len(test_broker.get_trades()) == 1
+
+    test_broker.get_positions()[0].update_take_profit(101.0)
+
+    test_data.increment_data_index()
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 0
+    assert len(test_broker.get_trades()) == 2
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.LONG
+    assert test_broker.get_trades()[1].open_price == pytest.approx(100.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(101.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
+    assert test_broker.get_trades()[1].market_order is True
+
+
+@pytest.mark.parametrize(
+    "market_data",
+    [[(None, 100.0, 100.0, 99.0, 99.0, None), (None, 99.0, 99.0, 99.0, 99.0, None)]],
+)
+def test_short_update_take_profit(
+    test_data: Data,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.SHORT,
+        take_profit=98.0,
+    )
+
+    test_broker.process_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 1
+    assert len(test_broker.get_trades()) == 1
+
+    test_broker.get_positions()[0].update_take_profit(99.0)
+
+    test_data.increment_data_index()
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 0
+    assert len(test_broker.get_trades()) == 2
+
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[1].open_price == pytest.approx(100.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(99.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
+    assert test_broker.get_trades()[1].market_order is True

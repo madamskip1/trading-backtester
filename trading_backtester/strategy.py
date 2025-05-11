@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Sequence
 
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.indicator import Indicator
@@ -10,9 +10,14 @@ from trading_backtester.position import Position
 
 class Strategy:
     def __init__(self, market: Market, positions: List[Position]):
-        self._market = market
-        self._positions = positions
+        self.__positions = positions
         self.__candlesticks_to_skip = 0
+
+        self._market = market
+
+    @property
+    def _positions(self) -> Sequence[Position]:
+        return tuple(self.__positions)
 
     def collect_orders(
         self, candlestick_phase: CandlestickPhase, price: float, date_time: datetime
