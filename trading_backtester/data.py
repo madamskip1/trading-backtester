@@ -55,10 +55,24 @@ class Data:
     def get_current_data(self, key: str) -> float:
         return self.__data[self.__current_data_index][key]
 
-    def get_current_phase_price(self) -> float:
+    def get_current_price(self) -> float:
         return self.__data[self.__current_data_index][
             "open" if self.__candlestick_phase == CandlestickPhase.OPEN else "close"
         ]
+
+    def get_current_low_price(self) -> float:
+        return (
+            self.__data[self.__current_data_index]["low"]
+            if self.__candlestick_phase == CandlestickPhase.CLOSE
+            else self.__data[self.__current_data_index]["open"]
+        )
+
+    def get_current_high_price(self) -> float:
+        return (
+            self.__data[self.__current_data_index]["high"]
+            if self.__candlestick_phase == CandlestickPhase.CLOSE
+            else self.__data[self.__current_data_index]["open"]
+        )
 
     def get_current_numpy_datetime(self) -> np.datetime64:
         return self.__data[self.__current_data_index]["datetime"]

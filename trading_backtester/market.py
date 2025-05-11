@@ -9,7 +9,7 @@ class Market:
         self.__data = data
 
     def get_current_price(self) -> float:
-        return self.__data.get_current_phase_price()
+        return self.__data.get_current_price()
 
     def get_current_open_price(self) -> float:
         return self.__data.get_current_data("open")
