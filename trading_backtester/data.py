@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import Any, List, Optional, Tuple
 
 import numpy as np
@@ -15,11 +16,17 @@ DATA_TYPE = np.dtype(
 )
 
 
+class CandlestickPhase(Enum):
+    OPEN = 1
+    CLOSE = 2
+
+
 class Data:
 
     def __init__(self, data: np.ndarray[Any, np.dtype[Any]]):
         self.__data = data
         self.__current_data_index = 0
+        self.__candlestick_phase = CandlestickPhase.OPEN
 
     def __getitem__(self, index: int) -> Any:
         return self.__data[index]
@@ -29,6 +36,12 @@ class Data:
 
     def __iter__(self):
         return iter(self.__data)
+
+    def set_candlestick_phase(self, phase: CandlestickPhase) -> None:
+        self.__candlestick_phase = phase
+
+    def get_candlestick_phase(self) -> CandlestickPhase:
+        return self.__candlestick_phase
 
     def increment_data_index(self) -> None:
         self.__current_data_index += 1
@@ -41,6 +54,25 @@ class Data:
 
     def get_current_data(self, key: str) -> float:
         return self.__data[self.__current_data_index][key]
+
+    def get_current_price(self) -> float:
+        return self.__data[self.__current_data_index][
+            "open" if self.__candlestick_phase == CandlestickPhase.OPEN else "close"
+        ]
+
+    def get_current_low_price(self) -> float:
+        return (
+            self.__data[self.__current_data_index]["low"]
+            if self.__candlestick_phase == CandlestickPhase.CLOSE
+            else self.__data[self.__current_data_index]["open"]
+        )
+
+    def get_current_high_price(self) -> float:
+        return (
+            self.__data[self.__current_data_index]["high"]
+            if self.__candlestick_phase == CandlestickPhase.CLOSE
+            else self.__data[self.__current_data_index]["open"]
+        )
 
     def get_current_numpy_datetime(self) -> np.datetime64:
         return self.__data[self.__current_data_index]["datetime"]

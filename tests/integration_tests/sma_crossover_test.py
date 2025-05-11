@@ -5,9 +5,9 @@ import numpy as np
 import pytest
 
 from trading_backtester.backtest import Backtester
-from trading_backtester.data import Data
+from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.indicator import Indicator
-from trading_backtester.market import Market, MarketTime
+from trading_backtester.market import Market
 from trading_backtester.order import CloseOrder, OpenOrder, Order
 from trading_backtester.position import Position, PositionType
 from trading_backtester.strategy import Strategy
@@ -30,9 +30,9 @@ class SMACrossoverStrategy(Strategy):
         self.long_sma = SMAIndicator(period=3)
 
     def collect_orders(
-        self, market_time: MarketTime, price: float, date_time: datetime
+        self, candlestick_phase: CandlestickPhase, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.OPEN:
+        if candlestick_phase == CandlestickPhase.OPEN:
             return []
 
         orders: List[Order] = []

@@ -6,7 +6,6 @@ import pytest
 from trading_backtester.account import Account
 from trading_backtester.broker import Broker
 from trading_backtester.data import Data
-from trading_backtester.market import Market
 from trading_backtester.stats import Statistics
 
 
@@ -45,22 +44,13 @@ def test_account() -> Account:
 
 
 @pytest.fixture
-def test_market(test_data: Data) -> Market:
-    return Market(test_data)
-
-
-@pytest.fixture
 def spread() -> float:  # if not provided assume no spread
     return 0.0
 
 
 @pytest.fixture
-def test_broker(
-    test_market: Market, test_data: Data, test_account: Account, spread: float
-) -> Broker:
-    return Broker(
-        market=test_market, data=test_data, accout=test_account, spread=spread
-    )
+def test_broker(test_data: Data, test_account: Account, spread: float) -> Broker:
+    return Broker(data=test_data, accout=test_account, spread=spread)
 
 
 @pytest.fixture

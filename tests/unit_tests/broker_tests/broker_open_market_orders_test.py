@@ -2,7 +2,7 @@ import pytest
 
 from trading_backtester.account import Account
 from trading_backtester.broker import Broker
-from trading_backtester.market import Market, MarketTime
+from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder
 from trading_backtester.position import PositionType
 from trading_backtester.trade import TradeType
@@ -28,9 +28,7 @@ def test_open_long_single(test_account: Account, test_broker: Broker):
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        100.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(100.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -74,16 +72,12 @@ def test_open_long_multiple_in_single_process(
     assert len(test_broker.get_positions()) == 2
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
     assert test_broker.get_positions()[1].position_type == PositionType.LONG
     assert test_broker.get_positions()[1].size == 2
-    assert test_broker.get_positions()[1].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[1].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[1].stop_loss is None
     assert test_broker.get_positions()[1].take_profit is None
 
@@ -94,7 +88,7 @@ def test_open_long_multiple_in_single_process(
 
 @pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0, None)]])
 def test_open_long_multiple_in_multiple_processes(
-    test_market: Market, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker
 ):
     open_order1 = OpenOrder(
         size=1,
@@ -108,7 +102,7 @@ def test_open_long_multiple_in_multiple_processes(
         position_type=PositionType.LONG,
     )
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order2])
 
     assert len(test_broker.get_trades()) == 2
@@ -130,16 +124,12 @@ def test_open_long_multiple_in_multiple_processes(
     assert len(test_broker.get_positions()) == 2
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        50.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(50.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
     assert test_broker.get_positions()[1].position_type == PositionType.LONG
     assert test_broker.get_positions()[1].size == 2
-    assert test_broker.get_positions()[1].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[1].open_price == pytest.approx(25.0, abs=0.01)
     assert test_broker.get_positions()[1].stop_loss is None
     assert test_broker.get_positions()[1].take_profit is None
 
@@ -169,9 +159,7 @@ def test_open_short_single(test_account: Account, test_broker: Broker):
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        100.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(100.0, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -215,15 +203,11 @@ def test_open_short_multiple_in_single_process(
     assert len(test_broker.get_positions()) == 2
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(25.0, abs=0.01)
 
     assert test_broker.get_positions()[1].position_type == PositionType.SHORT
     assert test_broker.get_positions()[1].size == 2
-    assert test_broker.get_positions()[1].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[1].open_price == pytest.approx(25.0, abs=0.01)
 
     assert test_broker.get_assets_value() == pytest.approx(75.0, abs=0.01)
 
@@ -232,7 +216,7 @@ def test_open_short_multiple_in_single_process(
 
 @pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0, None)]])
 def test_open_short_multiple_in_multiple_processes(
-    test_market: Market, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker
 ):
     open_order1 = OpenOrder(
         size=1,
@@ -246,7 +230,7 @@ def test_open_short_multiple_in_multiple_processes(
         position_type=PositionType.SHORT,
     )
 
-    test_market.set_current_market_time(MarketTime.CLOSE)
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_orders([open_order2])
 
     assert len(test_broker.get_trades()) == 2
@@ -268,15 +252,11 @@ def test_open_short_multiple_in_multiple_processes(
     assert len(test_broker.get_positions()) == 2
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        50.0, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(50.0, abs=0.01)
 
     assert test_broker.get_positions()[1].position_type == PositionType.SHORT
     assert test_broker.get_positions()[1].size == 2
-    assert test_broker.get_positions()[1].avg_bought_price == pytest.approx(
-        25.0, abs=0.01
-    )
+    assert test_broker.get_positions()[1].open_price == pytest.approx(25.0, abs=0.01)
 
     assert test_broker.get_assets_value() == pytest.approx(125.0, abs=0.01)
 
@@ -309,9 +289,7 @@ def test_open_long_with_spread(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        92.2, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(92.2, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 
@@ -344,9 +322,7 @@ def test_open_short_with_spread(
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
     assert test_broker.get_positions()[0].size == 1
-    assert test_broker.get_positions()[0].avg_bought_price == pytest.approx(
-        87.8, abs=0.01
-    )
+    assert test_broker.get_positions()[0].open_price == pytest.approx(87.8, abs=0.01)
     assert test_broker.get_positions()[0].stop_loss is None
     assert test_broker.get_positions()[0].take_profit is None
 

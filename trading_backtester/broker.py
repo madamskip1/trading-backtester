@@ -2,7 +2,6 @@ from typing import List, Tuple
 
 from trading_backtester.account import Account
 from trading_backtester.data import Data
-from trading_backtester.market import Market
 from trading_backtester.order import CloseOrder, Order, OrderAction
 from trading_backtester.trade import CloseTrade, OpenTrade, Trade
 
@@ -12,12 +11,10 @@ from .position import Position, PositionType
 class Broker:
     def __init__(
         self,
-        market: Market,
         data: Data,
         accout: Account,
         spread: float,
     ):
-        self.__market = market
         self.__data = data
         self.__account = accout
         self.__spread = spread
@@ -35,17 +32,17 @@ class Broker:
         assets_value = 0.0
         for position in self.__positions:
             if position.position_type == PositionType.LONG:
-                assets_value += position.size * self.__market.get_current_price()
+                assets_value += position.size * self.__data.get_current_price()
             elif position.position_type == PositionType.SHORT:
                 assets_value += position.size * (
-                    2 * position.avg_bought_price - self.__market.get_current_price()
+                    2 * position.open_price - self.__data.get_current_price()
                 )
 
         return assets_value
 
     def process_stop_losses(self) -> None:
-        low_price = self.__market.get_current_low_price()
-        high_price = self.__market.get_current_high_price()
+        low_price = self.__data.get_current_low_price()
+        high_price = self.__data.get_current_high_price()
 
         close_orders: List[Tuple[CloseOrder, float]] = []
 
@@ -73,8 +70,8 @@ class Broker:
             self.__process_close_order(order, price)
 
     def process_take_profits(self) -> None:
-        low_price = self.__market.get_current_low_price()
-        high_price = self.__market.get_current_high_price()
+        low_price = self.__data.get_current_low_price()
+        high_price = self.__data.get_current_high_price()
 
         close_orders: List[Tuple[CloseOrder, float]] = []
 
@@ -101,7 +98,7 @@ class Broker:
             self.__process_close_order(order, price)
 
     def process_orders(self, new_orders: List[Order] = []) -> None:
-        price = self.__market.get_current_price()
+        price = self.__data.get_current_price()
 
         for order in new_orders:
             if order.action == OrderAction.CLOSE:
@@ -128,9 +125,9 @@ class Broker:
         self.__process_limit_orders()
 
     def __process_limit_orders(self) -> None:
-        price = self.__market.get_current_price()
-        low_price = self.__market.get_current_low_price()
-        high_price = self.__market.get_current_high_price()
+        price = self.__data.get_current_price()
+        low_price = self.__data.get_current_low_price()
+        high_price = self.__data.get_current_high_price()
 
         orders_to_remove: List[Order] = []
 
@@ -161,8 +158,8 @@ class Broker:
             Position(
                 order.position_type,
                 price,
-                order.size,
                 self.__data.get_current_numpy_datetime(),
+                order.size,
                 order.stop_loss,
                 order.take_profit,
             )
@@ -193,13 +190,16 @@ class Broker:
             if order.size == order.position_to_close.size:
                 self.__positions.remove(order.position_to_close)
             else:
-                order.position_to_close.size -= order.size
+                position_index = self.__positions.index(order.position_to_close)
+                self.__positions[position_index] = order.position_to_close.replace(
+                    size=order.position_to_close.size - order.size
+                )
 
             self.__trades.append(
                 CloseTrade(
                     order.position_type,
                     order.position_to_close.open_datetime,
-                    order.position_to_close.avg_bought_price,
+                    order.position_to_close.open_price,
                     self.__data.get_current_numpy_datetime(),
                     price,
                     order.size,
@@ -209,7 +209,7 @@ class Broker:
         else:
             size_to_reduce_left = order.size
             positions_to_close: List[Position] = []
-            for position in self.__positions:
+            for i, position in enumerate(self.__positions):
                 if position.position_type != order.position_type:
                     continue
 
@@ -219,7 +219,9 @@ class Broker:
                     self.__account.update_money(
                         self.__calc_money_from_close(position, price, reduce_size)
                     )
-                    position.size -= reduce_size
+                    self.__positions[i] = position.replace(
+                        size=position.size - reduce_size
+                    )
                 else:
                     self.__account.update_money(
                         self.__calc_money_from_close(position, price, reduce_size)
@@ -232,7 +234,7 @@ class Broker:
                     CloseTrade(
                         order.position_type,
                         position.open_datetime,
-                        position.avg_bought_price,
+                        position.open_price,
                         self.__data.get_current_numpy_datetime(),
                         price,
                         reduce_size,
@@ -269,7 +271,7 @@ class Broker:
         return (
             size * current_price
             if position.position_type == PositionType.LONG
-            else size * (2 * position.avg_bought_price - current_price)
+            else size * (2 * position.open_price - current_price)
         )
 
     def __check_limit_price(

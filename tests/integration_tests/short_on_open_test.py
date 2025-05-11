@@ -5,8 +5,7 @@ from typing import List
 import pytest
 
 from trading_backtester.backtest import Backtester
-from trading_backtester.data import Data
-from trading_backtester.market import MarketTime
+from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder, Order
 from trading_backtester.position import PositionType
 from trading_backtester.strategy import Strategy
@@ -15,9 +14,9 @@ from trading_backtester.strategy import Strategy
 class ShortOnOpenStrategy(Strategy):
 
     def collect_orders(
-        self, market_time: MarketTime, price: float, date_time: datetime
+        self, candlestick_phase: CandlestickPhase, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.CLOSE:
+        if candlestick_phase == CandlestickPhase.CLOSE:
             return []
 
         # Buy on open
@@ -56,9 +55,9 @@ def test_few_days():
 class SellOnOpenStrategyTakeProfit(Strategy):
 
     def collect_orders(
-        self, market_time: MarketTime, price: float, date_time: datetime
+        self, candlestick_phase: CandlestickPhase, price: float, date_time: datetime
     ) -> List[Order]:
-        if market_time == MarketTime.CLOSE:
+        if candlestick_phase == CandlestickPhase.CLOSE:
             return []
 
         self.had_trade = True
@@ -173,10 +172,10 @@ def test_take_profit_on_open_equal_short():
 class SellOnOpenStrategyStopLoss(Strategy):
 
     def collect_orders(
-        self, market_time: MarketTime, price: float, date_time: datetime
+        self, candlestick_phase: CandlestickPhase, price: float, date_time: datetime
     ) -> List[Order]:
 
-        if market_time == MarketTime.CLOSE:
+        if candlestick_phase == CandlestickPhase.CLOSE:
             return []
 
         # Sell on open

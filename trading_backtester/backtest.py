@@ -4,8 +4,8 @@ from trading_backtester.plotting import Plotting
 
 from .account import Account
 from .broker import Broker
-from .data import Data
-from .market import Market, MarketTime
+from .data import CandlestickPhase, Data
+from .market import Market
 from .stats import Statistics
 from .strategy import Strategy
 
@@ -20,14 +20,13 @@ class Backtester:
         benchmark: Optional[Data] = None,
     ):
         self.__data = data
-        self.__market = Market(self.__data)
         self.__account = Account(data_size=len(data), initial_money=money)
-        self.__broker = Broker(self.__market, self.__data, self.__account, spread)
+        self.__broker = Broker(self.__data, self.__account, spread)
         self.__statistics = Statistics(
             self.__broker.get_trades(), self.__account, benchmark
         )
 
-        self.__strategy = strategy(self.__market, self.__broker.get_positions())
+        self.__strategy = strategy(Market(self.__data), self.__broker.get_positions())
         self.__strategy.prepare_indicators(self.__data)
 
     def run(self) -> Dict[str, Any]:
@@ -43,26 +42,26 @@ class Backtester:
             self.__data.increment_data_index()
 
         for _ in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
-            self.__market.set_current_market_time(MarketTime.OPEN)
+            self.__data.set_candlestick_phase(CandlestickPhase.OPEN)
 
             self.__broker.process_stop_losses()
             self.__broker.process_take_profits()
 
             new_orders = self.__strategy.collect_orders(
-                self.__market.get_current_market_time(),
-                self.__market.get_current_open_price(),
+                self.__data.get_candlestick_phase(),
+                self.__data.get_current_data("open"),
                 self.__data.get_current_datatime(),
             )
             self.__broker.process_orders(new_orders=new_orders)
 
-            self.__market.set_current_market_time(MarketTime.CLOSE)
+            self.__data.set_candlestick_phase(CandlestickPhase.CLOSE)
 
             self.__broker.process_stop_losses()
             self.__broker.process_take_profits()
 
             new_orders = self.__strategy.collect_orders(
-                self.__market.get_current_market_time(),
-                self.__market.get_current_close_price(),
+                self.__data.get_candlestick_phase(),
+                self.__data.get_current_data("close"),
                 self.__data.get_current_datatime(),
             )
             self.__broker.process_orders(new_orders=new_orders)
