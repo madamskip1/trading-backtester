@@ -31,6 +31,9 @@ class Account:
     def get_final_equity(self) -> float:
         return self._equity[-1]
 
+    def get_current_equity(self) -> float:
+        return self._equity[-1] + self._current_money
+
     def get_equity(self) -> np.ndarray[Any, np.dtype[Any]]:
         return self._equity
 
