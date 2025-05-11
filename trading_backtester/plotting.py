@@ -189,10 +189,7 @@ class Plotting:
                 zorder=2,
             )
 
-    def __draw_equity_plot(
-        self,
-        ax: Axes,
-    ):
+    def __draw_equity_plot(self, ax: Axes):
         ax.set_ylabel("Equity")
 
         ax_right = ax.twinx()
@@ -235,20 +232,23 @@ class Plotting:
             equity_annotation.set_visible(False)
 
             def on_mouse_move(event):
-                cond, ind = scatter.contains(event)
-                if cond:
-                    idx = int(ind["ind"][0])
-                    pos = scatter.get_offsets()[idx]
-                    equity_annotation.xy = pos
-                    value = equity[idx]
-                    drawdown = drawdowns[idx]
-                    drawdown_percentage = drawdowns_percentages[idx] * 100
-                    equity_annotation.set_text(
-                        f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
-                    )
-                    equity_annotation.set_visible(True)
-                else:
+                if event.inaxes not in (ax, ax_right):
                     equity_annotation.set_visible(False)
+                else:
+                    cond, ind = scatter.contains(event)
+                    if cond:
+                        idx = int(ind["ind"][0])
+                        pos = scatter.get_offsets()[idx]
+                        equity_annotation.xy = pos
+                        value = equity[idx]
+                        drawdown = drawdowns[idx]
+                        drawdown_percentage = drawdowns_percentages[idx] * 100
+                        equity_annotation.set_text(
+                            f"Equity: {value:.2f}\nDrawdown: {drawdown:.2f} ({abs(drawdown_percentage):.2f}%)"
+                        )
+                        equity_annotation.set_visible(True)
+                    else:
+                        equity_annotation.set_visible(False)
 
                 event.canvas.draw_idle()
 
