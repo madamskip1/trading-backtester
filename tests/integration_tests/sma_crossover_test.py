@@ -4,7 +4,7 @@ from typing import Any, List
 import numpy as np
 import pytest
 
-from trading_backtester.backtest import Backtester
+from trading_backtester.backtester import Backtester
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.indicator import Indicator
 from trading_backtester.market import Market

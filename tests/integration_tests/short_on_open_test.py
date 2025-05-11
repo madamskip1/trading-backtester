@@ -4,7 +4,7 @@ from typing import List
 
 import pytest
 
-from trading_backtester.backtest import Backtester
+from trading_backtester.backtester import Backtester
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder, Order
 from trading_backtester.position import PositionType

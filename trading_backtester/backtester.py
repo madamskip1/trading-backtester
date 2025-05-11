@@ -30,8 +30,7 @@ class Backtester:
         self.__strategy.prepare_indicators(self.__data)
 
     def run(self) -> Dict[str, Any]:
-        candlesticks_to_skip = self.__strategy.candletsticks_to_skip()
-        for _ in range(candlesticks_to_skip):
+        for _ in range(self.__strategy.candletsticks_to_skip()):
             self.__account.update_assets_value(
                 self.__data.get_current_data_index(), 0.0
             )
