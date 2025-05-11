@@ -3,9 +3,11 @@ from typing import Dict, List, Optional
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.backend_bases import MouseEvent
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
+from matplotlib.text import Annotation
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 
 from trading_backtester.account import Account
@@ -229,18 +231,18 @@ class Plotting:
 
             equity_annotation.set_visible(False)
 
-            def on_mouse_move(event):
+            def on_mouse_move(event: MouseEvent):
                 if event.inaxes not in (ax, ax_right):
-                    if equity_annotation.get_visible():
-                        event.canvas.draw_idle()
-                        equity_annotation.set_visible(False)
+                    self.__hide_annotation_and_redraw_if_necessary(
+                        equity_annotation, event
+                    )
                     return
 
                 cond, ind = scatter.contains(event)
                 if not cond:
-                    if equity_annotation.get_visible():
-                        equity_annotation.set_visible(False)
-                        event.canvas.draw_idle()
+                    self.__hide_annotation_and_redraw_if_necessary(
+                        equity_annotation, event
+                    )
                     return
 
                 idx = int(ind["ind"][0])
@@ -380,11 +382,11 @@ class Plotting:
             )
             closed_trade_annotation.set_visible(False)
 
-            def on_mouse_move(event):
+            def on_mouse_move(event: MouseEvent):
                 if event.inaxes is not ax:
-                    if closed_trade_annotation.get_visible():
-                        event.canvas.draw_idle()
-                        closed_trade_annotation.set_visible(False)
+                    self.__hide_annotation_and_redraw_if_necessary(
+                        closed_trade_annotation, event
+                    )
                     return
 
                 for i, marker in enumerate(closed_trades_markers):
@@ -412,9 +414,9 @@ class Plotting:
                     event.canvas.draw_idle()
                     return
 
-                if closed_trade_annotation.get_visible():
-                    closed_trade_annotation.set_visible(False)
-                    event.canvas.draw_idle()
+                self.__hide_annotation_and_redraw_if_necessary(
+                    closed_trade_annotation, event
+                )
 
             ax.figure.canvas.mpl_connect("motion_notify_event", on_mouse_move)
 
@@ -540,3 +542,12 @@ class Plotting:
             return "%Y-%m"
         else:
             return "%Y"
+
+    def __hide_annotation_and_redraw_if_necessary(
+        self,
+        annotation: Annotation,
+        event: MouseEvent,
+    ):
+        if annotation.get_visible():
+            annotation.set_visible(False)
+            event.canvas.draw_idle()
