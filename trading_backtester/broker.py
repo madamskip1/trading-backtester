@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from trading_backtester.account import Account
 from trading_backtester.data import Data
@@ -92,7 +92,10 @@ class Broker:
         for order, price in close_orders:
             self.__process_close_order(order, price)
 
-    def process_orders(self, new_orders: List[Order] = []) -> None:
+    def process_orders(self, new_orders: Optional[List[Order]] = None) -> None:
+        if new_orders is None:
+            new_orders = []
+
         price = self.__data.get_current_price()
 
         for order in new_orders:
