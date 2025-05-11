@@ -129,7 +129,7 @@ class Broker:
 
         orders_to_remove: List[Order] = []
 
-        for order in self.__limit_orders.copy():
+        for order in self.__limit_orders:
             assert order.limit_price is not None
             if order.action == OrderAction.OPEN:
                 if not self.__check_limit_price(
