@@ -4,6 +4,14 @@ from typing import Any, List, Optional, Tuple
 
 import numpy as np
 
+# DATA_TYPE defines the structured dtype for OHLCV time series data.
+# Fields:
+#     datetime (datetime64[ns]): Timestamp of the data point.
+#     open (float): Opening price.
+#     high (float): Highest price during the interval.
+#     low (float): Lowest price during the interval.
+#     close (float): Closing price.
+#     volume (float): Trade volume.
 DATA_TYPE = np.dtype(
     [
         ("datetime", "datetime64[ns]"),
@@ -17,8 +25,12 @@ DATA_TYPE = np.dtype(
 
 
 class CandlestickPhase(Enum):
+    """Represents the phase of a candlestick."""
+
     OPEN = 1
+    """Open phase of a candlestick."""
     CLOSE = 2
+    """Close phase of a candlestick."""
 
 
 class Data:

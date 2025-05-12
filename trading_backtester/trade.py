@@ -7,8 +7,12 @@ from trading_backtester.position import PositionType
 
 
 class TradeType(Enum):
+    """Represents the type of trade."""
+
     OPEN = 1
+    """Open trade."""
     CLOSE = 2
+    """Close trade."""
 
 
 class Trade:

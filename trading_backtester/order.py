@@ -6,8 +6,12 @@ from .position import Position, PositionType
 
 
 class OrderAction(Enum):
+    """Represents the action when processing an order will be taken."""
+
     OPEN = 1
+    """Order to open a position."""
     CLOSE = 2
+    """Order to close a position."""
 
 
 class Order(ABC):

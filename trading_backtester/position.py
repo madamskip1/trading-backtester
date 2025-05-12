@@ -5,8 +5,12 @@ import numpy as np
 
 
 class PositionType(Enum):
+    """Represents the type of position."""
+
     LONG = 1
+    """Long position."""
     SHORT = 2
+    """Short position."""
 
 
 class Position:
