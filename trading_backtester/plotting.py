@@ -18,21 +18,21 @@ from trading_backtester.trade import Trade, TradeType
 
 class Plotting:
 
-    POSITIVE_BAR_COLOR = "green"
-    NEGATIVE_BAR_COLOR = "red"
+    __POSITIVE_BAR_COLOR = "green"
+    __NEGATIVE_BAR_COLOR = "red"
 
-    CANDLESTICK_BAR_WIDTH = 0.75
-    VOLUME_BAR_WIDTH = 0.95
-    SPACE_BETWEEN_PLOTS = 0.2
+    __CANDLESTICK_BAR_WIDTH = 0.75
+    __VOLUME_BAR_WIDTH = 0.95
+    __SPACE_BETWEEN_PLOTS = 0.2
 
-    EQUITY_PLOT_RATIO = 1
-    VOLUME_PLOT_RATIO = 1
-    PRICE_PLOT_RATIO = 3
+    __EQUITY_PLOT_RATIO = 1
+    __VOLUME_PLOT_RATIO = 1
+    __PRICE_PLOT_RATIO = 3
 
-    EQUITY_DRAWDOWN_THRESHOLD = 0.02
+    __EQUITY_DRAWDOWN_THRESHOLD = 0.02
 
-    LONG_TRADE_MARKER = "^"
-    SHORT_TRADE_MARKER = "v"
+    __LONG_TRADE_MARKER = "^"
+    __SHORT_TRADE_MARKER = "v"
 
     def __init__(self, data: Data, trades: List[Trade], account: Account):
         self.__figure: Optional[Figure] = None
@@ -92,17 +92,17 @@ class Plotting:
         if self.__should_draw_equity:
             ax_equity_index = num_of_plots
             num_of_plots += 1
-            height_ratios.append(self.EQUITY_PLOT_RATIO)
+            height_ratios.append(self.__EQUITY_PLOT_RATIO)
 
         if self.__should_draw_candlesticks or self.__should_draw_trades:
             ax_price_index = num_of_plots
             num_of_plots += 1
-            height_ratios.append(self.PRICE_PLOT_RATIO)
+            height_ratios.append(self.__PRICE_PLOT_RATIO)
 
         if self.__should_draw_volume:
             ax_volume_index = num_of_plots
             num_of_plots += 1
-            height_ratios.append(self.VOLUME_PLOT_RATIO)
+            height_ratios.append(self.__VOLUME_PLOT_RATIO)
 
         if num_of_plots == 0:
             raise ValueError("No plots to draw. Please enable at least one plot.")
@@ -114,7 +114,7 @@ class Plotting:
             1,
             sharex=True,
             gridspec_kw={
-                "hspace": self.SPACE_BETWEEN_PLOTS,
+                "hspace": self.__SPACE_BETWEEN_PLOTS,
                 "height_ratios": height_ratios,
             },
         )
@@ -183,7 +183,7 @@ class Plotting:
             ax.bar(
                 x,
                 data["volume"],
-                width=self.VOLUME_BAR_WIDTH,
+                width=self.__VOLUME_BAR_WIDTH,
                 color=color,
                 edgecolor="black",
                 zorder=2,
@@ -274,7 +274,7 @@ class Plotting:
         for i, drawdown in enumerate(drawdowns_percentages):
             if drawdown == 0.0:
                 if in_drawdown:
-                    if max_drawdown >= self.EQUITY_DRAWDOWN_THRESHOLD:
+                    if max_drawdown >= self.__EQUITY_DRAWDOWN_THRESHOLD:
                         ax.axvspan(last_peak, i - 1, color="red", alpha=0.2, zorder=1)
                     in_drawdown = False
                     max_drawdown = 0.0
@@ -284,7 +284,7 @@ class Plotting:
                 in_drawdown = True
                 max_drawdown = max(max_drawdown, drawdown)
 
-        if in_drawdown and max_drawdown >= self.EQUITY_DRAWDOWN_THRESHOLD:
+        if in_drawdown and max_drawdown >= self.__EQUITY_DRAWDOWN_THRESHOLD:
             ax.axvspan(
                 last_peak,
                 len(drawdowns_percentages) - 1,
@@ -304,13 +304,13 @@ class Plotting:
 
             body_low = min(data["open"], data["close"])
             body_height = abs(data["close"] - data["open"])
-            body_bottom_left = (x - self.CANDLESTICK_BAR_WIDTH / 2, body_low)
+            body_bottom_left = (x - self.__CANDLESTICK_BAR_WIDTH / 2, body_low)
 
             # Draw the body of the candlestick
             ax.add_patch(
                 Rectangle(
                     body_bottom_left,
-                    self.CANDLESTICK_BAR_WIDTH,
+                    self.__CANDLESTICK_BAR_WIDTH,
                     body_height,
                     facecolor=candlestick_color,
                     edgecolor="black",
@@ -433,9 +433,9 @@ class Plotting:
     ) -> Line2D:
         # def __draw_closed_trade_marker(self, ax: Axes, close_trade: Trade, datetime_to_x_axis: Dict[np.datetime64, int],) -> Line2D:
         marker = (
-            self.LONG_TRADE_MARKER
+            self.__LONG_TRADE_MARKER
             if position_type == PositionType.LONG
-            else self.SHORT_TRADE_MARKER
+            else self.__SHORT_TRADE_MARKER
         )
         color = self.__get_bar_color(open_price, close_price)
 
@@ -476,31 +476,33 @@ class Plotting:
         if had_profitable_long_trade:
             legend_elements.append(
                 self.__prepare_dummy_closed_trade_legend_marker(
-                    self.LONG_TRADE_MARKER,
+                    self.__LONG_TRADE_MARKER,
                     "Profitable Long Trade",
-                    self.POSITIVE_BAR_COLOR,
+                    self.__POSITIVE_BAR_COLOR,
                 )
             )
         if had_losing_long_trade:
             legend_elements.append(
                 self.__prepare_dummy_closed_trade_legend_marker(
-                    self.LONG_TRADE_MARKER, "Losing Long Trade", self.NEGATIVE_BAR_COLOR
+                    self.__LONG_TRADE_MARKER,
+                    "Losing Long Trade",
+                    self.__NEGATIVE_BAR_COLOR,
                 )
             )
         if had_profitable_short_trade:
             legend_elements.append(
                 self.__prepare_dummy_closed_trade_legend_marker(
-                    self.SHORT_TRADE_MARKER,
+                    self.__SHORT_TRADE_MARKER,
                     "Profitable Short Trade",
-                    self.POSITIVE_BAR_COLOR,
+                    self.__POSITIVE_BAR_COLOR,
                 )
             )
         if had_losing_short_trade:
             legend_elements.append(
                 self.__prepare_dummy_closed_trade_legend_marker(
-                    self.SHORT_TRADE_MARKER,
+                    self.__SHORT_TRADE_MARKER,
                     "Losing Short Trade",
-                    self.NEGATIVE_BAR_COLOR,
+                    self.__NEGATIVE_BAR_COLOR,
                 )
             )
 
@@ -525,9 +527,9 @@ class Plotting:
 
     def __get_bar_color(self, open_val: float, close_val: float) -> str:
         return (
-            self.POSITIVE_BAR_COLOR
+            self.__POSITIVE_BAR_COLOR
             if close_val >= open_val
-            else self.NEGATIVE_BAR_COLOR
+            else self.__NEGATIVE_BAR_COLOR
         )
 
     def __get_date_format(self) -> str:
