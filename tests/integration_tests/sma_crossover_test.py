@@ -7,9 +7,8 @@ import pytest
 from trading_backtester.backtester import Backtester
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.indicator import Indicator
-from trading_backtester.market import Market
 from trading_backtester.order import CloseOrder, OpenOrder, Order
-from trading_backtester.position import Position, PositionType
+from trading_backtester.position import PositionType
 from trading_backtester.strategy import Strategy
 
 
@@ -24,8 +23,8 @@ class SMAIndicator(Indicator):
 
 
 class SMACrossoverStrategy(Strategy):
-    def __init__(self, market: Market, positions: List[Position]):
-        super().__init__(market, positions)
+    def __init__(self):
+        super().__init__()
         self.short_sma = SMAIndicator(period=2)
         self.long_sma = SMAIndicator(period=3)
 

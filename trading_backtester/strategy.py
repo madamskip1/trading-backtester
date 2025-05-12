@@ -10,11 +10,11 @@ from trading_backtester.position import Position
 
 
 class Strategy:
-    def __init__(self, market: Market, account: Account, positions: List[Position]):
-        self.__positions = positions
+    def __init__(self):
+        self.__positions: List[Position]
         self.__candlesticks_to_skip = 0
-        self.__account = account
-        self.__market = market
+        self.__account: Account
+        self.__market: Market
 
     @property
     def _market(self) -> Market:
@@ -22,14 +22,17 @@ class Strategy:
 
     @property
     def _positions(self) -> Sequence[Position]:
+        assert self.__positions is not None, "Positions have not been set."
         return tuple(self.__positions)
 
     @property
     def _current_money(self) -> float:
+        assert self.__account is not None, "Account has not been set."
         return self.__account.get_current_money()
 
     @property
     def _current_equity(self) -> float:
+        assert self.__account is not None, "Account has not been set."
         return self.__account.get_current_equity()
 
     def collect_orders(
@@ -48,3 +51,12 @@ class Strategy:
 
     def candletsticks_to_skip(self) -> int:
         return self.__candlesticks_to_skip
+
+    def set_positions(self, positions: List[Position]) -> None:
+        self.__positions = positions
+
+    def set_account(self, account: Account) -> None:
+        self.__account = account
+
+    def set_market(self, market: Market) -> None:
+        self.__market = market

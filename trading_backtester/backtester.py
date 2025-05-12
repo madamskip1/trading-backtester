@@ -26,9 +26,10 @@ class Backtester:
             self.__broker.get_trades(), self.__account, benchmark
         )
 
-        self.__strategy = strategy(
-            Market(self.__data), self.__account, self.__broker.get_positions()
-        )
+        self.__strategy = strategy()
+        self.__strategy.set_account(self.__account)
+        self.__strategy.set_positions(self.__broker.get_positions())
+        self.__strategy.set_market(Market(self.__data))
         self.__strategy.prepare_indicators(self.__data)
 
     def run(self) -> None:
