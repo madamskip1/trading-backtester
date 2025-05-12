@@ -16,6 +16,23 @@ class TradeType(Enum):
 
 
 class Trade:
+    """Represents a completed trade.
+
+    This class is used to store the information of a completed trade.
+    It is used mainly for statistics and plotting.
+    It is not  directly involved in the backtesting process.
+
+    Attributes:
+        trade_type (TradeType): The type of trade (open or close).
+        position_type (PositionType): The type of position (long or short).
+        open_datetime (np.datetime64): The datetime when the trade was opened.
+        open_price (float): The price at which the trade was opened.
+        open_size (Optional[float]): The size of the trade when opened. Optional for close trades..
+        close_datetime (Optional[np.datetime64]): The datetime when the trade was closed. Optional for open trades.
+        close_price (Optional[float]): The price at which the trade was closed. Optional for open trades.
+        close_size (Optional[float]): The size of the trade when closed. Optional for open trades.
+        market_order (bool): Indicates whether the trade was a market order or a limit order.
+    """
 
     def __init__(
         self,
@@ -29,6 +46,20 @@ class Trade:
         close_size: Optional[float] = None,
         market_order: bool = False,
     ):
+        """Initializes a Trade object.
+
+        Args:
+            trade_type (TradeType): The type of trade (open or close).
+            position_type (PositionType): The type of position (long or short).
+            open_datetime (np.datetime64): The datetime when the trade was opened.
+            open_price (float): The price at which the trade was opened.
+            open_size (Optional[float]): The size of the trade when opened. Optional for close trades.
+            close_datetime (Optional[np.datetime64]): The datetime when the trade was closed. Optional for open trades.
+            close_price (Optional[float]): The price at which the trade was closed. Optional for open trades.
+            close_size (Optional[float]): The size of the trade when closed. Optional for open trades.
+            market_order (bool): Indicates whether the trade was a market order or a limit order.
+        """
+
         assert not (
             trade_type == TradeType.CLOSE
             and (close_price is None or close_size is None or close_datetime is None)
@@ -48,6 +79,12 @@ class Trade:
         self.market_order = market_order
 
     def calc_profit_loss(self) -> float:
+        """Calculates the profit/loss of the completed trade.
+
+        Returns:
+            float: The profit/loss of the trade.
+        """
+
         assert (
             self.trade_type == TradeType.CLOSE
         ), "Profit/loss can only be calculated for closed trades."
@@ -75,6 +112,15 @@ class OpenTrade(Trade):
         size: float,
         market_order: bool,
     ):
+        """Initializes an OpenTrade object.
+        Args:
+            position_type (PositionType): The type of position (long or short).
+            open_datetime (np.datetime64): The datetime when the trade was opened.
+            price (float): The price at which the trade was opened.
+            size (float): The size of the trade when opened.
+            market_order (bool): Indicates whether the trade was a market order or a limit order.
+        """
+
         super().__init__(
             trade_type=TradeType.OPEN,
             position_type=position_type,
@@ -86,6 +132,11 @@ class OpenTrade(Trade):
 
 
 class CloseTrade(Trade):
+    """Represents a closed trade.
+
+    Provides a convenient way for users to create a close trade.
+    """
+
     def __init__(
         self,
         position_type: PositionType,
@@ -96,6 +147,17 @@ class CloseTrade(Trade):
         close_size: float,
         market_order: bool,
     ):
+        """Initializes a CloseTrade object.
+
+        Args:
+            position_type (PositionType): The type of position (long or short).
+            open_datetime (np.datetime64): The datetime when the trade was opened.
+            open_price (float): The price at which the trade was opened.
+            close_datetime (np.datetime64): The datetime when the trade was closed.
+            close_price (float): The price at which the trade was closed.
+            close_size (float): The size of the trade when closed.
+            market_order (bool): Indicates whether the trade was a market order or a limit order.
+        """
         super().__init__(
             trade_type=TradeType.CLOSE,
             position_type=position_type,

@@ -11,6 +11,12 @@ from .trade import Trade, TradeType
 
 
 class Statistics:
+    """Class for calculating and returning backtest statistics.
+
+    This class calculates various statistics related to the backtest,
+    including the number of trades, final money, final asset value, final total equity,
+    and key indicators such as maximum drawdown, beta, alpha, and the strategy's return.
+    """
 
     @dataclass
     class __TradesCounters:
@@ -24,11 +30,27 @@ class Statistics:
     def __init__(
         self, trades: List[Trade], account: Account, benchmark: Optional[Data] = None
     ):
+        """Initializes the Statistics object.
+
+        Should be used after the backtest is completed.
+
+        Args:
+            trades (List[Trade]): List of trades made during the backtest.
+            account (Account): The account used for the backtest.
+            benchmark (Optional[Data]): Optional benchmark data for calculating beta and alpha.
+        """
+
         self.__trades = trades
         self.__account = account
         self.__benchmark = benchmark
 
     def get_stats(self) -> Dict[str, Any]:
+        """Calculates and returns various statistics related to the backtest.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing various statistics related to the backtest.
+        """
+
         max_drowdown, max_drawdown_percentage = self.__calc_max_drown()
         beta = self.__calc_beta()
 
@@ -53,6 +75,12 @@ class Statistics:
         }
 
     def __str__(self) -> str:
+        """Returns a string representation of the statistics in a human-readable format.
+
+        Returns:
+            str: A string representation of the statistics.
+        """
+
         stats = self.get_stats()
         return "\n".join(
             [

@@ -17,6 +17,10 @@ from trading_backtester.trade import Trade, TradeType
 
 
 class Plotting:
+    """Class for plotting the backtest results.
+
+    Used to visualize the backtest results, including equity, closed traes, and candlestick charts.
+    """
 
     __POSITIVE_BAR_COLOR = "green"
     __NEGATIVE_BAR_COLOR = "red"
@@ -35,6 +39,16 @@ class Plotting:
     __SHORT_TRADE_MARKER = "v"
 
     def __init__(self, data: Data, trades: List[Trade], account: Account):
+        """Initializes the Plotting object.
+
+        Should be used after the backtest is completed.
+
+        Args:
+            data (Data): The data used for the backtest.
+            trades (List[Trade]): List of trades made during the backtest.
+            account (Account): The account used for the backtest.
+        """
+
         self.__figure: Optional[Figure] = None
 
         self.__data = data
@@ -56,6 +70,16 @@ class Plotting:
         draw_trades: bool = True,
         annotations: bool = True,
     ) -> None:
+        """Configures the drawing options for the plots.
+
+        Args:
+            draw_candlesticks (bool): Whether to draw candlestick charts. Default is True.
+            draw_volume (bool): Whether to draw volume charts. Default is True.
+            draw_equity (bool): Whether to draw equity charts. Default is True.
+            draw_trades (bool): Whether to draw closed trades. Default is True.
+            annotations (bool): Whether to show annotations on the plots. Default is True.
+        """
+
         self.__should_draw_candlesticks = draw_candlesticks
         self.__should_draw_volume = draw_volume
         self.__should_draw_equity = draw_equity
@@ -65,16 +89,33 @@ class Plotting:
         self.__figure = None
 
     def get_figure(self) -> Figure:
+        """Returns the figure object.
+
+        This method returns the figure object, which can be used for further customization or saving by the user.
+
+        Returns:
+            Figure: The generated figure object.
+        """
+
         self.__prepare_figure()
         assert self.__figure is not None
         return self.__figure
 
     def show_plot(self) -> None:
+        """Displays the plot."""
+
         self.__prepare_figure()
         assert self.__figure is not None
         plt.show()
 
     def save_plot(self, file_path: str, **kwargs) -> None:
+        """Saves the plot to a file.
+
+        Args:
+            file_path (str): The path to save the plot.
+            **kwargs: Additional arguments to pass to the matplotlib savefig function.
+        """
+
         self.__prepare_figure()
         assert self.__figure is not None
         self.__figure.savefig(file_path, **kwargs)
