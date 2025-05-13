@@ -9,12 +9,26 @@ from .position import Position, PositionType
 
 
 class Broker:
+    """Represents the broker that handles orders and positions.
+
+    This class is used to manage the trading operations, including opening and closing positions,
+    processing orders, and managing the account balance.
+    """
+
     def __init__(
         self,
         data: Data,
         accout: Account,
         spread: float,
     ):
+        """Initializes a Broker object.
+
+        Args:
+            data (Data): The data object containing market data.
+            accout (Account): The account object representing the user's account.
+            spread (float): The spread value for the broker.
+        """
+
         self.__data = data
         self.__account = accout
         self.__spread = spread
@@ -23,12 +37,30 @@ class Broker:
         self.__limit_orders: List[Order] = []
 
     def get_trades(self) -> List[Trade]:
+        """Returns the list of trades executed by the user.
+
+        Returns:
+            List[Trade]: The list of trades executed by the user.
+        """
+
         return self.__trades
 
     def get_positions(self) -> List[Position]:
+        """Returns the list of positions held by the user.
+
+        Returns:
+            List[Position]: The list of positions held by the user.
+        """
+
         return self.__positions
 
     def get_assets_value(self) -> float:
+        """Returns the total value of the assets held by the user.
+
+        Returns:
+            float: The total value of the assets held by the user.
+        """
+
         assets_value = 0.0
         for position in self.__positions:
             assets_value += position.calc_value(self.__data.get_current_price())
@@ -36,6 +68,12 @@ class Broker:
         return assets_value
 
     def process_new_orders(self, new_orders: List[Order]) -> None:
+        """Processes new orders and executes them if possible.
+
+        Args:
+            new_orders (List[Order]): The list of new orders to process.
+        """
+
         if new_orders == []:
             return
 
@@ -58,6 +96,8 @@ class Broker:
                 self.__process_open_order(order, adjusted_price)
 
     def process_stop_losses(self) -> None:
+        """Processes stop loss orders and closes positions if necessary."""
+
         low_price = self.__data.get_current_low_price()
         high_price = self.__data.get_current_high_price()
 
@@ -87,6 +127,8 @@ class Broker:
             self.__process_close_order(order, price)
 
     def process_take_profits(self) -> None:
+        """Processes take profit orders and closes positions if necessary."""
+
         low_price = self.__data.get_current_low_price()
         high_price = self.__data.get_current_high_price()
 
@@ -115,6 +157,8 @@ class Broker:
             self.__process_close_order(order, price)
 
     def process_limit_orders(self) -> None:
+        """Processes limit orders and executes them if possible."""
+
         price = self.__data.get_current_price()
         low_price = self.__data.get_current_low_price()
         high_price = self.__data.get_current_high_price()

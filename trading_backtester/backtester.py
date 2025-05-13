@@ -11,6 +11,11 @@ from .strategy import Strategy
 
 
 class Backtester:
+    """Main class for the backtester.
+
+    This class is responsible for running the backtest and collecting statistics.
+    """
+
     def __init__(
         self,
         data: Data,
@@ -19,6 +24,20 @@ class Backtester:
         spread: float = 0.0,
         benchmark: Optional[Data] = None,
     ):
+        """Initializes a Backtester object.
+
+        Args:
+            data (Data): The data object containing market data.
+                strategy (Type[Strategy]): The trading strategy to be tested.
+            User should pass the type of the strategy class, not an instance.
+            money (float): The initial amount of money for the account. Default is 1000.0.
+            spread (float): The spread between the buy and sell prices.
+                Spread is applied twice - once at opening and once at closing the position.
+                For example, if the spread is 1.0 and the asset's price is 100.0,
+                the opening price will be 101.0 for long orders and 99.0 for short orders.
+            benchmark (Optional[Data]): Optional benchmark data for comparison (for example for beta, alpha indicators).
+        """
+
         self.__data = data
         self.__account = Account(data_size=len(data), initial_money=money)
         self.__broker = Broker(self.__data, self.__account, spread)
@@ -33,6 +52,11 @@ class Backtester:
         self.__strategy.prepare_indicators(self.__data)
 
     def run(self) -> None:
+        """Runs the backtest.
+
+        This method executes the trading strategy.
+        """
+
         for _ in range(self.__strategy.candletsticks_to_skip()):
             self.__account.update_assets_value(
                 self.__data.get_current_data_index(), 0.0
@@ -52,9 +76,25 @@ class Backtester:
             self.__data.increment_data_index()
 
     def get_statistics(self) -> Statistics:
+        """Returns the statistics of the backtest.
+
+        Should be called after the backtest is run.
+
+        Returns:
+            Statistics: The statistics object containing the results of the backtest.
+        """
+
         return self.__statistics
 
     def get_plotting(self) -> Plotting:
+        """Returns the plotting object for visualization of the backtest results.
+
+        Should be called after the backtest is run.
+
+        Returns:
+            Plotting: The plotting object for visualization.
+        """
+
         return Plotting(self.__data, self.__broker.get_trades(), self.__account)
 
     def __process_candlestick_phase(self, phase: CandlestickPhase) -> None:
