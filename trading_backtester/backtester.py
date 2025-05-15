@@ -52,6 +52,8 @@ class Backtester:
             benchmark=benchmark,
         )
 
+        self.__is_bankruptcy = False
+
         self.__strategy = strategy()
         self.__strategy.set_account(self.__account)
         self.__strategy.set_positions(self.__broker.get_positions())
@@ -69,29 +71,21 @@ class Backtester:
             self.__data.increment_data_index()
 
         for i in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
-            self.__data.set_candlestick_phase(CandlestickPhase.OPEN)
+            self.__process_candlestick_phase(CandlestickPhase.OPEN)
 
-            if self.__check_bankruptcy():
+            if self.__is_bankruptcy:
                 self.process_bankruptcy(i)
                 break
 
-            self.__process_candlestick_phase()
+            self.__process_candlestick_phase(CandlestickPhase.CLOSE)
 
-            self.__data.set_candlestick_phase(CandlestickPhase.CLOSE)
-
-            if self.__check_bankruptcy():
+            if self.__is_bankruptcy:
                 self.process_bankruptcy(i)
                 break
-
-            self.__process_candlestick_phase()
 
             self.__equity_log[i + 1] = (
                 self.__account.current_money + self.__broker.get_assets_value()
             )
-
-            if self.__check_bankruptcy():
-                self.process_bankruptcy(i)
-                break
 
             self.__data.increment_data_index()
 
@@ -143,12 +137,18 @@ class Backtester:
     def process_bankruptcy(self, data_index: int) -> None:
         self.__equity_log[data_index + 1 :] = 0.0
 
-    def __process_candlestick_phase(self) -> None:
+    def __process_candlestick_phase(self, phase: CandlestickPhase) -> None:
+        self.__data.set_candlestick_phase(phase)
+
+        if self.__check_bankruptcy():
+            self.__is_bankruptcy = True
+            return
+
         self.__broker.process_stop_losses()
         self.__broker.process_take_profits()
 
         new_orders = self.__strategy.collect_orders(
-            self.__data.get_candlestick_phase(),
+            phase,
             self.__data.get_current_price(),
             self.__data.get_current_datatime(),
         )
