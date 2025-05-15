@@ -1,46 +1,13 @@
-from typing import Any, List, Union
-
-import numpy as np
 import pytest
 
 from trading_backtester.account import Account
 from trading_backtester.broker import Broker
 from trading_backtester.data import Data
-from trading_backtester.stats import Statistics
-
-
-class AccountMock(Account):
-    def __init__(self):
-        super().__init__(data_size=1, initial_money=0.0)
-
-    def set_current_money(self, amount: float):
-        self._current_money = amount
-
-    def set_assets_value(
-        self, values: Union[np.ndarray[Any, np.dtype[Any]], List[float]]
-    ):
-        if isinstance(values, np.ndarray):
-            self._assets_value = values
-        else:
-            self._assets_value = np.array(values, dtype=float)
-
-    def set_equity(self, values: Union[np.ndarray[Any, np.dtype[Any]], List[float]]):
-        if isinstance(values, np.ndarray):
-            self._equity = values
-        else:
-            self._equity = np.array(values, dtype=float)
-
-        self._initial_money = self._equity[0]
-
-
-@pytest.fixture
-def account_mock() -> AccountMock:
-    return AccountMock()
 
 
 @pytest.fixture
 def test_account() -> Account:
-    return Account(data_size=1, initial_money=100)
+    return Account(initial_money=100)
 
 
 @pytest.fixture
@@ -51,8 +18,3 @@ def spread() -> float:  # if not provided assume no spread
 @pytest.fixture
 def test_broker(test_data: Data, test_account: Account, spread: float) -> Broker:
     return Broker(data=test_data, accout=test_account, spread=spread)
-
-
-@pytest.fixture
-def test_statistics(account_mock: AccountMock) -> Statistics:
-    return Statistics(account=account_mock, trades=[])

@@ -1,5 +1,7 @@
 from typing import Optional, Type
 
+import numpy as np
+
 from trading_backtester.plotting import Plotting
 
 from .account import Account
@@ -39,10 +41,15 @@ class Backtester:
         """
 
         self.__data = data
-        self.__account = Account(data_size=len(data), initial_money=money)
+        self.__account = Account(initial_money=money)
         self.__broker = Broker(self.__data, self.__account, spread)
+        self.__equity_log = np.zeros(len(self.__data) + 1, dtype=float)
+        self.__equity_log[0] = money
         self.__statistics = Statistics(
-            self.__broker.get_trades(), self.__account, benchmark
+            trades=self.__broker.get_trades(),
+            equity_log=self.__equity_log,
+            account=self.__account,
+            benchmark=benchmark,
         )
 
         self.__strategy = strategy()
@@ -57,21 +64,17 @@ class Backtester:
         This method executes the trading strategy.
         """
 
-        for _ in range(self.__strategy.candletsticks_to_skip()):
-            self.__account.update_assets_value(
-                self.__data.get_current_data_index(), 0.0
-            )
-            self.__account.calculate_equity(self.__data.get_current_data_index())
+        for i in range(self.__strategy.candletsticks_to_skip()):
+            self.__equity_log[i + 1] = self.__equity_log[0]
             self.__data.increment_data_index()
 
-        for _ in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
+        for i in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
             self.__process_candlestick_phase(CandlestickPhase.OPEN)
             self.__process_candlestick_phase(CandlestickPhase.CLOSE)
 
-            self.__account.update_assets_value(
-                self.__data.get_current_data_index(), self.__broker.get_assets_value()
+            self.__equity_log[i + 1] = (
+                self.__account.current_money + self.__broker.get_assets_value()
             )
-            self.__account.calculate_equity(self.__data.get_current_data_index())
 
             self.__data.increment_data_index()
 
@@ -95,7 +98,7 @@ class Backtester:
             Plotting: The plotting object for visualization.
         """
 
-        return Plotting(self.__data, self.__broker.get_trades(), self.__account)
+        return Plotting(self.__data, self.__broker.get_trades(), self.__equity_log)
 
     def __process_candlestick_phase(self, phase: CandlestickPhase) -> None:
         self.__data.set_candlestick_phase(phase)

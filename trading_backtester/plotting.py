@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -10,7 +10,6 @@ from matplotlib.patches import Rectangle
 from matplotlib.text import Annotation
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 
-from trading_backtester.account import Account
 from trading_backtester.data import Data
 from trading_backtester.position import PositionType
 from trading_backtester.trade import Trade, TradeType
@@ -38,7 +37,12 @@ class Plotting:
     __LONG_TRADE_MARKER = "^"
     __SHORT_TRADE_MARKER = "v"
 
-    def __init__(self, data: Data, trades: List[Trade], account: Account):
+    def __init__(
+        self,
+        data: Data,
+        trades: List[Trade],
+        equity_log: np.ndarray[Any, np.dtype[Any]],
+    ):
         """Initializes the Plotting object.
 
         Should be used after the backtest is completed.
@@ -46,14 +50,14 @@ class Plotting:
         Args:
             data (Data): The data used for the backtest.
             trades (List[Trade]): List of trades made during the backtest.
-            account (Account): The account used for the backtest.
+            equity_log (np.ndarray): Array containing the equity log of the backtest.
         """
 
         self.__figure: Optional[Figure] = None
 
         self.__data = data
         self.__trades = trades
-        self.__account = account
+        self.__equity_log = equity_log
 
         self.__should_draw_candlesticks: bool
         self.__should_draw_volume: bool
@@ -237,12 +241,12 @@ class Plotting:
         ax_right.set_ylabel("Equity %")
         ax.grid(True, axis="y")
 
-        equity = self.__account.get_equity()
+        ax.plot(self.__equity_log, zorder=11, color="blue")
+        scatter = ax.scatter(
+            np.arange(len(self.__equity_log)), self.__equity_log, s=10, alpha=0
+        )
 
-        ax.plot(equity, zorder=11, color="blue")
-        scatter = ax.scatter(np.arange(len(equity)), equity, s=10, alpha=0)
-
-        percent_equity = equity / equity[0] * 100
+        percent_equity = self.__equity_log / self.__equity_log[0] * 100
         ax_right.set_ylim(
             percent_equity.min() - percent_equity.min() * 0.05,
             percent_equity.max() + percent_equity.max() * 0.05,
@@ -250,8 +254,8 @@ class Plotting:
         formatter = FuncFormatter(lambda y, _: f"{y:.1f}%")
         ax_right.yaxis.set_major_formatter(formatter)
 
-        peaks = np.maximum.accumulate(equity)
-        drawdowns = equity - peaks
+        peaks = np.maximum.accumulate(self.__equity_log)
+        drawdowns = self.__equity_log - peaks
         drawdowns_percentages = np.abs(drawdowns / peaks)
 
         self.__draw_equity_drawdown(ax, drawdowns_percentages)
@@ -295,7 +299,7 @@ class Plotting:
                     return
 
                 equity_annotation.xy = pos
-                value = equity[idx]
+                value = self.__equity_log[idx]
                 drawdown = drawdowns[idx]
                 drawdown_percentage = drawdowns_percentages[idx] * 100
                 equity_annotation.set_text(

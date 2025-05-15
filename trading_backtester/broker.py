@@ -184,8 +184,7 @@ class Broker:
 
     def __process_open_order(self, order: Order, price: float) -> None:
         money = order.size * price
-
-        if self.__account.get_current_money() < money:
+        if not self.__account.has_enough_money(money):
             return
 
         self.__positions.append(

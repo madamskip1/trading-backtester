@@ -1,12 +1,11 @@
 from typing import List, Optional
 
+import numpy as np
 import pytest
 
+from trading_backtester.account import Account
 from trading_backtester.data import Data
 from trading_backtester.stats import Statistics
-from trading_backtester.trade import Trade
-
-from ..conftest import AccountMock
 
 
 @pytest.mark.parametrize(
@@ -93,14 +92,17 @@ from ..conftest import AccountMock
     ],
 )
 def test_beta(
-    account_mock: AccountMock,
+    test_account: Account,
     test_data: Data,
     equity: List[float],
     expected_beta: Optional[float],
 ):
-    trades: List[Trade] = []
-    statistics = Statistics(trades, account_mock, benchmark=test_data)
-    account_mock.set_equity(equity)
+    statistics = Statistics(
+        trades=[],
+        equity_log=np.array(equity),
+        account=test_account,
+        benchmark=test_data,
+    )
 
     stats = statistics.get_stats()
     assert stats["beta"] == expected_beta

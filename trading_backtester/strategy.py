@@ -78,18 +78,7 @@ class Strategy:
         """
 
         assert self.__account is not None, "Account has not been set."
-        return self.__account.get_current_money()
-
-    @property
-    def _current_equity(self) -> float:
-        """Returns the current equity in the account.
-
-        Provides the user with a way to check the total equity in the account.
-        This includes the current money and the value of all open positions.
-        """
-
-        assert self.__account is not None, "Account has not been set."
-        return self.__account.get_current_equity()
+        return self.__account.current_money
 
     def candletsticks_to_skip(self) -> int:
         """Returns the number of candlesticks to skip.
