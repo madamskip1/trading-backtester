@@ -69,12 +69,29 @@ class Backtester:
             self.__data.increment_data_index()
 
         for i in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
-            self.__process_candlestick_phase(CandlestickPhase.OPEN)
-            self.__process_candlestick_phase(CandlestickPhase.CLOSE)
+            self.__data.set_candlestick_phase(CandlestickPhase.OPEN)
+
+            if self.__check_bankruptcy():
+                self.process_bankruptcy(i)
+                break
+
+            self.__process_candlestick_phase()
+
+            self.__data.set_candlestick_phase(CandlestickPhase.CLOSE)
+
+            if self.__check_bankruptcy():
+                self.process_bankruptcy(i)
+                break
+
+            self.__process_candlestick_phase()
 
             self.__equity_log[i + 1] = (
                 self.__account.current_money + self.__broker.get_assets_value()
             )
+
+            if self.__check_bankruptcy():
+                self.process_bankruptcy(i)
+                break
 
             self.__data.increment_data_index()
 
@@ -100,14 +117,38 @@ class Backtester:
 
         return Plotting(self.__data, self.__broker.get_trades(), self.__equity_log)
 
-    def __process_candlestick_phase(self, phase: CandlestickPhase) -> None:
-        self.__data.set_candlestick_phase(phase)
+    def __check_bankruptcy(self) -> bool:
+        if (self.__account.current_money + self.__broker.get_assets_value()) <= 0.0:
+            return True
 
+        if self.__data.get_candlestick_phase() == CandlestickPhase.CLOSE:
+            if (
+                self.__account.current_money
+                + self.__broker.get_assets_value_at_price(
+                    self.__data.get_current_low_price()
+                )
+            ) <= 0.0:
+                return True
+
+            if (
+                self.__account.current_money
+                + self.__broker.get_assets_value_at_price(
+                    self.__data.get_current_high_price()
+                )
+            ) <= 0.0:
+                return True
+
+        return False
+
+    def process_bankruptcy(self, data_index: int) -> None:
+        self.__equity_log[data_index + 1 :] = 0.0
+
+    def __process_candlestick_phase(self) -> None:
         self.__broker.process_stop_losses()
         self.__broker.process_take_profits()
 
         new_orders = self.__strategy.collect_orders(
-            phase,
+            self.__data.get_candlestick_phase(),
             self.__data.get_current_price(),
             self.__data.get_current_datatime(),
         )

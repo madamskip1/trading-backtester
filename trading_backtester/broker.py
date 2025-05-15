@@ -67,6 +67,22 @@ class Broker:
 
         return assets_value
 
+    def get_assets_value_at_price(self, price: float) -> float:
+        """Returns the total value of the assets held by the user at a given price.
+
+        Args:
+            price (float): The price at which to calculate the value of the assets.
+
+        Args:
+            price (float): The price at which to calculate the value of the assets.
+        """
+
+        assets_value = 0.0
+        for position in self.__positions:
+            assets_value += position.calc_value(price)
+
+        return assets_value
+
     def process_new_orders(self, new_orders: List[Order]) -> None:
         """Processes new orders and executes them if possible.
 
