@@ -28,7 +28,11 @@ class Statistics:
         total_close_short_trades: int = 0
 
     def __init__(
-        self, trades: List[Trade], account: Account, benchmark: Optional[Data] = None
+        self,
+        trades: List[Trade],
+        equity_log: np.ndarray[Any, np.dtype[Any]],
+        account: Account,
+        benchmark: Optional[Data] = None,
     ):
         """Initializes the Statistics object.
 
@@ -36,12 +40,14 @@ class Statistics:
 
         Args:
             trades (List[Trade]): List of trades made during the backtest.
+            equity_log (np.ndarray): Array containing the equity log of the backtest.
             account (Account): The account used for the backtest.
             benchmark (Optional[Data]): Optional benchmark data for calculating beta and alpha.
         """
 
-        self.__trades = trades
         self.__account = account
+        self.__trades = trades
+        self.__equity_log = equity_log
         self.__benchmark = benchmark
 
     def get_stats(self) -> Dict[str, Any]:
@@ -53,8 +59,9 @@ class Statistics:
 
         max_drowdown, max_drawdown_percentage = self.__calc_max_drown()
         beta = self.__calc_beta()
-
         trades_counters = self.__get_trades_counters()
+        return_value = self.__equity_log[-1] - self.__equity_log[0]
+        return_value_percentage = return_value / self.__equity_log[0] * 100
 
         return {
             "total_trades": len(self.__trades),
@@ -64,10 +71,11 @@ class Statistics:
             "total_close_long_trades": trades_counters.total_close_long_trades,
             "total_open_short_trades": trades_counters.total_open_short_trades,
             "total_close_short_trades": trades_counters.total_close_short_trades,
-            "final_money": self.__account.get_current_money(),
-            "final_assets_value": self.__account.get_final_assets_value(),
-            "final_total_equity": self.__account.get_final_equity(),
-            "return": self.__account.calc_return_value(),
+            "final_money": self.__account.current_money,
+            "final_assets_value": self.__equity_log[-1] - self.__account.current_money,
+            "final_total_equity": self.__equity_log[-1],
+            "return": return_value,
+            "return_percentage": return_value_percentage,
             "max_drawdown": max_drowdown,
             "max_drawdown_percentage": max_drawdown_percentage,
             "beta": beta,
@@ -93,9 +101,8 @@ class Statistics:
                 f"Total open short trades: {stats['total_open_short_trades']}",
                 f"Total close short trades: {stats['total_close_short_trades']}",
                 f"Final money: {stats['final_money']}",
-                f"Final assets value: {stats['final_assets_value']}",
                 f"Final total equity: {stats['final_total_equity']}",
-                f"Return: {stats['return']} ({(stats['return'] / self.__account.get_initial_money() * 100):.2f}%)",
+                f"Return: {stats['return']} ({(stats['return_percentage']):.2f}%)",
                 f"Max drawdown: {stats['max_drawdown']} ({stats['max_drawdown_percentage']:.2f}%)",
             ]
         )
@@ -103,9 +110,9 @@ class Statistics:
     def __calc_max_drown(self) -> Tuple[float, float]:
         max_drawdown = 0.0
         max_drawdown_percentage = 0.0
-        peak = self.__account.get_initial_money()
+        peak = self.__equity_log[0]
 
-        for equity in self.__account.get_equity():
+        for equity in self.__equity_log:
             if equity > peak:
                 peak = equity
 
@@ -126,9 +133,7 @@ class Statistics:
         )
         benchmark_returns = np.diff(benchmark_data) / benchmark_data[:-1]
 
-        equity_returns = (
-            np.diff(self.__account.get_equity()) / self.__account.get_equity()[:-1]
-        )
+        equity_returns = np.diff(self.__equity_log) / self.__equity_log[:-1]
 
         if len(benchmark_returns) < 2 or len(equity_returns) < 2:
             return None
@@ -148,8 +153,8 @@ class Statistics:
             return None
 
         equity_return = (
-            self.__account.calc_return_value() / self.__account.get_initial_money()
-        )
+            self.__equity_log[-1] - self.__equity_log[0]
+        ) / self.__equity_log[0]
         benchmark_return = (
             self.__benchmark.close[-1] - self.__benchmark.open[0]
         ) / self.__benchmark.open[0]

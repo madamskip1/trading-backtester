@@ -1,5 +1,7 @@
 from typing import Optional, Type
 
+import numpy as np
+
 from trading_backtester.plotting import Plotting
 
 from .account import Account
@@ -39,11 +41,18 @@ class Backtester:
         """
 
         self.__data = data
-        self.__account = Account(data_size=len(data), initial_money=money)
+        self.__account = Account(initial_money=money)
         self.__broker = Broker(self.__data, self.__account, spread)
+        self.__equity_log = np.zeros(len(self.__data) + 1, dtype=float)
+        self.__equity_log[0] = money
         self.__statistics = Statistics(
-            self.__broker.get_trades(), self.__account, benchmark
+            trades=self.__broker.get_trades(),
+            equity_log=self.__equity_log,
+            account=self.__account,
+            benchmark=benchmark,
         )
+
+        self.__is_bankruptcy = False
 
         self.__strategy = strategy()
         self.__strategy.set_account(self.__account)
@@ -57,21 +66,26 @@ class Backtester:
         This method executes the trading strategy.
         """
 
-        for _ in range(self.__strategy.candletsticks_to_skip()):
-            self.__account.update_assets_value(
-                self.__data.get_current_data_index(), 0.0
-            )
-            self.__account.calculate_equity(self.__data.get_current_data_index())
+        for i in range(self.__strategy.candletsticks_to_skip()):
+            self.__equity_log[i + 1] = self.__equity_log[0]
             self.__data.increment_data_index()
 
-        for _ in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
+        for i in range(self.__strategy.candletsticks_to_skip(), len(self.__data)):
             self.__process_candlestick_phase(CandlestickPhase.OPEN)
+
+            if self.__is_bankruptcy:
+                self.process_bankruptcy(i)
+                break
+
             self.__process_candlestick_phase(CandlestickPhase.CLOSE)
 
-            self.__account.update_assets_value(
-                self.__data.get_current_data_index(), self.__broker.get_assets_value()
+            if self.__is_bankruptcy:
+                self.process_bankruptcy(i)
+                break
+
+            self.__equity_log[i + 1] = (
+                self.__account.current_money + self.__broker.get_assets_value()
             )
-            self.__account.calculate_equity(self.__data.get_current_data_index())
 
             self.__data.increment_data_index()
 
@@ -95,10 +109,40 @@ class Backtester:
             Plotting: The plotting object for visualization.
         """
 
-        return Plotting(self.__data, self.__broker.get_trades(), self.__account)
+        return Plotting(self.__data, self.__broker.get_trades(), self.__equity_log)
+
+    def __check_bankruptcy(self) -> bool:
+        if (self.__account.current_money + self.__broker.get_assets_value()) <= 0.0:
+            return True
+
+        if self.__data.get_candlestick_phase() == CandlestickPhase.CLOSE:
+            if (
+                self.__account.current_money
+                + self.__broker.get_assets_value_at_price(
+                    self.__data.get_current_low_price()
+                )
+            ) <= 0.0:
+                return True
+
+            if (
+                self.__account.current_money
+                + self.__broker.get_assets_value_at_price(
+                    self.__data.get_current_high_price()
+                )
+            ) <= 0.0:
+                return True
+
+        return False
+
+    def process_bankruptcy(self, data_index: int) -> None:
+        self.__equity_log[data_index + 1 :] = 0.0
 
     def __process_candlestick_phase(self, phase: CandlestickPhase) -> None:
         self.__data.set_candlestick_phase(phase)
+
+        if self.__check_bankruptcy():
+            self.__is_bankruptcy = True
+            return
 
         self.__broker.process_stop_losses()
         self.__broker.process_take_profits()

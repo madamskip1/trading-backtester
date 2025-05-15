@@ -34,7 +34,7 @@ def test_open_long_single(test_account: Account, test_broker: Broker):
 
     assert test_broker.get_assets_value() == pytest.approx(100.0, abs=0.01)
 
-    assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(0.0, abs=0.01)
 
 
 @pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, None, None)]])
@@ -83,7 +83,7 @@ def test_open_long_multiple_in_single_process(
 
     assert test_broker.get_assets_value() == pytest.approx(75.0, abs=0.01)
 
-    assert test_account.get_current_money() == pytest.approx(25.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(25.0, abs=0.01)
 
 
 @pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0, None)]])
@@ -135,7 +135,7 @@ def test_open_long_multiple_in_multiple_processes(
 
     assert test_broker.get_assets_value() == pytest.approx(75.0, abs=0.01)
 
-    assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(0.0, abs=0.01)
 
 
 @pytest.mark.parametrize("market_data", [[(None, 100.0, None, None, None, None)]])
@@ -165,7 +165,7 @@ def test_open_short_single(test_account: Account, test_broker: Broker):
 
     assert test_broker.get_assets_value() == pytest.approx(100.0, abs=0.01)
 
-    assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(0.0, abs=0.01)
 
 
 @pytest.mark.parametrize("market_data", [[(None, 25.0, None, None, None, None)]])
@@ -211,7 +211,7 @@ def test_open_short_multiple_in_single_process(
 
     assert test_broker.get_assets_value() == pytest.approx(75.0, abs=0.01)
 
-    assert test_account.get_current_money() == pytest.approx(25.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(25.0, abs=0.01)
 
 
 @pytest.mark.parametrize("market_data", [[(None, 50.0, None, None, 25.0, None)]])
@@ -260,7 +260,7 @@ def test_open_short_multiple_in_multiple_processes(
 
     assert test_broker.get_assets_value() == pytest.approx(125.0, abs=0.01)
 
-    assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(0.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -294,7 +294,7 @@ def test_open_long_with_spread(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(90.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(7.8, abs=0.01)
+    assert test_account.current_money == pytest.approx(7.8, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -327,4 +327,4 @@ def test_open_short_with_spread(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(85.6, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(12.2, abs=0.01)
+    assert test_account.current_money == pytest.approx(12.2, abs=0.01)

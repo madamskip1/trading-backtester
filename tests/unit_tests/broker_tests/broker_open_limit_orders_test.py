@@ -35,7 +35,7 @@ def test_open_long_on_close(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(90.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(10.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(10.0, abs=0.01)
 
 
 @pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 85.0, 90.0, None)]])
@@ -65,7 +65,7 @@ def test_open_long_during_day(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(90.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(10.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(10.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -103,7 +103,7 @@ def test_open_long_on_open_equal(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(90.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(10.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(10.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -141,7 +141,7 @@ def test_open_long_on_open_less(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(85.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(15.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(15.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -165,7 +165,7 @@ def test_open_long_on_open_greater_not_opened(
     assert len(test_broker.get_trades()) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(100.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(100.0, abs=0.01)
 
 
 @pytest.mark.parametrize("market_data", [[(None, 90.0, 100.0, 90.0, 100.0, None)]])
@@ -195,7 +195,7 @@ def test_open_short_on_close(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(100.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(0.0, abs=0.01)
 
 
 @pytest.mark.parametrize("market_data", [[(None, 90.0, 105.0, 90.0, 100.0, None)]])
@@ -225,7 +225,7 @@ def test_open_short_during_day(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(100.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(0.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -263,7 +263,7 @@ def test_open_short_on_open_equal(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(100.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(0.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -301,7 +301,7 @@ def test_open_short_on_open_less(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(100.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(0.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -325,7 +325,7 @@ def test_open_short_on_open_greater_not_opened(
     assert len(test_broker.get_trades()) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(100.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(100.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -345,7 +345,7 @@ def test_open_long_with_spread_exact_price(
     assert len(test_broker.get_trades()) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(100.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(100.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -379,7 +379,7 @@ def test_open_long_with_spread_enough_price(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(87.8, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(10.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(10.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -399,7 +399,7 @@ def test_open_short_with_spread_exact_price(
     assert len(test_broker.get_trades()) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(100.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(100.0, abs=0.01)
 
 
 @pytest.mark.parametrize(
@@ -433,4 +433,4 @@ def test_open_short_with_spread_enough_price(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(92.8, abs=0.01)
-    assert test_account.get_current_money() == pytest.approx(5.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(5.0, abs=0.01)

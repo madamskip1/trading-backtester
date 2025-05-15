@@ -309,3 +309,121 @@ def test_stop_loss_on_open_equal_short():
     assert stats["return"] == pytest.approx(0.0, abs=0.01)
     assert stats["max_drawdown"] == pytest.approx(0.5, abs=0.01)
     assert stats["max_drawdown_percentage"] == pytest.approx(0.5, abs=0.01)
+
+
+def test_bankruptcy_on_open_equal_short():
+    data_array = [
+        (None, 100.0, 150.0, 100.0, 150.0, None),
+        (None, 200.0, 200.0, 50.0, 50.0, None),
+    ]
+
+    data = Data.from_array(data_array)
+    backtest = Backtester(
+        data,
+        ShortOnOpenStrategy,
+        money=100.0,
+    )
+    backtest.run()
+
+    stats = backtest.get_statistics().get_stats()
+    assert stats["total_trades"] == 1
+    assert stats["total_open_trades"] == 1
+    assert stats["total_close_trades"] == 0
+    assert stats["total_open_long_trades"] == 0
+    assert stats["total_close_long_trades"] == 0
+    assert stats["total_open_short_trades"] == 1
+    assert stats["total_close_short_trades"] == 0
+    assert stats["final_money"] == pytest.approx(0.0, abs=0.01)
+    assert stats["final_assets_value"] == pytest.approx(0.0, abs=0.01)
+    assert stats["final_total_equity"] == pytest.approx(0.0, abs=0.01)
+    assert stats["return"] == pytest.approx(-100.0, abs=0.01)
+    assert stats["max_drawdown"] == pytest.approx(100.0, abs=0.01)
+    assert stats["max_drawdown_percentage"] == pytest.approx(100.0, abs=0.01)
+
+
+def test_bankruptcy_on_open_greater_short():
+    data_array = [
+        (None, 100.0, 150.0, 100.0, 150.0, None),
+        (None, 220.0, 220.0, 50.0, 50.0, None),
+    ]
+
+    data = Data.from_array(data_array)
+    backtest = Backtester(
+        data,
+        ShortOnOpenStrategy,
+        money=100.0,
+    )
+    backtest.run()
+
+    stats = backtest.get_statistics().get_stats()
+    assert stats["total_trades"] == 1
+    assert stats["total_open_trades"] == 1
+    assert stats["total_close_trades"] == 0
+    assert stats["total_open_long_trades"] == 0
+    assert stats["total_close_long_trades"] == 0
+    assert stats["total_open_short_trades"] == 1
+    assert stats["total_close_short_trades"] == 0
+    assert stats["final_money"] == pytest.approx(0.0, abs=0.01)
+    assert stats["final_assets_value"] == pytest.approx(0.0, abs=0.01)
+    assert stats["final_total_equity"] == pytest.approx(0.0, abs=0.01)
+    assert stats["return"] == pytest.approx(-100.0, abs=0.01)
+    assert stats["max_drawdown"] == pytest.approx(100.0, abs=0.01)
+    assert stats["max_drawdown_percentage"] == pytest.approx(100.0, abs=0.01)
+
+
+def test_bankruptcy_on_close_short():
+    data_array = [
+        (None, 100.0, 200.0, 100.0, 200.0, None),
+    ]
+
+    data = Data.from_array(data_array)
+    backtest = Backtester(
+        data,
+        ShortOnOpenStrategy,
+        money=100.0,
+    )
+    backtest.run()
+
+    stats = backtest.get_statistics().get_stats()
+    assert stats["total_trades"] == 1
+    assert stats["total_open_trades"] == 1
+    assert stats["total_close_trades"] == 0
+    assert stats["total_open_long_trades"] == 0
+    assert stats["total_close_long_trades"] == 0
+    assert stats["total_open_short_trades"] == 1
+    assert stats["total_close_short_trades"] == 0
+    assert stats["final_money"] == pytest.approx(0.0, abs=0.01)
+    assert stats["final_assets_value"] == pytest.approx(0.0, abs=0.01)
+    assert stats["final_total_equity"] == pytest.approx(0.0, abs=0.01)
+    assert stats["return"] == pytest.approx(-100.0, abs=0.01)
+    assert stats["max_drawdown"] == pytest.approx(100.0, abs=0.01)
+    assert stats["max_drawdown_percentage"] == pytest.approx(100.0, abs=0.01)
+
+
+def test_bankruptcy_during_day_short():
+    data_array = [
+        (None, 100.0, 220.0, 100.0, 180.0, None),
+    ]
+
+    data = Data.from_array(data_array)
+    backtest = Backtester(
+        data,
+        ShortOnOpenStrategy,
+        money=100.0,
+    )
+    backtest.run()
+
+    stats = backtest.get_statistics().get_stats()
+    assert stats["total_trades"] == 1
+    assert stats["total_open_trades"] == 1
+    assert stats["total_close_trades"] == 0
+    assert stats["total_open_long_trades"] == 0
+    assert stats["total_close_long_trades"] == 0
+    assert stats["total_open_short_trades"] == 1
+    assert stats["total_close_short_trades"] == 0
+    assert stats["final_money"] == pytest.approx(0.0, abs=0.01)
+    assert stats["final_assets_value"] == pytest.approx(0.0, abs=0.01)
+    assert stats["final_total_equity"] == pytest.approx(0.0, abs=0.01)
+    assert stats["return"] == pytest.approx(-100.0, abs=0.01)
+    assert stats["max_drawdown"] == pytest.approx(100.0, abs=0.01)
+    assert stats["max_drawdown_percentage"] == pytest.approx(100.0, abs=0.01)

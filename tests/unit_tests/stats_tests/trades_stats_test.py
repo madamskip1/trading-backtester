@@ -2,16 +2,17 @@ from typing import List
 
 import numpy as np
 
+from trading_backtester.account import Account
 from trading_backtester.position import PositionType
 from trading_backtester.stats import Statistics
 from trading_backtester.trade import CloseTrade, OpenTrade, Trade
 
-from ..conftest import AccountMock
 
-
-def test_open_long_position(account_mock: AccountMock):
+def test_open_long_position(test_account: Account):
     trades: List[Trade] = []
-    statistics = Statistics(trades, account_mock)
+    statistics = Statistics(
+        trades=trades, account=test_account, equity_log=np.array([-1])
+    )
 
     trades.append(
         OpenTrade(
@@ -32,13 +33,13 @@ def test_open_long_position(account_mock: AccountMock):
     assert stats["total_close_long_trades"] == 0
     assert stats["total_open_short_trades"] == 0
     assert stats["total_close_short_trades"] == 0
-    assert stats["max_drawdown"] == 0
-    assert stats["max_drawdown_percentage"] == 0
 
 
-def test_open_short_position(account_mock: AccountMock):
+def test_open_short_position(test_account: Account):
     trades: List[Trade] = []
-    statistics = Statistics(trades, account_mock)
+    statistics = Statistics(
+        trades=trades, account=test_account, equity_log=np.array([-1])
+    )
 
     trades.append(
         OpenTrade(
@@ -61,9 +62,11 @@ def test_open_short_position(account_mock: AccountMock):
     assert stats["total_close_short_trades"] == 0
 
 
-def test_close_long_position(account_mock: AccountMock):
+def test_close_long_position(test_account: Account):
     trades: List[Trade] = []
-    statistics = Statistics(trades, account_mock)
+    statistics = Statistics(
+        trades=trades, account=test_account, equity_log=np.array([-1])
+    )
 
     trades.append(
         CloseTrade(
@@ -88,9 +91,11 @@ def test_close_long_position(account_mock: AccountMock):
     assert stats["total_close_short_trades"] == 0
 
 
-def test_close_short_position(account_mock: AccountMock):
+def test_close_short_position(test_account: Account):
     trades: List[Trade] = []
-    statistics = Statistics(trades, account_mock)
+    statistics = Statistics(
+        trades=trades, account=test_account, equity_log=np.array([-1])
+    )
 
     trades.append(
         CloseTrade(
@@ -115,9 +120,11 @@ def test_close_short_position(account_mock: AccountMock):
     assert stats["total_close_short_trades"] == 1
 
 
-def test_open_and_close_long_position(account_mock: AccountMock):
+def test_open_and_close_long_position(test_account: Account):
     trades: List[Trade] = []
-    statistics = Statistics(trades, account_mock)
+    statistics = Statistics(
+        trades=trades, account=test_account, equity_log=np.array([-1])
+    )
 
     trades.append(
         OpenTrade(
@@ -152,9 +159,11 @@ def test_open_and_close_long_position(account_mock: AccountMock):
     assert stats["total_close_short_trades"] == 0
 
 
-def test_open_and_close_short_position(account_mock: AccountMock):
+def test_open_and_close_short_position(test_account: Account):
     trades: List[Trade] = []
-    statistics = Statistics(trades, account_mock)
+    statistics = Statistics(
+        trades=trades, account=test_account, equity_log=np.array([-1])
+    )
 
     trades.append(
         OpenTrade(

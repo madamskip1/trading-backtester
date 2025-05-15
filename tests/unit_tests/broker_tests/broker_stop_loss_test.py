@@ -80,6 +80,7 @@ def test_long_less_on_open_time(test_data: Data, test_broker: Broker):
         stop_loss=99.0,
     )
 
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_new_orders([open_order])
 
     test_data.increment_data_index()
