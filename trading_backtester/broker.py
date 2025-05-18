@@ -20,6 +20,7 @@ class Broker:
         data: Data,
         accout: Account,
         spread: float,
+        commission: float,
     ):
         """Initializes a Broker object.
 
@@ -27,11 +28,13 @@ class Broker:
             data (Data): The data object containing market data.
             accout (Account): The account object representing the user's account.
             spread (float): The spread value for the broker.
+            commission (float): The commission value for the broker.
         """
 
         self.__data = data
         self.__account = accout
         self.__spread = spread
+        self.__commission = commission
         self.__positions: List[Position] = []
         self.__trades: List[Trade] = []
         self.__limit_orders: List[Order] = []
@@ -200,6 +203,8 @@ class Broker:
 
     def __process_open_order(self, order: Order, price: float) -> None:
         money = order.size * price
+        money += self.__calc_commission(money)
+
         if not self.__account.has_enough_money(money):
             return
 
@@ -245,10 +250,16 @@ class Broker:
                 self.__account.update_money(
                     self.__calc_money_from_close(position, price, reduce_size)
                 )
+                self.__account.update_money(
+                    -self.__calc_commission(price) * reduce_size
+                )
                 self.__positions[i] = position.replace(size=position.size - reduce_size)
             else:
                 self.__account.update_money(
                     self.__calc_money_from_close(position, price, reduce_size)
+                )
+                self.__account.update_money(
+                    -self.__calc_commission(price) * reduce_size
                 )
                 positions_to_close.append(position)
 
@@ -285,6 +296,7 @@ class Broker:
         self.__account.update_money(
             self.__calc_money_from_close(order.position_to_close, price, order.size)
         )
+        self.__account.update_money(-self.__calc_commission(price) * order.size)
 
         if order.size == order.position_to_close.size:
             self.__positions.remove(order.position_to_close)
@@ -332,6 +344,9 @@ class Broker:
             if position.position_type == PositionType.LONG
             else size * (2 * position.open_price - current_price)
         )
+
+    def __calc_commission(self, price: float) -> float:
+        return price * self.__commission
 
     def __check_limit_price(
         self, limit_price: float, price: float, position_type: PositionType

@@ -24,6 +24,7 @@ class Backtester:
         strategy: Type[Strategy],
         money: float = 1000.0,
         spread: float = 0.0,
+        commission: float = 0.0,
         benchmark: Optional[Data] = None,
     ):
         """Initializes a Backtester object.
@@ -37,12 +38,13 @@ class Backtester:
                 Spread is applied twice - once at opening and once at closing the position.
                 For example, if the spread is 1.0 and the asset's price is 100.0,
                 the opening price will be 101.0 for long orders and 99.0 for short orders.
+            commission (float): The commission for each trade. Default is 0.0.
             benchmark (Optional[Data]): Optional benchmark data for comparison (for example for beta, alpha indicators).
         """
 
         self.__data = data
         self.__account = Account(initial_money=money)
-        self.__broker = Broker(self.__data, self.__account, spread)
+        self.__broker = Broker(self.__data, self.__account, spread, commission)
         self.__equity_log = np.zeros(len(self.__data) + 1, dtype=float)
         self.__equity_log[0] = money
         self.__statistics = Statistics(

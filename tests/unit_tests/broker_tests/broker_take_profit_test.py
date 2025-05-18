@@ -1,5 +1,6 @@
 import pytest
 
+from trading_backtester.account import Account
 from trading_backtester.broker import Broker
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder
@@ -596,3 +597,125 @@ def test_short_update_take_profit(
     assert test_broker.get_trades()[1].close_price == pytest.approx(99.0, abs=0.01)
     assert test_broker.get_trades()[1].close_size == 1
     assert test_broker.get_trades()[1].market_order is True
+
+
+@pytest.mark.parametrize(
+    "market_data, commission", [([(None, 80.0, 90.0, 80.0, 90.0, None)], 0.02)]
+)
+def test_long_commission(test_data: Data, test_broker: Broker, test_account: Account):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.LONG,
+        take_profit=90.0,
+    )
+
+    test_broker.process_new_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 0
+    assert len(test_broker.get_trades()) == 2
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.LONG
+    assert test_broker.get_trades()[1].open_price == pytest.approx(80.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(90.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
+    assert test_broker.get_trades()[1].market_order is True
+
+    assert test_broker.get_assets_value() == 0
+    assert test_account.current_money == pytest.approx(106.6, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, commission", [([(None, 90.0, 90.0, 80.0, 80.0, None)], 0.02)]
+)
+def test_short_commission(test_data: Data, test_broker: Broker, test_account: Account):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.SHORT,
+        take_profit=80.0,
+    )
+
+    test_broker.process_new_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 0
+    assert len(test_broker.get_trades()) == 2
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[1].open_price == pytest.approx(90.0, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(80.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
+    assert test_broker.get_trades()[1].market_order is True
+
+    assert test_broker.get_assets_value() == 0
+    assert test_account.current_money == pytest.approx(106.6, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, commission, spread",
+    [([(None, 80.0, 92.2, 80.0, 92.2, None)], 0.02, 2.2)],
+)
+def test_long_commission_and_spread(
+    test_data: Data, test_broker: Broker, test_account: Account
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.LONG,
+        take_profit=90.0,
+    )
+
+    test_broker.process_new_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 0
+    assert len(test_broker.get_trades()) == 2
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.LONG
+    assert test_broker.get_trades()[1].open_price == pytest.approx(82.2, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(90.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
+    assert test_broker.get_trades()[1].market_order is True
+
+    assert test_broker.get_assets_value() == 0
+    assert test_account.current_money == pytest.approx(104.36, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, commission, spread",
+    [([(None, 90.0, 90.0, 77.8, 77.8, None)], 0.02, 2.2)],
+)
+def test_short_commission_and_spread(
+    test_data: Data, test_broker: Broker, test_account: Account
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.SHORT,
+        take_profit=80.0,
+    )
+
+    test_broker.process_new_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_take_profits()
+
+    assert len(test_broker.get_positions()) == 0
+    assert len(test_broker.get_trades()) == 2
+    assert test_broker.get_trades()[1].trade_type == TradeType.CLOSE
+    assert test_broker.get_trades()[1].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[1].open_price == pytest.approx(87.8, abs=0.01)
+    assert test_broker.get_trades()[1].open_size is None
+    assert test_broker.get_trades()[1].close_price == pytest.approx(80.0, abs=0.01)
+    assert test_broker.get_trades()[1].close_size == 1
+    assert test_broker.get_trades()[1].market_order is True
+
+    assert test_broker.get_assets_value() == 0
+    assert test_account.current_money == pytest.approx(104.44, abs=0.01)
