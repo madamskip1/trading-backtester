@@ -5,7 +5,7 @@ import numpy as np
 from trading_backtester.plotting import Plotting
 
 from .account import Account
-from .broker import Broker
+from .broker import Broker, CommissionType
 from .data import CandlestickPhase, Data
 from .market import Market
 from .stats import Statistics
@@ -25,6 +25,7 @@ class Backtester:
         money: float = 1000.0,
         spread: float = 0.0,
         commission: Union[float, Tuple[float, float]] = 0.0,
+        commission_type: CommissionType = CommissionType.RELATIVE,
         benchmark: Optional[Data] = None,
     ):
         """Initializes a Backtester object.
@@ -45,12 +46,15 @@ class Backtester:
                     - `relative` is the percentage-based commission.
                     The effective commission will be the higher of the two: either the `minimum` or the price multiplied by the `relative` rate.
                 Default is 0.0 - no commission.
+            commission_type (CommissionType): The type of commission to be used.
             benchmark (Optional[Data]): Optional benchmark data for comparison (for example for beta, alpha indicators).
         """
 
         self.__data = data
         self.__account = Account(initial_money=money)
-        self.__broker = Broker(self.__data, self.__account, spread, commission)
+        self.__broker = Broker(
+            self.__data, self.__account, spread, commission, commission_type
+        )
         self.__equity_log = np.zeros(len(self.__data) + 1, dtype=float)
         self.__equity_log[0] = money
         self.__statistics = Statistics(

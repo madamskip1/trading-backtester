@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List, Tuple, Union
 
 from trading_backtester.account import Account
@@ -6,6 +7,18 @@ from trading_backtester.order import CloseOrder, Order, OrderAction
 from trading_backtester.trade import CloseTrade, OpenTrade, Trade
 
 from .position import Position, PositionType
+
+
+class CommissionType(Enum):
+    """Represents the type of commission for the broker."""
+
+    RELATIVE = 1
+    """Commission is a percentage of the price."""
+    MINIMUM_RELATIVE = 2
+    """Commission is a percentage of the price,
+        but has a minimum value that will be charged
+        if calculated commission is lower.
+    """
 
 
 class Broker:
@@ -21,6 +34,7 @@ class Broker:
         accout: Account,
         spread: float,
         commission: Union[float, Tuple[float, float]],
+        commission_type: CommissionType,
     ):
         """Initializes a Broker object.
 
@@ -35,6 +49,7 @@ class Broker:
         self.__account = accout
         self.__spread = spread
         self.__commission = commission
+        self.__commission_type = commission_type
         self.__positions: List[Position] = []
         self.__trades: List[Trade] = []
         self.__limit_orders: List[Order] = []
@@ -347,10 +362,12 @@ class Broker:
 
     def __calc_commission(self, price: float) -> float:
         commission = 0.0
-        if isinstance(self.__commission, tuple):
+        if self.__commission_type == CommissionType.MINIMUM_RELATIVE:
+            assert isinstance(self.__commission, tuple)
             commission = price * self.__commission[1]
             commission = max(commission, self.__commission[0])
-        else:
+        elif self.__commission_type == CommissionType.RELATIVE:
+            assert isinstance(self.__commission, float)
             commission = price * self.__commission
 
         return commission

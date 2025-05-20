@@ -1,7 +1,7 @@
 import pytest
 
 from trading_backtester.account import Account
-from trading_backtester.broker import Broker
+from trading_backtester.broker import Broker, CommissionType
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder
 from trading_backtester.position import PositionType
@@ -331,7 +331,8 @@ def test_open_short_with_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission", [([(None, 90.0, None, None, None, None)], 0.02)]
+    "market_data, commission, commission_type",
+    [([(None, 90.0, None, None, None, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_open_long_relative_commision(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(
@@ -362,7 +363,8 @@ def test_open_long_relative_commision(test_account: Account, test_broker: Broker
 
 
 @pytest.mark.parametrize(
-    "market_data, commission", [([(None, 90.0, None, None, None, None)], 0.02)]
+    "market_data, commission, commission_type",
+    [([(None, 90.0, None, None, None, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_open_short_relative_commission(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(
@@ -394,7 +396,8 @@ def test_open_short_relative_commission(test_account: Account, test_broker: Brok
 
 
 @pytest.mark.parametrize(
-    "market_data, commission", [([(None, 100.0, None, None, None, None)], 0.02)]
+    "market_data, commission, commission_type",
+    [([(None, 100.0, None, None, None, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_open_long_relative_commision_not_enough_money(
     test_account: Account, test_broker: Broker
@@ -412,7 +415,8 @@ def test_open_long_relative_commision_not_enough_money(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission", [([(None, 100.0, None, None, None, None)], 0.02)]
+    "market_data, commission, commission_type",
+    [([(None, 100.0, None, None, None, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_open_short_relative_commission_not_enough_money(
     test_account: Account, test_broker: Broker
@@ -431,8 +435,8 @@ def test_open_short_relative_commission_not_enough_money(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, spread",
-    [([(None, 90.0, None, None, None, None)], 0.02, 2.2)],
+    "market_data, commission, commission_type, spread",
+    [([(None, 90.0, None, None, None, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_open_long_commision_and_spread(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(
@@ -463,8 +467,8 @@ def test_open_long_commision_and_spread(test_account: Account, test_broker: Brok
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, spread",
-    [([(None, 90.0, None, None, None, None)], 0.02, 2.2)],
+    "market_data, commission, commission_type, spread",
+    [([(None, 90.0, None, None, None, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_open_short_commission_and_spread(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(
@@ -496,7 +500,14 @@ def test_open_short_commission_and_spread(test_account: Account, test_broker: Br
 
 
 @pytest.mark.parametrize(
-    "market_data, commission", [([(None, 90.0, None, None, None, None)], (5.0, 0.02))]
+    "market_data, commission, commission_type",
+    [
+        (
+            [(None, 90.0, None, None, None, None)],
+            (5.0, 0.02),
+            CommissionType.MINIMUM_RELATIVE,
+        )
+    ],
 )
 def test_open_long_minimum_commision_less(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(
@@ -527,7 +538,14 @@ def test_open_long_minimum_commision_less(test_account: Account, test_broker: Br
 
 
 @pytest.mark.parametrize(
-    "market_data, commission", [([(None, 90.0, None, None, None, None)], (1.0, 0.02))]
+    "market_data, commission, commission_type",
+    [
+        (
+            [(None, 90.0, None, None, None, None)],
+            (1.0, 0.02),
+            CommissionType.MINIMUM_RELATIVE,
+        )
+    ],
 )
 def test_open_long_minimum_commision_greater(
     test_account: Account, test_broker: Broker
@@ -560,7 +578,14 @@ def test_open_long_minimum_commision_greater(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission", [([(None, 90.0, None, None, None, None)], (5.0, 0.02))]
+    "market_data, commission, commission_type",
+    [
+        (
+            [(None, 90.0, None, None, None, None)],
+            (5.0, 0.02),
+            CommissionType.MINIMUM_RELATIVE,
+        )
+    ],
 )
 def test_open_short_minimum_commission_less(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(
@@ -592,7 +617,14 @@ def test_open_short_minimum_commission_less(test_account: Account, test_broker: 
 
 
 @pytest.mark.parametrize(
-    "market_data, commission", [([(None, 90.0, None, None, None, None)], (1.0, 0.02))]
+    "market_data, commission, commission_type",
+    [
+        (
+            [(None, 90.0, None, None, None, None)],
+            (1.0, 0.02),
+            CommissionType.MINIMUM_RELATIVE,
+        )
+    ],
 )
 def test_open_short_minimum_commission_greater(
     test_account: Account, test_broker: Broker
