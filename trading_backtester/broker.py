@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from trading_backtester.account import Account
 from trading_backtester.data import Data
@@ -20,7 +20,7 @@ class Broker:
         data: Data,
         accout: Account,
         spread: float,
-        commission: float,
+        commission: Union[float, Tuple[float, float]],
     ):
         """Initializes a Broker object.
 
@@ -28,7 +28,7 @@ class Broker:
             data (Data): The data object containing market data.
             accout (Account): The account object representing the user's account.
             spread (float): The spread value for the broker.
-            commission (float): The commission value for the broker.
+            commission (Union[float, Tuple[float, float]]): The commission value for the broker.
         """
 
         self.__data = data
@@ -346,7 +346,14 @@ class Broker:
         )
 
     def __calc_commission(self, price: float) -> float:
-        return price * self.__commission
+        commission = 0.0
+        if isinstance(self.__commission, tuple):
+            commission = price * self.__commission[1]
+            commission = max(commission, self.__commission[0])
+        else:
+            commission = price * self.__commission
+
+        return commission
 
     def __check_limit_price(
         self, limit_price: float, price: float, position_type: PositionType

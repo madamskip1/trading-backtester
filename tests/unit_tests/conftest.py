@@ -1,3 +1,5 @@
+from typing import Tuple, Union
+
 import pytest
 
 from trading_backtester.account import Account
@@ -22,7 +24,10 @@ def commission() -> float:  # if not provided assume no commission
 
 @pytest.fixture
 def test_broker(
-    test_data: Data, test_account: Account, spread: float, commission: float
+    test_data: Data,
+    test_account: Account,
+    spread: float,
+    commission: Union[float, Tuple[float, float]],
 ) -> Broker:
     return Broker(
         data=test_data, accout=test_account, spread=spread, commission=commission
