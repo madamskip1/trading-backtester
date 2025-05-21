@@ -4,6 +4,7 @@ import numpy as np
 
 from trading_backtester.commission import Commission, CommissionType
 from trading_backtester.plotting import Plotting
+from trading_backtester.spread import Spread
 
 from .account import Account
 from .broker import Broker
@@ -24,7 +25,7 @@ class Backtester:
         data: Data,
         strategy: Type[Strategy],
         money: float = 1000.0,
-        spread: float = 0.0,
+        spread: Optional[Spread] = None,
         commission: Optional[Commission] = None,
         benchmark: Optional[Data] = None,
     ):
@@ -35,11 +36,8 @@ class Backtester:
                 strategy (Type[Strategy]): The trading strategy to be tested.
             User should pass the type of the strategy class, not an instance.
             money (float): The initial amount of money for the account. Default is 1000.0.
-            spread (float): The spread between the buy and sell prices.
-                Spread is applied twice - once at opening and once at closing the position.
-                For example, if the spread is 1.0 and the asset's price is 100.0,
-                the opening price will be 101.0 for long orders and 99.0 for short orders.
-            commission (Commisssion): The commission object.
+            spread (Optional[Spread]): The spread object.
+            commission (Optional[Commission]): The commission object.
             benchmark (Optional[Data]): Optional benchmark data for comparison (for example for beta, alpha indicators).
         """
 
@@ -47,6 +45,8 @@ class Backtester:
         self.__account = Account(initial_money=money)
         if commission is None:
             commission = Commission(CommissionType.RELATIVE, 0.0)
+        if spread is None:
+            spread = Spread(0.0)
         self.__broker = Broker(self.__data, self.__account, spread, commission)
         self.__equity_log = np.zeros(len(self.__data) + 1, dtype=float)
         self.__equity_log[0] = money

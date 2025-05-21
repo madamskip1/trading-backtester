@@ -799,7 +799,7 @@ def test_open_short_reduce_in_multiple_candlesticks(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, None, None, 95.0, None)], 2.2)]
+    "market_data, spread_rate", [([(None, 90.0, None, None, 95.0, None)], 2.2)]
 )
 def test_close_long_with_spread(
     test_data: Data,
@@ -837,7 +837,7 @@ def test_close_long_with_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, None, None, 85.0, None)], 2.2)]
+    "market_data, spread_rate", [([(None, 90.0, None, None, 85.0, None)], 2.2)]
 )
 def test_close_short_with_spread(
     test_data: Data,
@@ -1021,7 +1021,7 @@ def test_close_short_relative_commission_specified_position(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread_rate",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_close_long_commission_and_spread(
@@ -1057,7 +1057,7 @@ def test_close_long_commission_and_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread_rate",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_close_short_commission_and_spread(
@@ -1093,7 +1093,7 @@ def test_close_short_commission_and_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread_rate",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_close_long_commission_and_spread_specified_position(
@@ -1130,7 +1130,7 @@ def test_close_long_commission_and_spread_specified_position(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread_rate",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_close_short_commission_and_spread_specified_position(

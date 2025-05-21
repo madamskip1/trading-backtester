@@ -265,7 +265,7 @@ def test_open_short_multiple_in_multiple_processes(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, None, None, None, None)], 2.2)]
+    "market_data, spread_rate", [([(None, 90.0, None, None, None, None)], 2.2)]
 )
 def test_open_long_with_spread(
     test_account: Account,
@@ -299,7 +299,7 @@ def test_open_long_with_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, None, None, None, None)], 2.2)]
+    "market_data, spread_rate", [([(None, 90.0, None, None, None, None)], 2.2)]
 )
 def test_open_short_with_spread(
     test_account: Account,
@@ -436,7 +436,7 @@ def test_open_short_relative_commission_not_enough_money(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread_rate",
     [([(None, 90.0, None, None, None, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_open_long_commision_and_spread(test_account: Account, test_broker: Broker):
@@ -468,7 +468,7 @@ def test_open_long_commision_and_spread(test_account: Account, test_broker: Brok
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread_rate",
     [([(None, 90.0, None, None, None, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_open_short_commission_and_spread(test_account: Account, test_broker: Broker):

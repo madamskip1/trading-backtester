@@ -4,6 +4,7 @@ from trading_backtester.account import Account
 from trading_backtester.commission import Commission
 from trading_backtester.data import Data
 from trading_backtester.order import CloseOrder, Order, OrderAction
+from trading_backtester.spread import Spread
 from trading_backtester.trade import CloseTrade, OpenTrade, Trade
 
 from .position import Position, PositionType
@@ -17,7 +18,7 @@ class Broker:
     """
 
     def __init__(
-        self, data: Data, accout: Account, spread: float, commission: Commission
+        self, data: Data, accout: Account, spread: Spread, commission: Commission
     ):
         """Initializes a Broker object.
 
@@ -320,20 +321,14 @@ class Broker:
     def __adjust_open_price_by_spread(
         self, price: float, position_type: PositionType
     ) -> float:
-        return (
-            price + self.__spread
-            if position_type == PositionType.LONG
-            else price - self.__spread
-        )
+        spread = self.__spread.calc_spread_value(price)
+        return price + spread if position_type == PositionType.LONG else price - spread
 
     def __adjust_close_price_by_spread(
         self, price: float, position_type: PositionType
     ) -> float:
-        return (
-            price - self.__spread
-            if position_type == PositionType.LONG
-            else price + self.__spread
-        )
+        spread = self.__spread.calc_spread_value(price)
+        return price - spread if position_type == PositionType.LONG else price + spread
 
     def __calc_money_from_close(
         self, position: Position, current_price: float, size: int

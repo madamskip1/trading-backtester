@@ -418,7 +418,7 @@ def test_multiple_short_positions(test_data: Data, test_broker: Broker):
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, 95.0, 90.0, 95.0, None)], 2.2)]
+    "market_data, spread_rate", [([(None, 90.0, 95.0, 90.0, 95.0, None)], 2.2)]
 )
 def test_long_with_spread_exact_price(
     test_data: Data,
@@ -439,7 +439,7 @@ def test_long_with_spread_exact_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, 97.2, 90.0, 97.2, None)], 2.2)]
+    "market_data, spread_rate", [([(None, 90.0, 97.2, 90.0, 97.2, None)], 2.2)]
 )
 def test_long_with_spread_enough_price(
     test_data: Data,
@@ -468,7 +468,7 @@ def test_long_with_spread_enough_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, 90.0, 85.0, 85.0, None)], 2.2)]
+    "market_data, spread_rate", [([(None, 90.0, 90.0, 85.0, 85.0, None)], 2.2)]
 )
 def test_short_with_spread_exact_price(
     test_data: Data,
@@ -489,7 +489,7 @@ def test_short_with_spread_exact_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 90.0, 90.0, 82.8, 82.8, None)], 2.2)]
+    "market_data, spread_rate", [([(None, 90.0, 90.0, 82.8, 82.8, None)], 2.2)]
 )
 def test_short_with_spread_enough_price(
     test_data: Data,
@@ -665,7 +665,7 @@ def test_short_relative_commission(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread_rate",
     [([(None, 80.0, 92.2, 80.0, 92.2, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_long_commission_and_spread(
@@ -697,7 +697,7 @@ def test_long_commission_and_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread_rate",
     [([(None, 90.0, 90.0, 77.8, 77.8, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_short_commission_and_spread(
