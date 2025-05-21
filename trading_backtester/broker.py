@@ -1,24 +1,12 @@
-from enum import Enum
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 from trading_backtester.account import Account
+from trading_backtester.commission import Commission
 from trading_backtester.data import Data
 from trading_backtester.order import CloseOrder, Order, OrderAction
 from trading_backtester.trade import CloseTrade, OpenTrade, Trade
 
 from .position import Position, PositionType
-
-
-class CommissionType(Enum):
-    """Represents the type of commission for the broker."""
-
-    RELATIVE = 1
-    """Commission is a percentage of the price."""
-    MINIMUM_RELATIVE = 2
-    """Commission is a percentage of the price,
-        but has a minimum value that will be charged
-        if calculated commission is lower.
-    """
 
 
 class Broker:
@@ -29,12 +17,7 @@ class Broker:
     """
 
     def __init__(
-        self,
-        data: Data,
-        accout: Account,
-        spread: float,
-        commission: Union[float, Tuple[float, float]],
-        commission_type: CommissionType,
+        self, data: Data, accout: Account, spread: float, commission: Commission
     ):
         """Initializes a Broker object.
 
@@ -42,14 +25,13 @@ class Broker:
             data (Data): The data object containing market data.
             accout (Account): The account object representing the user's account.
             spread (float): The spread value for the broker.
-            commission (Union[float, Tuple[float, float]]): The commission value for the broker.
+            commission (Optional[Commission]): The commission object representing the broker's fees.
         """
 
         self.__data = data
         self.__account = accout
         self.__spread = spread
         self.__commission = commission
-        self.__commission_type = commission_type
         self.__positions: List[Position] = []
         self.__trades: List[Trade] = []
         self.__limit_orders: List[Order] = []
@@ -218,7 +200,7 @@ class Broker:
 
     def __process_open_order(self, order: Order, price: float) -> None:
         money = order.size * price
-        money += self.__calc_commission(money)
+        money += self.__commission.calc_commission_value(money)
 
         if not self.__account.has_enough_money(money):
             return
@@ -266,7 +248,7 @@ class Broker:
                     self.__calc_money_from_close(position, price, reduce_size)
                 )
                 self.__account.update_money(
-                    -self.__calc_commission(price) * reduce_size
+                    -self.__commission.calc_commission_value(price) * reduce_size
                 )
                 self.__positions[i] = position.replace(size=position.size - reduce_size)
             else:
@@ -274,7 +256,7 @@ class Broker:
                     self.__calc_money_from_close(position, price, reduce_size)
                 )
                 self.__account.update_money(
-                    -self.__calc_commission(price) * reduce_size
+                    -self.__commission.calc_commission_value(price) * reduce_size
                 )
                 positions_to_close.append(position)
 
@@ -311,7 +293,9 @@ class Broker:
         self.__account.update_money(
             self.__calc_money_from_close(order.position_to_close, price, order.size)
         )
-        self.__account.update_money(-self.__calc_commission(price) * order.size)
+        self.__account.update_money(
+            -self.__commission.calc_commission_value(price) * order.size
+        )
 
         if order.size == order.position_to_close.size:
             self.__positions.remove(order.position_to_close)
@@ -359,18 +343,6 @@ class Broker:
             if position.position_type == PositionType.LONG
             else size * (2 * position.open_price - current_price)
         )
-
-    def __calc_commission(self, price: float) -> float:
-        commission = 0.0
-        if self.__commission_type == CommissionType.MINIMUM_RELATIVE:
-            assert isinstance(self.__commission, tuple)
-            commission = price * self.__commission[1]
-            commission = max(commission, self.__commission[0])
-        elif self.__commission_type == CommissionType.RELATIVE:
-            assert isinstance(self.__commission, float)
-            commission = price * self.__commission
-
-        return commission
 
     def __check_limit_price(
         self, limit_price: float, price: float, position_type: PositionType

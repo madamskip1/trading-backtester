@@ -1,7 +1,8 @@
 import pytest
 
 from trading_backtester.account import Account
-from trading_backtester.broker import Broker, CommissionType
+from trading_backtester.broker import Broker
+from trading_backtester.commission import CommissionType
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import CloseOrder, OpenOrder
 from trading_backtester.position import PositionType
@@ -874,7 +875,7 @@ def test_close_short_with_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_close_long_relative_commission(
@@ -910,7 +911,7 @@ def test_close_long_relative_commission(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_close_short_relative_commission(
@@ -946,7 +947,7 @@ def test_close_short_relative_commission(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_close_long_relative_commission_specified_position(
@@ -983,7 +984,7 @@ def test_close_long_relative_commission_specified_position(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_close_short_relative_commission_specified_position(
@@ -1020,7 +1021,7 @@ def test_close_short_relative_commission_specified_position(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_close_long_commission_and_spread(
@@ -1056,7 +1057,7 @@ def test_close_long_commission_and_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_close_short_commission_and_spread(
@@ -1092,7 +1093,7 @@ def test_close_short_commission_and_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_close_long_commission_and_spread_specified_position(
@@ -1129,7 +1130,7 @@ def test_close_long_commission_and_spread_specified_position(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type, spread",
+    "market_data, commission_rate, commission_type, spread",
     [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
 )
 def test_close_short_commission_and_spread_specified_position(
@@ -1166,7 +1167,7 @@ def test_close_short_commission_and_spread_specified_position(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [
         (
             [(None, 90.0, None, None, 90.0, None)],
@@ -1208,7 +1209,7 @@ def test_close_long_minimum_commission_less(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [
         (
             [(None, 90.0, None, None, 90.0, None)],
@@ -1250,7 +1251,7 @@ def test_close_long_minimum_commission_greater(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [
         (
             [(None, 90.0, None, None, 90.0, None)],
@@ -1292,7 +1293,7 @@ def test_close_short_minimum_commission_less(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [
         (
             [(None, 90.0, None, None, 90.0, None)],
@@ -1334,7 +1335,7 @@ def test_close_short_minimum_commission_greater(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [
         (
             [(None, 90.0, None, None, 90.0, None)],
@@ -1377,7 +1378,7 @@ def test_close_long_minimum_commission_specified_position(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission, commission_type",
+    "market_data, commission_rate, commission_type",
     [
         (
             [(None, 90.0, None, None, 90.0, None)],
