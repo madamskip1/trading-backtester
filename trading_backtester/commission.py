@@ -44,6 +44,15 @@ class Commission:
         self.__commission_rate = commission_rate
 
     def calc_commission_value(self, price: float) -> float:
+        """Calculates the commission value based on the price and commission type.
+
+        Args:
+            price (float): The price of the trade.
+
+        Returns:
+            float: The commission value.
+        """
+
         commission = 0.0
         if self.__commission_type == CommissionType.RELATIVE:
             assert isinstance(self.__commission_rate, float)
