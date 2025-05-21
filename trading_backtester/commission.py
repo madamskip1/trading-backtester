@@ -12,6 +12,8 @@ class CommissionType(Enum):
         but has a minimum value that will be charged
         if calculated commission is lower.
     """
+    FIXED = 3
+    """Commission is a fixed fee per trade."""
 
 
 class Commission:
@@ -54,5 +56,8 @@ class Commission:
             commission = max(
                 self.__commission_rate[0], price * self.__commission_rate[1]
             )
+        elif self.__commission_type == CommissionType.FIXED:
+            assert isinstance(self.__commission_rate, float)
+            commission = self.__commission_rate
 
         return commission

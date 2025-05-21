@@ -729,12 +729,51 @@ def test_open_short_minimum_commission_less(
     [
         (
             [(None, 80.0, 90.0, 80.0, 90.0, None)],
-            (5.0, 0.02),
-            CommissionType.MINIMUM_RELATIVE,
+            5.0,
+            CommissionType.FIXED,
         )
     ],
 )
-def test_open_short_minimum_commission_greater(
+def test_open_short_fixed_commission(
+    test_data: Data, test_account: Account, test_broker: Broker
+):
+    open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=90.0)
+    test_broker.process_new_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_limit_orders()
+
+    assert len(test_broker.get_trades()) == 1
+    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
+    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert test_broker.get_trades()[0].open_size == 1
+    assert test_broker.get_trades()[0].close_price is None
+    assert test_broker.get_trades()[0].close_size is None
+    assert test_broker.get_trades()[0].market_order is False
+
+    assert len(test_broker.get_positions()) == 1
+    assert test_broker.get_positions()[0].position_type == PositionType.SHORT
+    assert test_broker.get_positions()[0].size == 1
+    assert test_broker.get_positions()[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert test_broker.get_positions()[0].stop_loss is None
+    assert test_broker.get_positions()[0].take_profit is None
+
+    assert test_broker.get_assets_value() == pytest.approx(90.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(5.0, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, commission_rate, commission_type",
+    [
+        (
+            [(None, 80.0, 90.0, 80.0, 90.0, None)],
+            5.0,
+            CommissionType.FIXED,
+        )
+    ],
+)
+def test_open_short_fixed_commission(
     test_data: Data, test_account: Account, test_broker: Broker
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=90.0)
