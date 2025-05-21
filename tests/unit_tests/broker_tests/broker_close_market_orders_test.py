@@ -6,6 +6,7 @@ from trading_backtester.commission import CommissionType
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import CloseOrder, OpenOrder
 from trading_backtester.position import PositionType
+from trading_backtester.spread import SpreadType
 from trading_backtester.trade import TradeType
 
 
@@ -799,7 +800,8 @@ def test_open_short_reduce_in_multiple_candlesticks(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread_rate", [([(None, 90.0, None, None, 95.0, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 90.0, None, None, 95.0, None)], 2.2, SpreadType.FIXED)],
 )
 def test_close_long_with_spread(
     test_data: Data,
@@ -837,7 +839,8 @@ def test_close_long_with_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread_rate", [([(None, 90.0, None, None, 85.0, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 90.0, None, None, 85.0, None)], 2.2, SpreadType.FIXED)],
 )
 def test_close_short_with_spread(
     test_data: Data,
@@ -1021,8 +1024,16 @@ def test_close_short_relative_commission_specified_position(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread_rate",
-    [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 90.0, None, None, 90.0, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_close_long_commission_and_spread(
     test_data: Data, test_account: Account, test_broker: Broker
@@ -1057,8 +1068,16 @@ def test_close_long_commission_and_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread_rate",
-    [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 90.0, None, None, 90.0, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_close_short_commission_and_spread(
     test_data: Data, test_account: Account, test_broker: Broker
@@ -1093,8 +1112,16 @@ def test_close_short_commission_and_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread_rate",
-    [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 90.0, None, None, 90.0, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_close_long_commission_and_spread_specified_position(
     test_data: Data, test_account: Account, test_broker: Broker
@@ -1130,8 +1157,16 @@ def test_close_long_commission_and_spread_specified_position(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread_rate",
-    [([(None, 90.0, None, None, 90.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 90.0, None, None, 90.0, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_close_short_commission_and_spread_specified_position(
     test_data: Data, test_account: Account, test_broker: Broker

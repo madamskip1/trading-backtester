@@ -6,6 +6,7 @@ from trading_backtester.commission import CommissionType
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder
 from trading_backtester.position import PositionType
+from trading_backtester.spread import SpreadType
 from trading_backtester.trade import TradeType
 
 
@@ -265,7 +266,8 @@ def test_open_short_multiple_in_multiple_processes(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread_rate", [([(None, 90.0, None, None, None, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 90.0, None, None, None, None)], 2.2, SpreadType.FIXED)],
 )
 def test_open_long_with_spread(
     test_account: Account,
@@ -299,7 +301,8 @@ def test_open_long_with_spread(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread_rate", [([(None, 90.0, None, None, None, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 90.0, None, None, None, None)], 2.2, SpreadType.FIXED)],
 )
 def test_open_short_with_spread(
     test_account: Account,
@@ -436,8 +439,16 @@ def test_open_short_relative_commission_not_enough_money(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread_rate",
-    [([(None, 90.0, None, None, None, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 90.0, None, None, None, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_open_long_commision_and_spread(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(
@@ -468,8 +479,16 @@ def test_open_long_commision_and_spread(test_account: Account, test_broker: Brok
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread_rate",
-    [([(None, 90.0, None, None, None, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 90.0, None, None, None, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_open_short_commission_and_spread(test_account: Account, test_broker: Broker):
     open_order = OpenOrder(

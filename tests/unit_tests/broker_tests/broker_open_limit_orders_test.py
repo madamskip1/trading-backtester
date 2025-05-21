@@ -6,6 +6,7 @@ from trading_backtester.commission import CommissionType
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder
 from trading_backtester.position import PositionType
+from trading_backtester.spread import SpreadType
 from trading_backtester.trade import TradeType
 
 
@@ -330,7 +331,8 @@ def test_open_short_on_open_greater_not_opened(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread_rate", [([(None, 100.0, 100.0, 90.0, 90.0, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 100.0, 100.0, 90.0, 90.0, None)], 2.2, SpreadType.FIXED)],
 )
 def test_open_long_with_spread_exact_price(
     test_data: Data,
@@ -350,7 +352,8 @@ def test_open_long_with_spread_exact_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread_rate", [([(None, 100.0, 100.0, 87.8, 87.8, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 100.0, 100.0, 87.8, 87.8, None)], 2.2, SpreadType.FIXED)],
 )
 def test_open_long_with_spread_enough_price(
     test_data: Data,
@@ -384,7 +387,8 @@ def test_open_long_with_spread_enough_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread_rate", [([(None, 85.0, 95.0, 85.0, 95.0, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 85.0, 95.0, 85.0, 95.0, None)], 2.2, SpreadType.FIXED)],
 )
 def test_open_short_with_spread_exact_price(
     test_data: Data,
@@ -404,7 +408,8 @@ def test_open_short_with_spread_exact_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread_rate", [([(None, 85.0, 97.2, 85.0, 97.2, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 85.0, 97.2, 85.0, 97.2, None)], 2.2, SpreadType.FIXED)],
 )
 def test_open_short_with_spread_enough_price(
     test_data: Data,
@@ -490,8 +495,16 @@ def test_open_long_relative_commission_not_enough_money(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread_rate",
-    [([(None, 100.0, 100.0, 85.0, 85.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 100.0, 100.0, 85.0, 85.0, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_open_long_commission_and_spread(
     test_data: Data, test_account: Account, test_broker: Broker
@@ -575,8 +588,16 @@ def test_open_short_relative_commission_not_enough_money(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread_rate",
-    [([(None, 80.0, 95.0, 80.0, 95.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 80.0, 95.0, 80.0, 95.0, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_open_short_commission_and_spread(
     test_data: Data, test_account: Account, test_broker: Broker

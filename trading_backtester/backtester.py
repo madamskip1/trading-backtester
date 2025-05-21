@@ -4,7 +4,7 @@ import numpy as np
 
 from trading_backtester.commission import Commission, CommissionType
 from trading_backtester.plotting import Plotting
-from trading_backtester.spread import Spread
+from trading_backtester.spread import Spread, SpreadType
 
 from .account import Account
 from .broker import Broker
@@ -44,9 +44,9 @@ class Backtester:
         self.__data = data
         self.__account = Account(initial_money=money)
         if commission is None:
-            commission = Commission(CommissionType.RELATIVE, 0.0)
+            commission = Commission(CommissionType.FIXED, 0.0)
         if spread is None:
-            spread = Spread(0.0)
+            spread = Spread(SpreadType.FIXED, 0.0)
         self.__broker = Broker(self.__data, self.__account, spread, commission)
         self.__equity_log = np.zeros(len(self.__data) + 1, dtype=float)
         self.__equity_log[0] = money
