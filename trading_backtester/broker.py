@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
 from trading_backtester.account import Account
+from trading_backtester.commission import Commission
 from trading_backtester.data import Data
 from trading_backtester.order import CloseOrder, Order, OrderAction
 from trading_backtester.trade import CloseTrade, OpenTrade, Trade
@@ -16,10 +17,7 @@ class Broker:
     """
 
     def __init__(
-        self,
-        data: Data,
-        accout: Account,
-        spread: float,
+        self, data: Data, accout: Account, spread: float, commission: Commission
     ):
         """Initializes a Broker object.
 
@@ -27,11 +25,13 @@ class Broker:
             data (Data): The data object containing market data.
             accout (Account): The account object representing the user's account.
             spread (float): The spread value for the broker.
+            commission (Optional[Commission]): The commission object representing the broker's fees.
         """
 
         self.__data = data
         self.__account = accout
         self.__spread = spread
+        self.__commission = commission
         self.__positions: List[Position] = []
         self.__trades: List[Trade] = []
         self.__limit_orders: List[Order] = []
@@ -200,6 +200,8 @@ class Broker:
 
     def __process_open_order(self, order: Order, price: float) -> None:
         money = order.size * price
+        money += self.__commission.calc_commission_value(money)
+
         if not self.__account.has_enough_money(money):
             return
 
@@ -245,10 +247,16 @@ class Broker:
                 self.__account.update_money(
                     self.__calc_money_from_close(position, price, reduce_size)
                 )
+                self.__account.update_money(
+                    -self.__commission.calc_commission_value(price) * reduce_size
+                )
                 self.__positions[i] = position.replace(size=position.size - reduce_size)
             else:
                 self.__account.update_money(
                     self.__calc_money_from_close(position, price, reduce_size)
+                )
+                self.__account.update_money(
+                    -self.__commission.calc_commission_value(price) * reduce_size
                 )
                 positions_to_close.append(position)
 
@@ -284,6 +292,9 @@ class Broker:
 
         self.__account.update_money(
             self.__calc_money_from_close(order.position_to_close, price, order.size)
+        )
+        self.__account.update_money(
+            -self.__commission.calc_commission_value(price) * order.size
         )
 
         if order.size == order.position_to_close.size:
