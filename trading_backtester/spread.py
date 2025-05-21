@@ -5,7 +5,9 @@ class SpreadType(Enum):
     """Represents the type of spread's calculation."""
 
     FIXED = 1
-    """Fixed spread - a fixed difference between the bid and ask prices."""
+    """Fixed spread - the difference between the bid and ask prices is a fixed amount."""
+    RELATIVE = 2
+    """Relative spread - the difference between the bid and ask prices is a percentage of the price."""
 
 
 class Spread:
@@ -25,17 +27,20 @@ class Spread:
         self.__spread_type = spread_type
         self.__spread_rate = spread_rate
 
-    def calc_spread_value(self, _: float) -> float:
+    def calc_spread_value(self, price: float) -> float:
         """Calculate the spread value.
 
         Args:
-            _ (float): The price of the trade (not used in this case).
+            price (float): The price of the trade.
 
         Returns:
             float: The spread value.
         """
+
         spread = 0.0
         if self.__spread_type == SpreadType.FIXED:
             spread = self.__spread_rate
+        elif self.__spread_type == SpreadType.RELATIVE:
+            spread = self.__spread_rate * price
 
         return spread

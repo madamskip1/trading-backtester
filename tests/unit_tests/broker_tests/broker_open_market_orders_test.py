@@ -269,7 +269,7 @@ def test_open_short_multiple_in_multiple_processes(
     "market_data, spread_rate, spread_type",
     [([(None, 90.0, None, None, None, None)], 2.2, SpreadType.FIXED)],
 )
-def test_open_long_with_spread(
+def test_open_long_with_fixed_spread(
     test_account: Account,
     test_broker: Broker,
     # spread: float
@@ -304,7 +304,7 @@ def test_open_long_with_spread(
     "market_data, spread_rate, spread_type",
     [([(None, 90.0, None, None, None, None)], 2.2, SpreadType.FIXED)],
 )
-def test_open_short_with_spread(
+def test_open_short_with_fixed_spread(
     test_account: Account,
     test_broker: Broker,
 ):
@@ -752,3 +752,72 @@ def test_open_short_fixed_commission(test_account: Account, test_broker: Broker)
     assert test_broker.get_assets_value() == pytest.approx(90.0, abs=0.01)
 
     assert test_account.current_money == pytest.approx(5.0, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, spread_rate, spread_type",
+    [([(None, 90.0, None, None, None, None)], 0.02, SpreadType.RELATIVE)],
+)
+def test_open_long_with_relative_spread(
+    test_account: Account,
+    test_broker: Broker,
+    # spread: float
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.LONG,
+    )
+    test_broker.process_new_orders([open_order])
+
+    assert len(test_broker.get_trades()) == 1
+    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
+    assert test_broker.get_trades()[0].position_type == PositionType.LONG
+    assert test_broker.get_trades()[0].open_price == pytest.approx(91.8, abs=0.01)
+    assert test_broker.get_trades()[0].open_size == 1
+    assert test_broker.get_trades()[0].close_price is None
+    assert test_broker.get_trades()[0].close_size is None
+    assert test_broker.get_trades()[0].market_order is True
+
+    assert len(test_broker.get_positions()) == 1
+    assert test_broker.get_positions()[0].position_type == PositionType.LONG
+    assert test_broker.get_positions()[0].size == 1
+    assert test_broker.get_positions()[0].open_price == pytest.approx(91.8, abs=0.01)
+    assert test_broker.get_positions()[0].stop_loss is None
+    assert test_broker.get_positions()[0].take_profit is None
+
+    assert test_broker.get_assets_value() == pytest.approx(90.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(8.2, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, spread_rate, spread_type",
+    [([(None, 90.0, None, None, None, None)], 0.02, SpreadType.RELATIVE)],
+)
+def test_open_short_with_relative_spread(
+    test_account: Account,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(
+        size=1,
+        position_type=PositionType.SHORT,
+    )
+    test_broker.process_new_orders([open_order])
+
+    assert len(test_broker.get_trades()) == 1
+    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
+    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[0].open_price == pytest.approx(88.2, abs=0.01)
+    assert test_broker.get_trades()[0].open_size == 1
+    assert test_broker.get_trades()[0].close_price is None
+    assert test_broker.get_trades()[0].close_size is None
+    assert test_broker.get_trades()[0].market_order is True
+
+    assert len(test_broker.get_positions()) == 1
+    assert test_broker.get_positions()[0].position_type == PositionType.SHORT
+    assert test_broker.get_positions()[0].size == 1
+    assert test_broker.get_positions()[0].open_price == pytest.approx(88.2, abs=0.01)
+    assert test_broker.get_positions()[0].stop_loss is None
+    assert test_broker.get_positions()[0].take_profit is None
+
+    assert test_broker.get_assets_value() == pytest.approx(86.4, abs=0.01)
+    assert test_account.current_money == pytest.approx(11.8, abs=0.01)
