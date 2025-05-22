@@ -6,6 +6,7 @@ from trading_backtester.commission import CommissionType
 from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder
 from trading_backtester.position import PositionType
+from trading_backtester.spread import SpreadType
 from trading_backtester.trade import TradeType
 
 
@@ -330,9 +331,10 @@ def test_open_short_on_open_greater_not_opened(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 100.0, 100.0, 90.0, 90.0, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 100.0, 100.0, 90.0, 90.0, None)], 2.2, SpreadType.FIXED)],
 )
-def test_open_long_with_spread_exact_price(
+def test_open_long_with_fixed_spread_exact_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
@@ -350,9 +352,10 @@ def test_open_long_with_spread_exact_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 100.0, 100.0, 87.8, 87.8, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 100.0, 100.0, 87.8, 87.8, None)], 2.2, SpreadType.FIXED)],
 )
-def test_open_long_with_spread_enough_price(
+def test_open_long_with_fixed_spread_enough_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
@@ -384,9 +387,10 @@ def test_open_long_with_spread_enough_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 85.0, 95.0, 85.0, 95.0, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 85.0, 95.0, 85.0, 95.0, None)], 2.2, SpreadType.FIXED)],
 )
-def test_open_short_with_spread_exact_price(
+def test_open_short_with_fixed_spread_exact_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
@@ -404,9 +408,10 @@ def test_open_short_with_spread_exact_price(
 
 
 @pytest.mark.parametrize(
-    "market_data, spread", [([(None, 85.0, 97.2, 85.0, 97.2, None)], 2.2)]
+    "market_data, spread_rate, spread_type",
+    [([(None, 85.0, 97.2, 85.0, 97.2, None)], 2.2, SpreadType.FIXED)],
 )
-def test_open_short_with_spread_enough_price(
+def test_open_short_with_fixed_spread_enough_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
@@ -490,8 +495,16 @@ def test_open_long_relative_commission_not_enough_money(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
-    [([(None, 100.0, 100.0, 85.0, 85.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 100.0, 100.0, 85.0, 85.0, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_open_long_commission_and_spread(
     test_data: Data, test_account: Account, test_broker: Broker
@@ -575,8 +588,16 @@ def test_open_short_relative_commission_not_enough_money(
 
 
 @pytest.mark.parametrize(
-    "market_data, commission_rate, commission_type, spread",
-    [([(None, 80.0, 95.0, 80.0, 95.0, None)], 0.02, CommissionType.RELATIVE, 2.2)],
+    "market_data, commission_rate, commission_type, spread_rate, spread_type",
+    [
+        (
+            [(None, 80.0, 95.0, 80.0, 95.0, None)],
+            0.02,
+            CommissionType.RELATIVE,
+            2.2,
+            SpreadType.FIXED,
+        )
+    ],
 )
 def test_open_short_commission_and_spread(
     test_data: Data, test_account: Account, test_broker: Broker
@@ -799,4 +820,116 @@ def test_open_short_fixed_commission(
     assert test_broker.get_positions()[0].take_profit is None
 
     assert test_broker.get_assets_value() == pytest.approx(90.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(5.0, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, spread_rate, spread_type",
+    [([(None, 100.0, 100.0, 90.0, 90.0, None)], 0.02, SpreadType.RELATIVE)],
+)
+def test_open_long_with_relative_spread_exact_price(
+    test_data: Data,
+    test_account: Account,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
+    test_broker.process_new_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_limit_orders()
+
+    assert len(test_broker.get_trades()) == 0
+    assert len(test_broker.get_positions()) == 0
+    assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(100.0, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, spread_rate, spread_type",
+    [([(None, 100.0, 100.0, 88.23, 88.23, None)], 0.02, SpreadType.RELATIVE)],
+)
+def test_open_long_with_relative_spread_enough_price(
+    test_data: Data,
+    test_account: Account,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
+    test_broker.process_new_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_limit_orders()
+
+    assert len(test_broker.get_trades()) == 1
+    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
+    assert test_broker.get_trades()[0].position_type == PositionType.LONG
+    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert test_broker.get_trades()[0].open_size == 1
+    assert test_broker.get_trades()[0].close_price is None
+    assert test_broker.get_trades()[0].close_size is None
+    assert test_broker.get_trades()[0].market_order is False
+
+    assert len(test_broker.get_positions()) == 1
+    assert test_broker.get_positions()[0].position_type == PositionType.LONG
+    assert test_broker.get_positions()[0].size == 1
+    assert test_broker.get_positions()[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert test_broker.get_positions()[0].stop_loss is None
+    assert test_broker.get_positions()[0].take_profit is None
+
+    assert test_broker.get_assets_value() == pytest.approx(88.24, abs=0.01)
+    assert test_account.current_money == pytest.approx(10.0, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, spread_rate, spread_type",
+    [([(None, 85.0, 95.0, 85.0, 95.0, None)], 0.02, SpreadType.RELATIVE)],
+)
+def test_open_short_with_relative_spread_exact_price(
+    test_data: Data,
+    test_account: Account,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
+    test_broker.process_new_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_limit_orders()
+
+    assert len(test_broker.get_trades()) == 0
+    assert len(test_broker.get_positions()) == 0
+    assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
+    assert test_account.current_money == pytest.approx(100.0, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "market_data, spread_rate, spread_type",
+    [([(None, 85.0, 96.94, 85.0, 96.94, None)], 0.02, SpreadType.RELATIVE)],
+)
+def test_open_short_with_relative_spread_enough_price(
+    test_data: Data,
+    test_account: Account,
+    test_broker: Broker,
+):
+    open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
+    test_broker.process_new_orders([open_order])
+
+    test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
+    test_broker.process_limit_orders()
+
+    assert len(test_broker.get_trades()) == 1
+    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
+    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
+    assert test_broker.get_trades()[0].open_price == pytest.approx(95.0, abs=0.01)
+    assert test_broker.get_trades()[0].open_size == 1
+    assert test_broker.get_trades()[0].close_price is None
+    assert test_broker.get_trades()[0].close_size is None
+    assert test_broker.get_trades()[0].market_order is False
+
+    assert len(test_broker.get_positions()) == 1
+    assert test_broker.get_positions()[0].position_type == PositionType.SHORT
+    assert test_broker.get_positions()[0].size == 1
+    assert test_broker.get_positions()[0].open_price == pytest.approx(95.0, abs=0.01)
+    assert test_broker.get_positions()[0].stop_loss is None
+    assert test_broker.get_positions()[0].take_profit is None
+
+    assert test_broker.get_assets_value() == pytest.approx(93.06, abs=0.01)
     assert test_account.current_money == pytest.approx(5.0, abs=0.01)

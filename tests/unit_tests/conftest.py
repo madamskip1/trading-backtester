@@ -6,6 +6,7 @@ from trading_backtester.account import Account
 from trading_backtester.broker import Broker
 from trading_backtester.commission import Commission, CommissionType
 from trading_backtester.data import Data
+from trading_backtester.spread import Spread, SpreadType
 
 
 @pytest.fixture
@@ -14,8 +15,18 @@ def test_account() -> Account:
 
 
 @pytest.fixture
-def spread() -> float:  # if not provided assume no spread
+def spread_rate() -> float:  # if not provided assume no spread
     return 0.0
+
+
+@pytest.fixture
+def spread_type() -> SpreadType:
+    return SpreadType.FIXED
+
+
+@pytest.fixture
+def spread(spread_type: SpreadType, spread_rate: float) -> Spread:
+    return Spread(spread_type=spread_type, spread_rate=spread_rate)
 
 
 @pytest.fixture
@@ -45,7 +56,7 @@ def commission(
 def test_broker(
     test_data: Data,
     test_account: Account,
-    spread: float,
+    spread: Spread,
     commission: Commission,
 ) -> Broker:
     return Broker(

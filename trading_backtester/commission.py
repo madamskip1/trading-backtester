@@ -33,11 +33,14 @@ class Commission:
         Args:
             commission_type (CommissionType): The type of commission to be used.
             commission_rate (Union[float, Tuple[float, float]]): The commission rate.
-                * If a float is provided, it represents a relative commission as a percentage of the price.
+                * If a float is provided, it represents either a relative commission as a percentage of the price, or a fixed fee.
                 * If a tuple of two floats is given, it should be in the form of Tuple(minimum, relative), where:
                     - `minimum` is the minimum absolute commission that will be charged,
                     - `relative` is the percentage-based commission.
-                    The effective commission will be the higher of the two: either the `minimum` or the price multiplied by the `relative` rate.
+                    The effective commission will be the higher of the two: the `minimum` or the price multiplied by the `relative` rate.
+                * If the commission type is FIXED, the commission_rate should be a float representing the fixed fee (1.0 == 1.0 pip).
+                * If the commission type is RELATIVE, the commission_rate should be a float representing the percentage (0.01 == 1%).
+                * If the commission type is MINIMUM_RELATIVE, the commission_rate should be a tuple of two floats representing the minimum fee (e.g. 1.0 == 1.0 $) and the relative percentage (e.g. 0.01 == 1%).
         """
 
         self.__commission_type = commission_type
