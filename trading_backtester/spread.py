@@ -21,7 +21,7 @@ class Spread:
 
         Args:
             spread_type (SpreadType): The type of spread's calculation.
-            spread_rate (float): The spread rate as a fixed amount.
+            spread_rate (float): The spread rate - the amount of spread in case of FIXED (e.g. 1.0 == 1.0 pip) or the percentage in case of RELATIVE (e.g. 0.01 == 1%).
         """
 
         self.__spread_type = spread_type
