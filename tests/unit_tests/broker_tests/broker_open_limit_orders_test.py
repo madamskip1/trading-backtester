@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 
 from trading_backtester.account import Account
@@ -7,12 +9,12 @@ from trading_backtester.data import CandlestickPhase, Data
 from trading_backtester.order import OpenOrder
 from trading_backtester.position import PositionType
 from trading_backtester.spread import SpreadType
-from trading_backtester.trade import TradeType
+from trading_backtester.trade import Trade, TradeType
 
 
 @pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 90.0, 90.0, None)]])
 def test_open_long_on_close(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -20,14 +22,14 @@ def test_open_long_on_close(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -42,7 +44,7 @@ def test_open_long_on_close(
 
 @pytest.mark.parametrize("market_data", [[(None, 100.0, 100.0, 85.0, 90.0, None)]])
 def test_open_long_during_day(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -50,14 +52,14 @@ def test_open_long_during_day(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -78,6 +80,7 @@ def test_open_long_on_open_equal(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
@@ -88,14 +91,14 @@ def test_open_long_on_open_equal(
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -116,6 +119,7 @@ def test_open_long_on_open_less(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
@@ -126,14 +130,14 @@ def test_open_long_on_open_less(
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(85.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(85.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -154,6 +158,7 @@ def test_open_long_on_open_greater_not_opened(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
 
@@ -164,7 +169,7 @@ def test_open_long_on_open_greater_not_opened(
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 0
+    assert len(trades_log) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
     assert test_account.current_money == pytest.approx(100.0, abs=0.01)
@@ -172,7 +177,7 @@ def test_open_long_on_open_greater_not_opened(
 
 @pytest.mark.parametrize("market_data", [[(None, 90.0, 100.0, 90.0, 100.0, None)]])
 def test_open_short_on_close(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
     test_broker.process_new_orders([open_order])
@@ -180,14 +185,14 @@ def test_open_short_on_close(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(100.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(100.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -202,7 +207,7 @@ def test_open_short_on_close(
 
 @pytest.mark.parametrize("market_data", [[(None, 90.0, 105.0, 90.0, 100.0, None)]])
 def test_open_short_during_day(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
     test_broker.process_new_orders([open_order])
@@ -210,14 +215,14 @@ def test_open_short_during_day(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(100.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(100.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -238,6 +243,7 @@ def test_open_short_on_open_equal(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
 
@@ -248,14 +254,14 @@ def test_open_short_on_open_equal(
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(100.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(100.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -276,6 +282,7 @@ def test_open_short_on_open_less(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
 
@@ -286,14 +293,14 @@ def test_open_short_on_open_less(
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(100.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(100.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -314,6 +321,7 @@ def test_open_short_on_open_greater_not_opened(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=100.0)
 
@@ -324,7 +332,7 @@ def test_open_short_on_open_greater_not_opened(
     test_data.set_candlestick_phase(CandlestickPhase.OPEN)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 0
+    assert len(trades_log) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
     assert test_account.current_money == pytest.approx(100.0, abs=0.01)
@@ -338,6 +346,7 @@ def test_open_long_with_fixed_spread_exact_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -345,7 +354,7 @@ def test_open_long_with_fixed_spread_exact_price(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 0
+    assert len(trades_log) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
     assert test_account.current_money == pytest.approx(100.0, abs=0.01)
@@ -359,6 +368,7 @@ def test_open_long_with_fixed_spread_enough_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -366,14 +376,14 @@ def test_open_long_with_fixed_spread_enough_price(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -394,6 +404,7 @@ def test_open_short_with_fixed_spread_exact_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
     test_broker.process_new_orders([open_order])
@@ -401,7 +412,7 @@ def test_open_short_with_fixed_spread_exact_price(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 0
+    assert len(trades_log) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
     assert test_account.current_money == pytest.approx(100.0, abs=0.01)
@@ -415,6 +426,7 @@ def test_open_short_with_fixed_spread_enough_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
     test_broker.process_new_orders([open_order])
@@ -422,14 +434,14 @@ def test_open_short_with_fixed_spread_enough_price(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(95.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(95.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -447,7 +459,7 @@ def test_open_short_with_fixed_spread_enough_price(
     [([(None, 100.0, 100.0, 90.0, 90.0, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_open_long_relative_commission(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -455,14 +467,14 @@ def test_open_long_relative_commission(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -480,7 +492,7 @@ def test_open_long_relative_commission(
     [([(None, 110.0, 110.0, 99.0, 99.0, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_open_long_relative_commission_not_enough_money(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=99.0)
     test_broker.process_new_orders([open_order])
@@ -488,7 +500,7 @@ def test_open_long_relative_commission_not_enough_money(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 0
+    assert len(trades_log) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
     assert test_account.current_money == pytest.approx(100.0, abs=0.01)
@@ -507,7 +519,7 @@ def test_open_long_relative_commission_not_enough_money(
     ],
 )
 def test_open_long_commission_and_spread(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -515,14 +527,14 @@ def test_open_long_commission_and_spread(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -540,7 +552,7 @@ def test_open_long_commission_and_spread(
     [([(None, 80.0, 90.0, 80.0, 90.0, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_open_short_relative_commission(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -548,14 +560,14 @@ def test_open_short_relative_commission(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -573,7 +585,7 @@ def test_open_short_relative_commission(
     [([(None, 90.0, 99.0, 90.0, 99.0, None)], 0.02, CommissionType.RELATIVE)],
 )
 def test_open_short_relative_commission_not_enough_money(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=99.0)
     test_broker.process_new_orders([open_order])
@@ -581,7 +593,7 @@ def test_open_short_relative_commission_not_enough_money(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 0
+    assert len(trades_log) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
     assert test_account.current_money == pytest.approx(100.0, abs=0.01)
@@ -600,7 +612,7 @@ def test_open_short_relative_commission_not_enough_money(
     ],
 )
 def test_open_short_commission_and_spread(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -608,14 +620,14 @@ def test_open_short_commission_and_spread(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -639,7 +651,7 @@ def test_open_short_commission_and_spread(
     ],
 )
 def test_open_long_minimum_commission_less(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -647,14 +659,14 @@ def test_open_long_minimum_commission_less(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -678,7 +690,7 @@ def test_open_long_minimum_commission_less(
     ],
 )
 def test_open_long_minimum_commission_greater(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -686,14 +698,14 @@ def test_open_long_minimum_commission_greater(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -717,7 +729,7 @@ def test_open_long_minimum_commission_greater(
     ],
 )
 def test_open_short_minimum_commission_less(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -725,14 +737,14 @@ def test_open_short_minimum_commission_less(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -756,7 +768,7 @@ def test_open_short_minimum_commission_less(
     ],
 )
 def test_open_short_fixed_commission(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -764,14 +776,14 @@ def test_open_short_fixed_commission(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -795,7 +807,7 @@ def test_open_short_fixed_commission(
     ],
 )
 def test_open_short_fixed_commission(
-    test_data: Data, test_account: Account, test_broker: Broker
+    test_data: Data, test_account: Account, test_broker: Broker, trades_log: List[Trade]
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -803,14 +815,14 @@ def test_open_short_fixed_commission(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
@@ -831,6 +843,7 @@ def test_open_long_with_relative_spread_exact_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -838,7 +851,7 @@ def test_open_long_with_relative_spread_exact_price(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 0
+    assert len(trades_log) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
     assert test_account.current_money == pytest.approx(100.0, abs=0.01)
@@ -852,6 +865,7 @@ def test_open_long_with_relative_spread_enough_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.LONG, limit_price=90.0)
     test_broker.process_new_orders([open_order])
@@ -859,14 +873,14 @@ def test_open_long_with_relative_spread_enough_price(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.LONG
-    assert test_broker.get_trades()[0].open_price == pytest.approx(90.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.LONG
+    assert trades_log[0].open_price == pytest.approx(90.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.LONG
@@ -887,6 +901,7 @@ def test_open_short_with_relative_spread_exact_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
     test_broker.process_new_orders([open_order])
@@ -894,7 +909,7 @@ def test_open_short_with_relative_spread_exact_price(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 0
+    assert len(trades_log) == 0
     assert len(test_broker.get_positions()) == 0
     assert test_broker.get_assets_value() == pytest.approx(0.0, abs=0.01)
     assert test_account.current_money == pytest.approx(100.0, abs=0.01)
@@ -908,6 +923,7 @@ def test_open_short_with_relative_spread_enough_price(
     test_data: Data,
     test_account: Account,
     test_broker: Broker,
+    trades_log: List[Trade],
 ):
     open_order = OpenOrder(size=1, position_type=PositionType.SHORT, limit_price=95.0)
     test_broker.process_new_orders([open_order])
@@ -915,14 +931,14 @@ def test_open_short_with_relative_spread_enough_price(
     test_data.set_candlestick_phase(CandlestickPhase.CLOSE)
     test_broker.process_limit_orders()
 
-    assert len(test_broker.get_trades()) == 1
-    assert test_broker.get_trades()[0].trade_type == TradeType.OPEN
-    assert test_broker.get_trades()[0].position_type == PositionType.SHORT
-    assert test_broker.get_trades()[0].open_price == pytest.approx(95.0, abs=0.01)
-    assert test_broker.get_trades()[0].open_size == 1
-    assert test_broker.get_trades()[0].close_price is None
-    assert test_broker.get_trades()[0].close_size is None
-    assert test_broker.get_trades()[0].market_order is False
+    assert len(trades_log) == 1
+    assert trades_log[0].trade_type == TradeType.OPEN
+    assert trades_log[0].position_type == PositionType.SHORT
+    assert trades_log[0].open_price == pytest.approx(95.0, abs=0.01)
+    assert trades_log[0].open_size == 1
+    assert trades_log[0].close_price is None
+    assert trades_log[0].close_size is None
+    assert trades_log[0].market_order is False
 
     assert len(test_broker.get_positions()) == 1
     assert test_broker.get_positions()[0].position_type == PositionType.SHORT
