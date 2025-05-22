@@ -7,6 +7,7 @@ from trading_backtester.broker import Broker
 from trading_backtester.commission import Commission, CommissionType
 from trading_backtester.data import Data
 from trading_backtester.spread import Spread, SpreadType
+from trading_backtester.stats import Statistics
 from trading_backtester.trade import Trade
 
 
@@ -72,4 +73,5 @@ def test_broker(
         spread=spread,
         commission=commission,
         trades_log=trades_log,
+        statistics=Statistics(trades_log, test_account, test_data),
     )

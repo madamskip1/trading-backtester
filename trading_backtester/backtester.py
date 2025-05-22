@@ -51,14 +51,19 @@ class Backtester:
         self.__equity_log = np.zeros(len(self.__data) + 1, dtype=float)
         self.__equity_log[0] = money
         self.__trades_log: List[Trade] = []
-        self.__broker = Broker(
-            self.__data, self.__account, spread, commission, self.__trades_log
-        )
         self.__statistics = Statistics(
             trades=self.__trades_log,
             equity_log=self.__equity_log,
             account=self.__account,
             benchmark=benchmark,
+        )
+        self.__broker = Broker(
+            self.__data,
+            self.__account,
+            spread,
+            commission,
+            self.__trades_log,
+            self.__statistics,
         )
 
         self.__is_bankruptcy = False

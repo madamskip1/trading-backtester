@@ -50,6 +50,17 @@ class Statistics:
         self.__equity_log = equity_log
         self.__benchmark = benchmark
 
+        self.__total_commission = 0.0
+
+    def add_commission(self, commission: float) -> None:
+        """Adds the paid commission to the total commission.
+
+        Args:
+            commission (float): The commission paid for the trade.
+        """
+
+        self.__total_commission += commission
+
     def get_stats(self) -> Dict[str, Any]:
         """Calculates and returns various statistics related to the backtest.
 
@@ -80,6 +91,7 @@ class Statistics:
             "max_drawdown_percentage": max_drawdown_percentage,
             "beta": beta,
             "alpha": self.__calc_alpha(beta),
+            "total_commission": self.__total_commission,
         }
 
     def __str__(self) -> str:
@@ -104,6 +116,9 @@ class Statistics:
                 f"Final total equity: {stats['final_total_equity']}",
                 f"Return: {stats['return']} ({(stats['return_percentage']):.2f}%)",
                 f"Max drawdown: {stats['max_drawdown']} ({stats['max_drawdown_percentage']:.2f}%)",
+                f"Beta: {stats['beta']:.2f}",
+                f"Alpha: {stats['alpha']:.2f}",
+                f"Total commission paid: {stats['total_commission']}",
             ]
         )
 
