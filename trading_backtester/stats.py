@@ -68,7 +68,7 @@ class Statistics:
             Dict[str, Any]: A dictionary containing various statistics related to the backtest.
         """
 
-        max_drowdown, max_drawdown_percentage = self.__calc_max_drown()
+        max_drowdown, max_drawdown_percentage = self.__calc_max_drawndown()
         beta = self.__calc_beta()
         trades_counters = self.__get_trades_counters()
         return_value = self.__equity_log[-1] - self.__equity_log[0]
@@ -122,20 +122,12 @@ class Statistics:
             ]
         )
 
-    def __calc_max_drown(self) -> Tuple[float, float]:
-        max_drawdown = 0.0
-        max_drawdown_percentage = 0.0
-        peak = self.__equity_log[0]
-
-        for equity in self.__equity_log:
-            if equity > peak:
-                peak = equity
-
-            drawdown = peak - equity
-
-            if drawdown > max_drawdown:
-                max_drawdown = drawdown
-                max_drawdown_percentage = (drawdown / peak) * 100
+    def __calc_max_drawndown(self) -> Tuple[float, float]:
+        peaks = np.maximum.accumulate(self.__equity_log)
+        drawdowns = peaks - self.__equity_log
+        max_drawdown = np.max(drawdowns)
+        max_drawdown_index = np.argmax(drawdowns)
+        max_drawdown_percentage = (max_drawdown / peaks[max_drawdown_index]) * 100
 
         return max_drawdown, max_drawdown_percentage
 
