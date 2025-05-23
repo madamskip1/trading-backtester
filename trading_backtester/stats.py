@@ -68,7 +68,9 @@ class Statistics:
             Dict[str, Any]: A dictionary containing various statistics related to the backtest.
         """
 
-        max_drowdown, max_drawdown_percentage = self.__calc_max_drawndown()
+        peaks = np.maximum.accumulate(self.__equity_log)
+        max_drowdown, max_drawdown_percentage = self.__calc_max_drawndown(peaks)
+        max_drawdown_duration = self.__calc_max_drawdown_duration(peaks)
         beta = self.__calc_beta()
         trades_counters = self.__get_trades_counters()
         return_value = self.__equity_log[-1] - self.__equity_log[0]
@@ -89,6 +91,7 @@ class Statistics:
             "return_percentage": return_value_percentage,
             "max_drawdown": max_drowdown,
             "max_drawdown_percentage": max_drawdown_percentage,
+            "max_drawdown_duration": max_drawdown_duration,
             "beta": beta,
             "alpha": self.__calc_alpha(beta),
             "total_commission": self.__total_commission,
@@ -116,20 +119,42 @@ class Statistics:
                 f"Final total equity: {stats['final_total_equity']}",
                 f"Return: {stats['return']} ({(stats['return_percentage']):.2f}%)",
                 f"Max drawdown: {stats['max_drawdown']} ({stats['max_drawdown_percentage']:.2f}%)",
+                f"Max drawdown duration: {stats['max_drawdown_duration']} days",
                 f"Beta: {stats['beta']:.2f}",
                 f"Alpha: {stats['alpha']:.2f}",
                 f"Total commission paid: {stats['total_commission']}",
             ]
         )
 
-    def __calc_max_drawndown(self) -> Tuple[float, float]:
-        peaks = np.maximum.accumulate(self.__equity_log)
+    def __calc_max_drawndown(
+        self, peaks: np.ndarray[Any, np.dtype[Any]]
+    ) -> Tuple[float, float]:
         drawdowns = peaks - self.__equity_log
         max_drawdown = np.max(drawdowns)
         max_drawdown_index = np.argmax(drawdowns)
         max_drawdown_percentage = (max_drawdown / peaks[max_drawdown_index]) * 100
 
         return max_drawdown, max_drawdown_percentage
+
+    def __calc_max_drawdown_duration(
+        self, peaks: np.ndarray[Any, np.dtype[Any]]
+    ) -> int:
+        drawdowns_occurred = self.__equity_log < peaks
+
+        longest_drawdown_duration = 0
+        current_drawdown_duration = 0
+        for is_drawdown in drawdowns_occurred:
+            if is_drawdown:
+                current_drawdown_duration += 1
+            else:
+                longest_drawdown_duration = max(
+                    longest_drawdown_duration, current_drawdown_duration
+                )
+                current_drawdown_duration = 0
+        longest_drawdown_duration = max(
+            longest_drawdown_duration, current_drawdown_duration
+        )
+        return longest_drawdown_duration
 
     def __calc_beta(self) -> Optional[float]:
         if self.__benchmark is None:
