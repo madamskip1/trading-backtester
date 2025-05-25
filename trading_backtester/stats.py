@@ -104,6 +104,7 @@ class Statistics:
             "worst_trade_return_percentage": self.__get_worst_trade_return_percentage(),
             "beta": beta,
             "alpha": self.__calc_alpha(beta),
+            "buy_and_hold_return_percentage": self.__get_buy_and_hold_return_percentage(),
             "total_commission": self.__total_commission,
         }
 
@@ -135,6 +136,7 @@ class Statistics:
                 f"Worst trade return: {stats['worst_trade_return_percentage']:.2f}%",
                 f"Beta: {stats['beta']:.2f}",
                 f"Alpha: {stats['alpha']:.2f}",
+                f"Buy and hold return: {stats['buy_and_hold_return_percentage']:.2f}%",
                 f"Total commission paid: {stats['total_commission']}",
             ]
         )
@@ -296,3 +298,13 @@ class Statistics:
             )
 
         return worst_losing_trade_return_percentage
+
+    def __get_buy_and_hold_return_percentage(self) -> Optional[float]:
+        if self.__benchmark is None:
+            return 0.0
+
+        return (
+            (self.__benchmark.close[-1] - self.__benchmark.open[0])
+            / self.__benchmark.open[0]
+            * 100
+        )
