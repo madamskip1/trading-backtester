@@ -116,7 +116,6 @@ class Statistics:
         Returns:
             str: A string representation of the statistics.
         """
-        print("CHUJ")
         stats = self.get_stats()
         return "\n".join(
             [
@@ -134,7 +133,7 @@ class Statistics:
                 f"Max drawdown: {stats['max_drawdown']} ({stats['max_drawdown_percentage']:.2f}%)",
                 f"Max drawdown duration: {stats['max_drawdown_duration']}",
                 f"Winning trades: {stats['profitable_trades_num']} ({stats['profitable_trades_percentage']:.2f}%)",
-                f"Best trade return: {stats['best_winning_trade_return_percentage']:.2f}%",
+                f"Best trade return: {stats['best_trade_return_percentage']:.2f}%",
                 f"Worst trade return: {stats['worst_trade_return_percentage']:.2f}%",
                 f"Beta: {stats['beta']:.2f}",
                 f"Alpha: {stats['alpha']:.2f}",
