@@ -529,7 +529,7 @@ class Plotting:
             legend_elements.append(
                 self.__prepare_dummy_closed_trade_legend_marker(
                     self.__LONG_TRADE_MARKER,
-                    "Profitable Long Trade",
+                    "Profitable closed Long Trade",
                     self.__POSITIVE_BAR_COLOR,
                 )
             )
@@ -537,7 +537,7 @@ class Plotting:
             legend_elements.append(
                 self.__prepare_dummy_closed_trade_legend_marker(
                     self.__LONG_TRADE_MARKER,
-                    "Losing Long Trade",
+                    "Losing closed Long Trade",
                     self.__NEGATIVE_BAR_COLOR,
                 )
             )
@@ -545,7 +545,7 @@ class Plotting:
             legend_elements.append(
                 self.__prepare_dummy_closed_trade_legend_marker(
                     self.__SHORT_TRADE_MARKER,
-                    "Profitable Short Trade",
+                    "Profitable closed Short Trade",
                     self.__POSITIVE_BAR_COLOR,
                 )
             )
@@ -553,7 +553,7 @@ class Plotting:
             legend_elements.append(
                 self.__prepare_dummy_closed_trade_legend_marker(
                     self.__SHORT_TRADE_MARKER,
-                    "Losing Short Trade",
+                    "Losing closed Short Trade",
                     self.__NEGATIVE_BAR_COLOR,
                 )
             )
