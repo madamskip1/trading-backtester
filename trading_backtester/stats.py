@@ -75,6 +75,12 @@ class Statistics:
         trades_counters = self.__get_trades_counters()
         return_value = self.__equity_log[-1] - self.__equity_log[0]
         return_value_percentage = return_value / self.__equity_log[0] * 100
+        profitable_trades_num = self.__calc_profitable_trades_number()
+        profitable_trades_percentage = (
+            profitable_trades_num / trades_counters.total_close_trades * 100
+            if trades_counters.total_close_trades > 0
+            else 0.0
+        )
 
         return {
             "total_trades": len(self.__trades),
@@ -92,6 +98,8 @@ class Statistics:
             "max_drawdown": max_drowdown,
             "max_drawdown_percentage": max_drawdown_percentage,
             "max_drawdown_duration": max_drawdown_duration,
+            "profitable_trades_num": profitable_trades_num,
+            "profitable_trades_percentage": profitable_trades_percentage,
             "beta": beta,
             "alpha": self.__calc_alpha(beta),
             "total_commission": self.__total_commission,
@@ -103,7 +111,7 @@ class Statistics:
         Returns:
             str: A string representation of the statistics.
         """
-
+        print("CHUJ")
         stats = self.get_stats()
         return "\n".join(
             [
@@ -120,6 +128,7 @@ class Statistics:
                 f"Return: {stats['return']} ({(stats['return_percentage']):.2f}%)",
                 f"Max drawdown: {stats['max_drawdown']} ({stats['max_drawdown_percentage']:.2f}%)",
                 f"Max drawdown duration: {stats['max_drawdown_duration']} days",
+                f"Winning trades: {stats['profitable_trades_num']} ({stats['profitable_trades_percentage']:.2f}%)",
                 f"Beta: {stats['beta']:.2f}",
                 f"Alpha: {stats['alpha']:.2f}",
                 f"Total commission paid: {stats['total_commission']}",
@@ -212,3 +221,26 @@ class Statistics:
                     counters.total_close_short_trades += 1
 
         return counters
+
+    def __calc_profitable_trades_number(self) -> int:
+        """Calculates the number of winning trades.
+
+        Returns:
+            int: The number of winning trades.
+        """
+
+        winning_trades = 0
+        for trade in self.__trades:
+            if trade.trade_type != TradeType.CLOSE:
+                continue
+
+            if trade.position_type == PositionType.LONG:
+                assert trade.close_price is not None
+                if trade.close_price > trade.open_price:
+                    winning_trades += 1
+            elif trade.position_type == PositionType.SHORT:
+                assert trade.close_price is not None
+                if trade.close_price < trade.open_price:
+                    winning_trades += 1
+
+        return winning_trades
