@@ -476,13 +476,20 @@ class Plotting:
         open_price: float,
         close_price: float,
     ) -> Line2D:
-        # def __draw_closed_trade_marker(self, ax: Axes, close_trade: Trade, datetime_to_x_axis: Dict[np.datetime64, int],) -> Line2D:
-        marker = (
-            self.__LONG_TRADE_MARKER
-            if position_type == PositionType.LONG
-            else self.__SHORT_TRADE_MARKER
-        )
-        color = self.__get_bar_color(open_price, close_price)
+        if position_type == PositionType.LONG:
+            marker = self.__LONG_TRADE_MARKER
+            color = (
+                self.__POSITIVE_BAR_COLOR
+                if open_price < close_price
+                else self.__NEGATIVE_BAR_COLOR
+            )
+        else:
+            marker = self.__SHORT_TRADE_MARKER
+            color = (
+                self.__POSITIVE_BAR_COLOR
+                if open_price > close_price
+                else self.__NEGATIVE_BAR_COLOR
+            )
 
         close_marker = ax.plot(
             x_end,
