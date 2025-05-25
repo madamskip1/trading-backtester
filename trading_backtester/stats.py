@@ -100,6 +100,8 @@ class Statistics:
             "max_drawdown_duration": max_drawdown_duration,
             "profitable_trades_num": profitable_trades_num,
             "profitable_trades_percentage": profitable_trades_percentage,
+            "best_trade_return_percentage": self.__get_best_trade_return_percentage(),
+            "worst_trade_return_percentage": self.__get_worst_trade_return_percentage(),
             "beta": beta,
             "alpha": self.__calc_alpha(beta),
             "total_commission": self.__total_commission,
@@ -129,6 +131,8 @@ class Statistics:
                 f"Max drawdown: {stats['max_drawdown']} ({stats['max_drawdown_percentage']:.2f}%)",
                 f"Max drawdown duration: {stats['max_drawdown_duration']} days",
                 f"Winning trades: {stats['profitable_trades_num']} ({stats['profitable_trades_percentage']:.2f}%)",
+                f"Best trade return: {stats['best_winning_trade_return_percentage']:.2f}%",
+                f"Worst trade return: {stats['worst_trade_return_percentage']:.2f}%",
                 f"Beta: {stats['beta']:.2f}",
                 f"Alpha: {stats['alpha']:.2f}",
                 f"Total commission paid: {stats['total_commission']}",
@@ -244,3 +248,51 @@ class Statistics:
                     winning_trades += 1
 
         return winning_trades
+
+    def __get_best_trade_return_percentage(self) -> float:
+        best_winning_trade_return_percentage = 0.0
+        for trade in self.__trades:
+            if trade.trade_type != TradeType.CLOSE:
+                continue
+
+            trade_return_percentage = 0.0
+            if trade.position_type == PositionType.LONG:
+                assert trade.close_price is not None
+                trade_return_percentage = (
+                    (trade.close_price - trade.open_price) / trade.open_price * 100
+                )
+            elif trade.position_type == PositionType.SHORT:
+                assert trade.close_price is not None
+                trade_return_percentage = (
+                    (trade.open_price - trade.close_price) / trade.open_price * 100
+                )
+
+            best_winning_trade_return_percentage = max(
+                best_winning_trade_return_percentage, trade_return_percentage
+            )
+
+        return best_winning_trade_return_percentage
+
+    def __get_worst_trade_return_percentage(self) -> float:
+        worst_losing_trade_return_percentage = 0.0
+        for trade in self.__trades:
+            if trade.trade_type != TradeType.CLOSE:
+                continue
+
+            trade_return_percentage = 0.0
+            if trade.position_type == PositionType.LONG:
+                assert trade.close_price is not None
+                trade_return_percentage = (
+                    (trade.close_price - trade.open_price) / trade.open_price * 100
+                )
+            elif trade.position_type == PositionType.SHORT:
+                assert trade.close_price is not None
+                trade_return_percentage = (
+                    (trade.open_price - trade.close_price) / trade.open_price * 100
+                )
+
+            worst_losing_trade_return_percentage = min(
+                worst_losing_trade_return_percentage, trade_return_percentage
+            )
+
+        return worst_losing_trade_return_percentage
