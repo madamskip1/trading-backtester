@@ -81,6 +81,7 @@ class Statistics:
             if trades_counters.total_close_trades > 0
             else 0.0
         )
+        peak_equity = self.__equity_log.max()
 
         return {
             "total_trades": len(self.__trades),
@@ -93,6 +94,7 @@ class Statistics:
             "final_money": self.__account.current_money,
             "final_assets_value": self.__equity_log[-1] - self.__account.current_money,
             "final_total_equity": self.__equity_log[-1],
+            "peak_equity": peak_equity,
             "return": return_value,
             "return_percentage": return_value_percentage,
             "max_drawdown": max_drowdown,
