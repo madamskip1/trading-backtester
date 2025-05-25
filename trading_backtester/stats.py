@@ -132,7 +132,7 @@ class Statistics:
                 f"Final total equity: {stats['final_total_equity']}",
                 f"Return: {stats['return']} ({(stats['return_percentage']):.2f}%)",
                 f"Max drawdown: {stats['max_drawdown']} ({stats['max_drawdown_percentage']:.2f}%)",
-                f"Max drawdown duration: {stats['max_drawdown_duration']} days",
+                f"Max drawdown duration: {stats['max_drawdown_duration']}",
                 f"Winning trades: {stats['profitable_trades_num']} ({stats['profitable_trades_percentage']:.2f}%)",
                 f"Best trade return: {stats['best_winning_trade_return_percentage']:.2f}%",
                 f"Worst trade return: {stats['worst_trade_return_percentage']:.2f}%",
