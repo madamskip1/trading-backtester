@@ -127,10 +127,10 @@ class Statistics:
                 f"Total close long trades: {stats['total_close_long_trades']}",
                 f"Total open short trades: {stats['total_open_short_trades']}",
                 f"Total close short trades: {stats['total_close_short_trades']}",
-                f"Final money: {stats['final_money']}",
-                f"Final total equity: {stats['final_total_equity']}",
-                f"Return: {stats['return']} ({(stats['return_percentage']):.2f}%)",
-                f"Max drawdown: {stats['max_drawdown']} ({stats['max_drawdown_percentage']:.2f}%)",
+                f"Final money: {stats['final_money']:.2f}",
+                f"Final total equity: {stats['final_total_equity']:.2f}",
+                f"Return: {stats['return']:.2f} ({(stats['return_percentage']):.2f}%)",
+                f"Max drawdown: {stats['max_drawdown']:.2f} ({stats['max_drawdown_percentage']:.2f}%)",
                 f"Max drawdown duration: {stats['max_drawdown_duration']}",
                 f"Winning trades: {stats['profitable_trades_num']} ({stats['profitable_trades_percentage']:.2f}%)",
                 f"Best trade return: {stats['best_trade_return_percentage']:.2f}%",
@@ -138,7 +138,7 @@ class Statistics:
                 f"Beta: {stats['beta']:.2f}",
                 f"Alpha: {stats['alpha']:.2f}",
                 f"Buy and hold return: {stats['buy_and_hold_return_percentage']:.2f}%",
-                f"Total commission paid: {stats['total_commission']}",
+                f"Total commission paid: {stats['total_commission']:.2f}",
             ]
         )
 
