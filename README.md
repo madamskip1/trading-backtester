@@ -17,6 +17,14 @@ There are many backtesting libraries and platforms available - that's right. How
 
 Additionally, building my own backtesting engine served as a great side project for learing and improving my development skills.
 
+## Installation
+
+Library is available on `PyPI`.
+
+```bash
+python3 -m pip install stock-backtesting
+```
+
 ## Usage example
 
 ### Declare RSI Indicator
