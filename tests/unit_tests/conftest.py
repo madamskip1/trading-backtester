@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import List, Tuple, Union
 
 import pytest
 
@@ -7,6 +7,8 @@ from trading_backtester.broker import Broker
 from trading_backtester.commission import Commission, CommissionType
 from trading_backtester.data import Data
 from trading_backtester.spread import Spread, SpreadType
+from trading_backtester.stats import Statistics
+from trading_backtester.trade import Trade
 
 
 @pytest.fixture
@@ -53,12 +55,23 @@ def commission(
 
 
 @pytest.fixture
+def trades_log() -> List[Trade]:
+    return []
+
+
+@pytest.fixture
 def test_broker(
     test_data: Data,
     test_account: Account,
     spread: Spread,
     commission: Commission,
+    trades_log: List[Trade],
 ) -> Broker:
     return Broker(
-        data=test_data, accout=test_account, spread=spread, commission=commission
+        data=test_data,
+        accout=test_account,
+        spread=spread,
+        commission=commission,
+        trades_log=trades_log,
+        statistics=Statistics(trades_log, test_account, test_data),
     )

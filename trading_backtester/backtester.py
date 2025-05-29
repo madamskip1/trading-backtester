@@ -1,10 +1,11 @@
-from typing import Optional, Type
+from typing import List, Optional, Type
 
 import numpy as np
 
 from trading_backtester.commission import Commission, CommissionType
 from trading_backtester.plotting import Plotting
 from trading_backtester.spread import Spread, SpreadType
+from trading_backtester.trade import Trade
 
 from .account import Account
 from .broker import Broker
@@ -47,14 +48,22 @@ class Backtester:
             commission = Commission(CommissionType.FIXED, 0.0)
         if spread is None:
             spread = Spread(SpreadType.FIXED, 0.0)
-        self.__broker = Broker(self.__data, self.__account, spread, commission)
         self.__equity_log = np.zeros(len(self.__data) + 1, dtype=float)
         self.__equity_log[0] = money
+        self.__trades_log: List[Trade] = []
         self.__statistics = Statistics(
-            trades=self.__broker.get_trades(),
+            trades=self.__trades_log,
             equity_log=self.__equity_log,
             account=self.__account,
             benchmark=benchmark,
+        )
+        self.__broker = Broker(
+            self.__data,
+            self.__account,
+            spread,
+            commission,
+            self.__trades_log,
+            self.__statistics,
         )
 
         self.__is_bankruptcy = False
@@ -114,7 +123,7 @@ class Backtester:
             Plotting: The plotting object for visualization.
         """
 
-        return Plotting(self.__data, self.__broker.get_trades(), self.__equity_log)
+        return Plotting(self.__data, self.__trades_log, self.__equity_log)
 
     def __check_bankruptcy(self) -> bool:
         if (self.__account.current_money + self.__broker.get_assets_value()) <= 0.0:

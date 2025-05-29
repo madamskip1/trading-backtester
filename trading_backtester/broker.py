@@ -5,6 +5,7 @@ from trading_backtester.commission import Commission
 from trading_backtester.data import Data
 from trading_backtester.order import CloseOrder, Order, OrderAction
 from trading_backtester.spread import Spread
+from trading_backtester.stats import Statistics
 from trading_backtester.trade import CloseTrade, OpenTrade, Trade
 
 from .position import Position, PositionType
@@ -18,7 +19,13 @@ class Broker:
     """
 
     def __init__(
-        self, data: Data, accout: Account, spread: Spread, commission: Commission
+        self,
+        data: Data,
+        accout: Account,
+        spread: Spread,
+        commission: Commission,
+        trades_log: List[Trade],
+        statistics: Statistics,
     ):
         """Initializes a Broker object.
 
@@ -27,6 +34,8 @@ class Broker:
             accout (Account): The account object representing the user's account.
             spread (float): The spread value for the broker.
             commission (Optional[Commission]): The commission object representing the broker's fees.
+            trades_log (List[Trade]): The list of trades made during the backtest, that will be filled.
+            statistics (Statistics): The statistics object.
         """
 
         self.__data = data
@@ -34,17 +43,9 @@ class Broker:
         self.__spread = spread
         self.__commission = commission
         self.__positions: List[Position] = []
-        self.__trades: List[Trade] = []
         self.__limit_orders: List[Order] = []
-
-    def get_trades(self) -> List[Trade]:
-        """Returns the list of trades executed by the user.
-
-        Returns:
-            List[Trade]: The list of trades executed by the user.
-        """
-
-        return self.__trades
+        self.__trades_log = trades_log
+        self.__statistics = statistics
 
     def get_positions(self) -> List[Position]:
         """Returns the list of positions held by the user.
@@ -201,9 +202,10 @@ class Broker:
 
     def __process_open_order(self, order: Order, price: float) -> None:
         money = order.size * price
-        money += self.__commission.calc_commission_value(money)
+        commission = self.__commission.calc_commission_value(price) * order.size
+        total_cost = money + commission
 
-        if not self.__account.has_enough_money(money):
+        if not self.__account.has_enough_money(total_cost):
             return
 
         self.__positions.append(
@@ -216,9 +218,10 @@ class Broker:
                 order.take_profit,
             )
         )
-        self.__account.update_money(-money)
+        self.__account.update_money(-total_cost)
+        self.__statistics.add_commission(commission)
 
-        self.__trades.append(
+        self.__trades_log.append(
             OpenTrade(
                 order.position_type,
                 self.__data.get_current_numpy_datetime(),
@@ -245,25 +248,21 @@ class Broker:
             reduce_size = min(size_to_reduce_left, position.size)
 
             if reduce_size < position.size:
-                self.__account.update_money(
-                    self.__calc_money_from_close(position, price, reduce_size)
-                )
-                self.__account.update_money(
-                    -self.__commission.calc_commission_value(price) * reduce_size
-                )
+
                 self.__positions[i] = position.replace(size=position.size - reduce_size)
             else:
-                self.__account.update_money(
-                    self.__calc_money_from_close(position, price, reduce_size)
-                )
-                self.__account.update_money(
-                    -self.__commission.calc_commission_value(price) * reduce_size
-                )
                 positions_to_close.append(position)
+
+            self.__account.update_money(
+                self.__calc_money_from_close(position, price, reduce_size)
+            )
+            commission = self.__commission.calc_commission_value(price) * reduce_size
+            self.__statistics.add_commission(commission)
+            self.__account.update_money(-commission)
 
             size_to_reduce_left -= reduce_size
 
-            self.__trades.append(
+            self.__trades_log.append(
                 CloseTrade(
                     order.position_type,
                     position.open_datetime,
@@ -306,7 +305,7 @@ class Broker:
                 size=order.position_to_close.size - order.size
             )
 
-        self.__trades.append(
+        self.__trades_log.append(
             CloseTrade(
                 order.position_type,
                 order.position_to_close.open_datetime,
