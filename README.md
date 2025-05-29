@@ -1,3 +1,22 @@
+# Stock-Backtesting
+
+A Python library for backtesting trading strategies. It allows users to simulate historical trades, evaluate strategy performance, and analyze key metrics such as returns, drawdowns, and risk. The library supports custom indicators, making it suitable for both simple and advanced strategies.
+
+## Requirements
+
+- numpy - for data and numeric manipulation
+- matplotlib - for plotting results
+
+### Why numpy?
+
+Of course I could handle most mathematical operation using regular floats number, but NumPy is widely used for such tasks and help make code more structured. What's more, NumPy is supported by many trading indicators libraries - for example, I wanted to use my backtesting engine with `TA-Lib`, library that takes NumPy arrays as input. 
+
+## Why another "Backtesting" library
+
+There are many backtesting libraries and platforms available - that's right. However, when I was looking for Python backtesting library that could handle some specific requirements for my strategies - such as placing different orders at market open and closes, detecting price gaps, etc. - I found that the features set of popular libraries were not sufficient.
+
+Additionally, building my own backtesting engine served as a great side project for learing and improving my development skills.
+
 ## Usage example
 
 ### Declare RSI Indicator
