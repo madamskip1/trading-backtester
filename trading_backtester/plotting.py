@@ -230,7 +230,6 @@ class Plotting:
                 data["volume"],
                 width=self.__VOLUME_BAR_WIDTH,
                 color=color,
-                edgecolor="black",
                 zorder=2,
             )
 
@@ -358,7 +357,6 @@ class Plotting:
                     self.__CANDLESTICK_BAR_WIDTH,
                     body_height,
                     facecolor=candlestick_color,
-                    edgecolor="black",
                     zorder=3,
                 )
             )
