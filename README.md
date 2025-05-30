@@ -1,4 +1,4 @@
-# Stock-Backtesting
+# Trading-Backtester
 
 A Python library for backtesting trading strategies. It allows users to simulate historical trades, evaluate strategy performance, and analyze key metrics such as returns, drawdowns, and risk. The library supports custom indicators, making it suitable for both simple and advanced strategies.
 
@@ -22,7 +22,7 @@ Additionally, building my own backtesting engine served as a great side project 
 Library is available on `PyPI`.
 
 ```bash
-python3 -m pip install stock-backtesting
+python3 -m pip install trading-backtester
 ```
 
 ## Usage example
