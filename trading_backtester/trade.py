@@ -3,7 +3,7 @@ from typing import Optional
 
 import numpy as np
 
-from trading_backtester.position import PositionType
+from .position import PositionType
 
 
 class TradeType(Enum):

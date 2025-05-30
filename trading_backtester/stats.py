@@ -3,9 +3,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from trading_backtester.data import Data
-
 from .account import Account
+from .data import Data
 from .position import PositionType
 from .trade import Trade, TradeType
 

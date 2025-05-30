@@ -1,6 +1,6 @@
 from typing import Optional
 
-from trading_backtester.data import CandlestickPhase, Data
+from .data import CandlestickPhase, Data
 
 
 class Market:

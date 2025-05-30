@@ -3,7 +3,7 @@ from typing import Any, List
 
 import numpy as np
 
-from trading_backtester.data import Data
+from .data import Data
 
 
 class Indicator(ABC):

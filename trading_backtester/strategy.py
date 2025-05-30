@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import List, Sequence
 
-from trading_backtester.account import Account
-from trading_backtester.data import CandlestickPhase, Data
-from trading_backtester.indicator import Indicator
-from trading_backtester.market import Market
-from trading_backtester.order import Order
-from trading_backtester.position import Position
+from .account import Account
+from .data import CandlestickPhase, Data
+from .indicator import Indicator
+from .market import Market
+from .order import Order
+from .position import Position
 
 
 class Strategy:

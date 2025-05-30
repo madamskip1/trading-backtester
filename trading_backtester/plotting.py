@@ -10,9 +10,9 @@ from matplotlib.patches import Rectangle
 from matplotlib.text import Annotation
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 
-from trading_backtester.data import Data
-from trading_backtester.position import PositionType
-from trading_backtester.trade import Trade, TradeType
+from .data import Data
+from .position import PositionType
+from .trade import Trade, TradeType
 
 
 class Plotting:

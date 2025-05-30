@@ -1,14 +1,13 @@
 from typing import List, Tuple
 
-from trading_backtester.account import Account
-from trading_backtester.commission import Commission
-from trading_backtester.data import Data
-from trading_backtester.order import CloseOrder, Order, OrderAction
-from trading_backtester.spread import Spread
-from trading_backtester.stats import Statistics
-from trading_backtester.trade import CloseTrade, OpenTrade, Trade
-
+from .account import Account
+from .commission import Commission
+from .data import Data
+from .order import CloseOrder, Order, OrderAction
 from .position import Position, PositionType
+from .spread import Spread
+from .stats import Statistics
+from .trade import CloseTrade, OpenTrade, Trade
 
 
 class Broker:

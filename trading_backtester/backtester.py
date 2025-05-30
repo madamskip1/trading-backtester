@@ -2,17 +2,16 @@ from typing import List, Optional, Type
 
 import numpy as np
 
-from trading_backtester.commission import Commission, CommissionType
-from trading_backtester.plotting import Plotting
-from trading_backtester.spread import Spread, SpreadType
-from trading_backtester.trade import Trade
-
 from .account import Account
 from .broker import Broker
+from .commission import Commission, CommissionType
 from .data import CandlestickPhase, Data
 from .market import Market
+from .plotting import Plotting
+from .spread import Spread, SpreadType
 from .stats import Statistics
 from .strategy import Strategy
+from .trade import Trade
 
 
 class Backtester:
