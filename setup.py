@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="trading-backtester",
-    version="1.0.0a1",
+    version="1.0.0",
     description="A trading backtesting framework for Python",
     url="https://github.com/madamskip1/trading-backtester",
     project_urls={
@@ -14,7 +14,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=["trading_backtester"],
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Financial and Insurance Industry",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
